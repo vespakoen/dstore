@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var _ = require('underscore');
+var Promise = require('bluebird');
+
+<span id='App'>/**
+</span> * The app object.
+ *
+ * @class App
+ * @param {Object} props
+ */
+function App(props) {
+  _.extend(this, props);
+  this.components = {};
+}
+
+<span id='App-method-use'>/**
+</span> * Register a component in the app.
+ *
+ * @param {*} component
+ */
+App.prototype.use = function(component) {
+  this.components[component.attachKey] = component;
+};
+
+<span id='App-method-get'>/**
+</span> * Get a component from the app (singleton).
+ *
+ * @param {String} key
+ * @returns {Promise} The instatiated component
+ */
+App.prototype.get = function(key) {
+  var component = this.components[key];
+  if (!(this[key] || component)) {
+    throw new Error(key + ' component not registered in the app!');
+  }
+  return new Promise(function(resolve) {
+    return component ? resolve(component.attach(this)) : resolve(this[key]);
+  }.bind(this));
+};
+
+module.exports = App;
+</pre>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var _ = require('underscore'),
+    Promise = require('bluebird');
+
+<span id='elasticsearch-ElasticsearchFacade'>/**
+</span> * @class elasticsearch.ElasticsearchFacade
+ * ElasticsearchFacade
+ *
+ * @param {elasticsearch.ElasticsearchRepository} repository
+ * @param {elasticsearch.ElasticsearchMigrator} migrator
+ */
+function ElasticsearchFacade(repository, migrator) {
+  this.repository = repository;
+  this.migrator = migrator;
+}
+
+<span id='elasticsearch-ElasticsearchFacade-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
+ElasticsearchFacade.attachKey = 'elasticsearch.facade';
+
+<span id='elasticsearch-ElasticsearchFacade-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ *
+ * @return {Promise|Object} The object with resolved dependencies
+ */
+ElasticsearchFacade.attach = function(app) {
+  return Promise.join(
+    app.get('elasticsearch.repository'),
+    app.get('elasticsearch.migrator')
+  ).spread(function(repository, migrator) {
+    return new ElasticsearchFacade(repository, migrator);
+  });
+};
+
+<span id='elasticsearch-ElasticsearchFacade-method-putItem'>/**
+</span> * Insert / update item.
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} item
+ *
+ * @return {Promise.&lt;null&gt;}
+ */
+ElasticsearchFacade.prototype.putItem = function(namespace, schemaKey, item) {
+  return this.repository.putItem(namespace, schemaKey, item);
+};
+
+<span id='elasticsearch-ElasticsearchFacade-method-delItem'>/**
+</span> * Delete item.
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} id
+ *
+ * @return {Promise.&lt;null&gt;}
+ */
+ElasticsearchFacade.prototype.delItem = function(namespace, schemaKey, id) {
+  return this.repository.delItem(namespace, schemaKey, id);
+};
+
+<span id='elasticsearch-ElasticsearchFacade-method-migrate'>/**
+</span> * Create a new elasticsearch index version and put the mapping.
+ *
+ * @param  {String} namespace
+ * @param  {Number} version
+ *
+ * @return {Promise.&lt;null&gt;}
+ */
+ElasticsearchFacade.prototype.migrate = function(namespace, version) {
+  return this.migrator.migrate(namespace, version);
+};
+
+<span id='elasticsearch-ElasticsearchFacade-method-serialize'>/**
+</span> * Serialize an item to make it compatible with elasticsearch.
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} item
+ * @return {Object} The serialized item
+ */
+ElasticsearchFacade.prototype.serialize = function(namespace, schemaKey, item) {
+  return this.serializer.serializer(namespace, schemaKey, item);
+};
+
+module.exports = ElasticsearchFacade;
+</pre>
+</body>
+</html>

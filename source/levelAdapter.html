@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var level = require('level-party');
+var sublevel = require('level-sublevel');
+
+<span id='level-LevelAdapter'>/**
+</span> * @class level.LevelAdapter
+ * LevelAdapter
+ *
+ * @param {String} path
+ */
+function LevelAdapter(path) {
+  this.path = path;
+  this.connections = {};
+}
+
+<span id='level-LevelAdapter-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
+LevelAdapter.attachKey = 'level.adapter';
+
+<span id='level-LevelAdapter-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ *
+ * @return {Promise|Object} The object with resolved dependencies
+ */
+LevelAdapter.attach = function(app) {
+  return new LevelAdapter(app.config.level.path);
+};
+
+<span id='level-LevelAdapter-method-getClient'>/**
+</span> * Get the level client.
+ *
+ * @param  {String} namespace
+ * @param  {Number} version
+ *
+ * @return {elasticsearch.ElasticsearchClient}
+ */
+LevelAdapter.prototype.getClient = function(namespace, version) {
+  if (!this.connections[namespace + version]) {
+    this.connections[namespace + version] = sublevel(level(this.path + '/' + namespace + 'v' + version));
+  }
+  return this.connections[namespace + version];
+};
+
+module.exports = LevelAdapter;
+</pre>
+</body>
+</html>

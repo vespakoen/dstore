@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var _ = require('underscore');
+var Promise = require('bluebird');
+
+function SchemaFacade(service, snapshotter, differ) {
+  this.service = service;
+  this.snapshotter = snapshotter;
+  this.differ = differ;
+}
+
+////////////////////////////////////////////////////////////////////
+///////////////////////// STATIC PROPERTIES ////////////////////////
+////////////////////////////////////////////////////////////////////
+
+SchemaFacade.attachKey = 'schema.facade';
+
+SchemaFacade.attach = function(app) {
+  return Promise.join(
+    app.get('schema.service'),
+    app.get('schema.snapshotter'),
+    app.get('schema.differ')
+  ).spread(function(service, snapshotter, differ) {
+    return new SchemaFacade(service, snapshotter, differ);
+  });
+};
+
+////////////////////////////////////////////////////////////////////
+///////////////////////// INSTANCE METHODS /////////////////////////
+////////////////////////////////////////////////////////////////////
+
+SchemaFacade.prototype.getSchema = function(namespace, schemaKey) {
+  return this.service.getSchema(namespace, schemaKey);
+};
+
+SchemaFacade.prototype.getAllSchemas = function(namespace) {
+  return this.service.getAllSchemas(namespace);
+};
+
+SchemaFacade.prototype.putSchema = function(namespace, schemaKey, schema) {
+  return this.service.putSchema(namespace, schemaKey, schema);
+};
+
+SchemaFacade.prototype.putAllSchemas = function(namespace, schemas) {
+  return this.service.putAllSchemas(namespace, schemas);
+};
+
+SchemaFacade.prototype.createSnapshot = function(namespace) {
+  return this.snapshotter.createSnapshot(namespace);
+};
+
+SchemaFacade.prototype.diff = function(schemaKey, from, to) {
+  return this.differ.diff(schemaKey, from, to);
+};
+
+module.exports = SchemaFacade;
+</pre>
+</body>
+</html>

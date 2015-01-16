@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var _ = require('underscore');
+var Promise = require('bluebird');
+
+<span id='postgresql-PostgresqlFacade'>/**
+</span> * @class postgresql.PostgresqlFacade
+ * LevelFacade
+ *
+ * @param {postgresql.PostgresqlRepository} repository
+ * @param {postgresql.PostgresqlSerializer} serializer
+ */
+function PostgresqlFacade(repository, serializer, migrator) {
+  this.repository = repository;
+  this.serializer = serializer;
+  this.migrator = migrator;
+}
+
+<span id='postgresql-PostgresqlFacade-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
+PostgresqlFacade.attachKey = 'postgresql.facade';
+
+<span id='postgresql-PostgresqlFacade-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ * @return {Promise|Object} The object with resolved dependencies
+ */
+PostgresqlFacade.attach = function(app) {
+  return Promise.join(
+    app.get('postgresql.repository'),
+    app.get('postgresql.serializer'),
+    app.get('postgresql.migrator')
+  ).spread(function(repostory, serializer, migrator) {
+    return new PostgresqlFacade(repostory, serializer, migrator);
+  });
+};
+
+<span id='postgresql-PostgresqlFacade-method-putItem'>/**
+</span> * Insert / update item
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} item
+ *
+ * @return {Promise}
+ */
+PostgresqlFacade.prototype.putItem = function(namespace, schemaKey, item) {
+  return this.repository.putItem(namespace, schemaKey, item);
+};
+
+<span id='postgresql-PostgresqlFacade-method-delItem'>/**
+</span> * Delete item
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Number} version
+ * @param  {String} id
+ *
+ * @return {Promise}
+ */
+PostgresqlFacade.prototype.delItem = function(namespace, schemaKey, version, id) {
+  return this.repository.delItem(namespace, schemaKey, version, id);
+};
+
+<span id='postgresql-PostgresqlFacade-method-migrate'>/**
+</span> * Create / migrate database.
+ *
+ * @param  {String} namespace
+ * @param  {Number} version
+ *
+ * @return {Promise.&lt;null&gt;}
+ */
+PostgresqlFacade.prototype.migrate = function(namespace, version) {
+  return this.migrator.migrate(namespace, version);
+};
+
+<span id='postgresql-PostgresqlFacade-method-serialize'>/**
+</span> * Serialize an item to make it compatible with postgresql.
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} item
+ * @return {Object} The serialized item
+ */
+PostgresqlFacade.prototype.serialize = function(namespace, schemaKey, item) {
+  return this.serializer.serializer(namespace, schemaKey, item);
+};
+
+module.exports = PostgresqlFacade;
+</pre>
+</body>
+</html>

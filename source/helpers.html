@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var _ = require('underscore');
+
+<span id='Helpers'>/**
+</span> * Generic helper functions
+ *
+ * @class Helpers
+ */
+module.exports = {
+<span id='Helpers-method-capitalizeFirstLetter'>  /**
+</span>   * Returns a new string where the first character is capitalized.
+   *
+   * @param  {String} string
+   * @return {String}
+   */
+  capitalizeFirstLetter: function (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  },
+
+  serializeError: function (err) {
+    var serialized = {};
+    var storeKey = function (key) {
+      serialized[key] = err[key];
+    };
+    Object.getOwnPropertyNames(err)
+      .forEach(storeKey);
+    return serialized;
+  },
+
+  unserializeError: function (obj) {
+    var err = new Error(obj.message);
+
+    _.each(obj, function (value, key) {
+      if (obj.hasOwnProperty(key) &amp;&amp; key !== 'message') {
+        err[key] = value;
+      }
+    });
+
+    return err;
+  }
+};
+</pre>
+</body>
+</html>

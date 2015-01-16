@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var _ = require('underscore');
+var moment = require('moment');
+var ItemSerializer = require('../item/itemSerializer');
+
+<span id='elasticsearch-ElasticsearchSerializer'>/**
+</span> * @class elasticsearch.ElasticsearchSerializer
+ * ElasticsearchSerializer
+ */
+function ElasticsearchSerializer(schemaAdapter) {
+  ItemSerializer.call(this, schemaAdapter);
+}
+
+ElasticsearchSerializer.prototype = Object.create(ItemSerializer.prototype);
+
+<span id='elasticsearch-ElasticsearchSerializer-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
+ElasticsearchSerializer.attachKey = 'elasticsearch.serializer';
+
+<span id='elasticsearch-ElasticsearchSerializer-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ *
+ * @return {Promise.&lt;null&gt;|Object} The object with resolved dependencies
+ */
+ElasticsearchSerializer.attach = function(app) {
+  return app.get('schema.adapter').then(function(schemaAdapter) {
+    return new ElasticsearchSerializer(schemaAdapter);
+  });
+};
+
+
+<span id='elasticsearch-ElasticsearchSerializer-method-serialize'>/**
+</span> * Serialize item for elasticsearch.
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} item
+ * @return {Object} The serialized item
+ */
+ElasticsearchSerializer.prototype.serialize = function(namespace, schemaKey, item) {
+  return this._serializeItem(namespace, schemaKey, item);
+};
+
+<span id='elasticsearch-ElasticsearchSerializer-method-_serializePoint'>/**
+</span> * Serialize a point.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ElasticsearchSerializer.prototype._serializePoint = function(value) {
+  if (_.isString(value)) {
+    value = JSON.parse(value);
+  }
+  if (!value || !value.coordinates) {
+    return null;
+  }
+  return value.coordinates;
+};
+
+<span id='elasticsearch-ElasticsearchSerializer-method-_serializeLinestring'>/**
+</span> * Serialize a linestring.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ElasticsearchSerializer.prototype._serializeLinestring = function(value) {
+  if (_.isString(value)) {
+    value = JSON.parse(value);
+  }
+  return value;
+};
+
+<span id='elasticsearch-ElasticsearchSerializer-method-_serializeRectangle'>/**
+</span> * Serialize a rectangle.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ElasticsearchSerializer.prototype._serializeRectangle = function(value) {
+  if (_.isString(value)) {
+    value = JSON.parse(value);
+  }
+  return value;
+};
+
+module.exports = ElasticsearchSerializer;
+</pre>
+</body>
+</html>

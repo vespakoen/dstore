@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var fs = require('fs');
+var Promise = require('bluebird');
+var SchemaClient = require('./schemaClient');
+Promise.promisifyAll(fs);
+
+function PostgresqlSchemaClient(differ, namespace) {
+  SchemaClient.call(this, differ);
+  this.namespace = namespace;
+}
+
+PostgresqlSchemaClient.attachKey = 'schema.client';
+
+PostgresqlSchemaClient.attach = function (app) {
+  return app.get('schema.differ')
+    .then(function (differ) {
+      return function (namespace) {
+        return new PostgresqlSchemaClient(differ, namespace);
+      };
+    });
+};
+PostgresqlSchemaClient.prototype = Object.create(SchemaClient.prototype);
+
+PostgresqlSchemaClient.prototype.getSchemaVersions = function(snapshotVersion) {
+  var client = this.adapter.getClient('schema');
+
+  return client.table('snapshots')
+    .select('schema_key,schema_version')
+    .where({snapshot_version: snapshotVersion})
+    .get();
+};
+
+PostgresqlSchemaClient.prototype.putSchemaVersions = function(snapshotVersion, schemaVersions) {
+  var client = this.adapter.getClient('schema');
+
+  return client.table('snapshots')
+    .select('schema_key,schema_version')
+    .where({snapshot_version: snapshotVersion})
+    .get();
+};
+
+PostgresqlSchemaClient.prototype.getLog = function() {
+};
+
+PostgresqlSchemaClient.prototype.log = function(changes) {
+};
+
+PostgresqlSchemaClient.prototype.getSchema = function(schemaKey, schemaVersion) {
+};
+
+PostgresqlSchemaClient.prototype.putSchema = function(schemaKey, schemaVersion, schema) {
+};
+
+PostgresqlSchemaClient.prototype.getSnapshot = function(snapshotVersion) {
+};
+
+PostgresqlSchemaClient.prototype.putSnapshot = function(snapshotVersion, snapshot) {
+};
+
+module.exports = PostgresqlSchemaClient;
+</pre>
+</body>
+</html>

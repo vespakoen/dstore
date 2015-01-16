@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">
+'use strict';
+
+var _ = require('underscore');
+var moment = require('moment');
+var help = require('../helpers');
+
+<span id='ItemSerializer'>/**
+</span> * @class ItemSerializer
+ * Base class for other serializers
+ *
+ * @param {schema.SchemaAdapter} schemaAdapter
+ */
+function ItemSerializer(schemaAdapter) {
+  this.schemaAdapter = schemaAdapter;
+}
+
+<span id='ItemSerializer-method-_serializeItem'>/**
+</span> * Serialize an item.
+ *
+ * @protected
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} item
+ * @return {Object} The serialized item
+ */
+ItemSerializer.prototype._serializeItem = function (namespace, schemaKey, item) {
+  var self = this;
+
+  var schemaClient = this.schemaAdapter.getClient(namespace);
+  return schemaClient.getSnapshot(item.version).then(function(schemas) {
+    var column;
+    var schema = schemas[schemaKey];
+    var columns = schema.columns;
+    for (var key in item) {
+      if (columns[key]) {
+        column = columns[key];
+        var method = '_serialize' + help.capitalizeFirstLetter(column.type).replace('[]', 'Array');
+        if (self[method]) {
+          item[key] = self[method](item[key]);
+        }
+      }
+    }
+    return item;
+  });
+};
+
+<span id='ItemSerializer-method-_serializeString'>/**
+</span> * Serialize a string.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeString = function(value) {
+  if (value === &quot;&quot;) {
+    return null;
+  }
+  return value;
+};
+
+<span id='ItemSerializer-method-_dateStringToMoment'>/**
+</span> * Convert a date string to a date object.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._dateStringToMoment = function(value) {
+  return moment(new Date(value));
+};
+
+<span id='ItemSerializer-method-_serializeDatetime'>/**
+</span> * Serialize a date string to a datetime.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeDatetime = function(value) {
+  return this._dateStringToMoment(value)
+    .format('YYYY-MM-DD HH:mm:ss');
+};
+
+<span id='ItemSerializer-method-_serializeDate'>/**
+</span> * Serialize a date string to a date.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeDate = function(value) {
+  return this._dateStringToMoment(value)
+    .format('YYYY-MM-DD');
+};
+
+<span id='ItemSerializer-method-_serializeBoolean'>/**
+</span> * Serialize to boolean.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeBoolean = function(value) {
+  return !!value;
+};
+
+<span id='ItemSerializer-method-_sortKeys'>/**
+</span> * Sort keys of an object.
+ *
+ * @protected
+ * @param  {Object} item
+ */
+ItemSerializer.prototype._sortKeys = function (item) {
+  var value
+    , sortedItem = {}
+    , keys = _.keys(item)
+    , sortedKeys = _.sortBy(keys, function(key) {
+      return key;
+    });
+
+  _.each(sortedKeys, function(key) {
+    value = item[key];
+    sortedItem[key] = value;
+  });
+
+  return sortedItem;
+};
+
+module.exports = ItemSerializer;
+</pre>
+</body>
+</html>

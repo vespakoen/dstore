@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var _ = require('underscore');
+var moment = require('moment');
+var knex = require('knex')({dialect: 'postgres'});
+var st = require('knex-postgis')(knex);
+var ItemSerializer = require('../item/itemSerializer');
+
+function PostgresqlSerializer(schemaAdapter) {
+  ItemSerializer.call(this, schemaAdapter);
+}
+
+PostgresqlSerializer.attachKey = 'postgresql.serializer';
+
+PostgresqlSerializer.attach = function(app) {
+  return app.get('schema.adapter').then(function(schemaAdapter) {
+    return new PostgresqlSerializer(schemaAdapter);
+  });
+};
+
+PostgresqlSerializer.prototype = Object.create(ItemSerializer.prototype);
+
+PostgresqlSerializer.prototype.serialize = function(namespace, schemaKey, item) {
+  return this._serializeItem(namespace, schemaKey, item);
+};
+
+PostgresqlSerializer.prototype._serializePoint = function(value) {
+  if (_.isString(value)) {
+    var geoJson = JSON.parse(value);
+    geoJson.crs = {
+      type: 'name',
+      properties: {name: 'EPSG:4326'}
+    };
+    value = st.geomFromGeoJSON(geoJson);
+  }
+  return value;
+};
+
+PostgresqlSerializer.prototype._serializeLinestring = function(value) {
+  if (_.isString(value)) {
+    var geoJson = JSON.parse(value);
+    geoJson.crs = {
+      type: 'name',
+      properties: {name: 'EPSG:4326'}
+    };
+    value = st.geomFromGeoJSON(geoJson);
+  }
+  return value;
+};
+
+PostgresqlSerializer.prototype._serializeRectangle = function(value) {
+  if (_.isString(value)) {
+    var geoJson = JSON.parse(value);
+    geoJson.crs = {
+      type: 'name',
+      properties: {name: 'EPSG:4326'}
+    };
+    value = st.geomFromGeoJSON(geoJson);
+  }
+  return value;
+};
+
+module.exports = PostgresqlSerializer;
+</pre>
+</body>
+</html>

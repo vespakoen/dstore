@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var knex = require('knex');
+
+function PostgresqlAdapter(config) {
+  this.config = config;
+  this.connections = {};
+}
+
+exports.attachKey = 'postgresql.adapter';
+
+exports.attach = function(app) {
+  return new PostgresqlAdapter(app.config.postgresql);
+};
+
+PostgresqlAdapter.prototype.getClient = function(namespace, version) {
+  if (!this.connections[namespace + version]) {
+    this.connections[namespace + version] = knex({
+      client: 'postgresql',
+      connection: {
+        host: this.config.host,
+        user: this.config.username,
+        password: this.config.password,
+        database: namespace + (version ? 'v' + version : '')
+      }
+    });
+  }
+  return this.connections[namespace + version];
+};
+</pre>
+</body>
+</html>
