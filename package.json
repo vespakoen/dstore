@@ -1,10 +1,11 @@
 {
-  "name": "trapps-cqrs",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "node-projector",
+  "version": "0.1.0",
+  "description": "Manage your schema & project data to PostgreSQL, Elasticsearch and LevelDB (more can be added) via a simple API",
+  "main": "bootstrap.js",
   "scripts": {
     "start": "./bin/start.sh",
+    "docs": "jsduck --title=node-projector lib/* -o /tmp/projector-docs && git stash && git checkout gh-pages && rsync -av /tmp/projector-docs/ . && git add . && git commit -am 'updating docs' && git push origin gh-pages && git checkout master && git stash apply",
     "test": "tape ./tests/*.js | tap-spec"
   },
   "dependencies": {

@@ -111,3 +111,7 @@ Deletes an item in all storage backends
 ```
 curl -X DEL http://localhost:2000/api/item/:namespace/:schemaKey
 ```
+
+# Api docs
+
+Head over to the [Api docs](http://trappsnl.github.io/node-projector) to learn more about the internals.
