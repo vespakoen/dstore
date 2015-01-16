@@ -23,6 +23,15 @@ var map = require('map-stream');
 var bytewiseCodec = require('level-sublevel/codec/bytewise');
 var ItemRepository = require('../item/itemRepository');
 
+<span id='level-LevelRepository'>/**
+</span> * @class level.LevelRepository
+ * LevelRepository
+ * 
+ * @param {level.LevelSerializer} serializer
+ * @param {level.LevelAdapter} adapter
+ * @param {schema.SchemaAdapter} schemaAdapter
+ * @param {item.ItemTransformer} itemTransformer
+ */
 function LevelRepository(serializer, adapter, schemaAdapter, itemTransformer) {
   ItemRepository.call(this, schemaAdapter, itemTransformer);
   this.serializer = serializer;
@@ -91,7 +100,7 @@ LevelRepository.prototype.delItem = function (namespace, schemaKey, version, id)
     });
 };
 
-<span id='global-method-getIdToTypeMap'>/**
+<span id='level-LevelRepository-method-getIdToTypeMap'>/**
 </span> * Get a id =&gt; type map.
  *
  * @param  {String} namespace
@@ -124,7 +133,7 @@ LevelRepository.prototype.getIdToTypeMap = function(namespace, version, ids) {
   });
 };
 
-<span id='global-method-getStream'>/**
+<span id='level-LevelRepository-method-getStream'>/**
 </span> * Get a stream of all items.
  *
  * @param  {String} namespace

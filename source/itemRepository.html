@@ -21,6 +21,13 @@ var _ = require('underscore');
 var Promise = require('bluebird');
 var validator = require('validator');
 
+<span id='item-ItemRepository'>/**
+</span> * @class item.ItemRepository
+ * ItemRepository
+ * 
+ * @param {schema.SchemaAdapter} schemaAdapter
+ * @param {item.ItemTransformer} itemTransformer
+ */
 function ItemRepository(schemaAdapter, itemTransformer) {
   this.schemaAdapter = schemaAdapter;
   this.itemTransformer = itemTransformer;
