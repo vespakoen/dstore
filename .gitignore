@@ -1,6 +1,1 @@
 node_modules/
-docs/
-storage/schema/*
-storage/level/*
-tests/out/
-bin/liveDbToQueue.js
