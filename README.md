@@ -98,7 +98,7 @@ Projects an item to all storage backends.
 ```shell
 curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d '\
 {\
-  'id": "66276124-ebcd-45e1-8013-825346daa283",\
+  "id": "66276124-ebcd-45e1-8013-825346daa283",\
   "version": 1,\
   "title": "Some title"\
 }'
@@ -109,7 +109,7 @@ curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d '\
 Deletes an item in all storage backends.
 
 ```shell
-curl -X DEL http://localhost:2000/api/item/:namespace/:schemaKey
+curl -X DELETE http://localhost:2000/api/item/:namespace/:schemaKey
 ```
 
 # API DOCS
