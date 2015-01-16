@@ -17,7 +17,7 @@ The following commands are available
 
 ## get all schemas
 
-Retrieves all the schema definitions for a given namespace.
+**Retrieves all the schema definitions for a given namespace.**
 
 *The namespace is an identifier for a project.*  
 *Say you are making a blog and a homepage, you could use the namespaces: "blog" and "homepage"*
@@ -28,7 +28,7 @@ curl -X GET http://localhost:2000/api/schema/:namespace
 
 ## get schema
 
-Retrieves a single schema for a given namespace and schema key.
+**Retrieves a single schema for a given namespace and schema key.**
 
 *The schema key is a string that uniquely identifies your schema*  
 *Coninuing from the previous blog example, the schemaKey could be a "post", "author" or a "comment"*
@@ -39,7 +39,7 @@ curl -X GET http://localhost:2000/api/schema/:namespace/:schemaKey
 
 ## put all schemas
 
-Stores all schemas for a given namespace.
+**Stores all schemas for a given namespace.**
 
 ```shell
 curl -X PUT http://localhost:2000/api/schema/:namespace -d '\
@@ -58,7 +58,7 @@ curl -X PUT http://localhost:2000/api/schema/:namespace -d '\
 
 ## put schema
 
-Stores a single schema for a given namespace and schema key.
+**Stores a single schema for a given namespace and schema key.**
 
 ```shell
 curl -X PUT http://localhost:2000/api/schema/:namespace/:schemaKey -d '\
@@ -75,7 +75,7 @@ curl -X PUT http://localhost:2000/api/schema/:namespace/:schemaKey -d '\
 
 ## create snapshot
 
-Stores the current schemas as a snapshot.
+**Stores the current schemas as a snapshot.**
 
 *The "put schema' and "put all schemas" commands modify the "current" schema*  
 *If you are happy with the schema, you create a snapshot which will give the schema a version number*  
@@ -93,7 +93,7 @@ curl -X POST http://localhost:2000/api/snapshot/:namespace
 
 ## put item
 
-Projects an item to all storage backends.
+**Projects an item to all storage backends.**
 
 ```shell
 curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d '\
@@ -106,7 +106,7 @@ curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d '\
 
 ## del item
 
-Deletes an item in all storage backends.
+**Deletes an item in all storage backends.**
 
 ```shell
 curl -X DELETE http://localhost:2000/api/item/:namespace/:schemaKey
