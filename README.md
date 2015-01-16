@@ -22,7 +22,7 @@ Retrieves all the schema definitions for a given namespace.
 *The namespace is an identifier for a project.*  
 *Say you are making a blog and a homepage, you could use the namespaces: "blog" and "homepage"*
 
-```
+```shell
 curl -X GET http://localhost:2000/api/schema/:namespace
 ```
 
@@ -33,7 +33,7 @@ Retrieves a single schema for a given namespace and schema key.
 *The schema key is a string that uniquely identifies your schema*  
 *Coninuing from the previous blog example, the schemaKey could be a "post", "author" or a "comment"*
 
-```
+```shell
 curl -X GET http://localhost:2000/api/schema/:namespace/:schemaKey
 ```
 
@@ -41,7 +41,7 @@ curl -X GET http://localhost:2000/api/schema/:namespace/:schemaKey
 
 Stores all schemas for a given namespace.
 
-```
+```shell
 curl -X PUT http://localhost:2000/api/schema/:namespace -d '\
 {\
   "article": {\
@@ -60,7 +60,7 @@ curl -X PUT http://localhost:2000/api/schema/:namespace -d '\
 
 Stores a single schema for a given namespace and schema key.
 
-```
+```shell
 curl -X PUT http://localhost:2000/api/schema/:namespace/:schemaKey -d '\
 {\
   "table": "articles",\
@@ -87,16 +87,16 @@ Stores the current schemas as a snapshot.
 - put the elasticsearch mappings
 - create or replace an alias from "namespace" to "namespace + 'v' + snapshotVersion"
 
-```
+```shell
 curl -X POST http://localhost:2000/api/snapshot/:namespace
 ```
 
 ## put item
 
-Projects an item to all storage backends
+Projects an item to all storage backends.
 
-```
-curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d \'\
+```shell
+curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d '\
 {\
   'id": "66276124-ebcd-45e1-8013-825346daa283",\
   "version": 1,\
@@ -106,9 +106,9 @@ curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d \'\
 
 ## del item
 
-Deletes an item in all storage backends
+Deletes an item in all storage backends.
 
-```
+```shell
 curl -X DEL http://localhost:2000/api/item/:namespace/:schemaKey
 ```
 
