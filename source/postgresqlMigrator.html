@@ -23,14 +23,33 @@ var help = require('../helpers');
 var Promise = require('bluebird');
 Promise.promisifyAll(pg);
 
+<span id='postgresql-PostgresqlMigrator'>/**
+</span> * @class postgresql.PostgresqlMigrator
+ * PostgresqlMigrator
+ * 
+ * @param {Object} config
+ * @param {schema.SchemaAdapter} schemaAdapter
+ * @param {postgresql.PostgresqlAdapter} adapter
+ */
 function PostgresqlMigrator(config, schemaAdapter, adapter) {
   this.config = config;
   this.schemaAdapter = schemaAdapter;
   this.adapter = adapter;
 }
 
+<span id='postgresql-PostgresqlMigrator-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
 PostgresqlMigrator.attachKey = 'postgresql.migrator';
 
+<span id='postgresql-PostgresqlMigrator-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ * @return {Promise|Object} The object with resolved dependencies
+ */
 PostgresqlMigrator.attach = function(app) {
   var config = app.config.postgresql;
   return Promise.join(
@@ -41,7 +60,7 @@ PostgresqlMigrator.attach = function(app) {
   });
 };
 
-<span id='global-method-migrate'>/**
+<span id='postgresql-PostgresqlMigrator-method-migrate'>/**
 </span> * Create / migrate database.
  *
  * @param  {String} namespace
