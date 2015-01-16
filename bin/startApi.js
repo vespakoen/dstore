@@ -4,7 +4,7 @@ var restify = require('restify');
 var app = require('../bootstrap');
 
 var server = restify.createServer({
-  name: 'myapp',
+  name: 'projector',
   version: '1.0.0'
 });
 
