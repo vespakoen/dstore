@@ -1,0 +1,42 @@
+{
+  "name": "trapps-cqrs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "./bin/start.sh",
+    "test": "tape ./tests/*.js | tap-spec"
+  },
+  "dependencies": {
+    "bluebird": "^2.3.10",
+    "deep-diff": "^0.3.0",
+    "elasticsearch": "^2.4.3",
+    "js-yaml": "^3.2.2",
+    "knex": "^0.7.3",
+    "knex-postgis": "^0.1.2",
+    "kue": "^0.8.11",
+    "level": "^0.18.0",
+    "level-party": "^1.0.1",
+    "level-sublevel": "^6.3.16",
+    "minimist": "^1.1.0",
+    "mkdirp": "^0.5.0",
+    "moment": "^2.8.3",
+    "node-uuid": "^1.4.1",
+    "pg": "^3.6.2",
+    "rabbit.js": "^0.4.2",
+    "request": "^2.49.0",
+    "restify": "^2.8.4",
+    "sequelize": "^2.0.0-rc2",
+    "underscore": "^1.7.0",
+    "validator": "^3.27.0"
+  },
+  "devDependencies": {
+    "traceur": "0.0.79",
+    "child-process-promise": "^1.0.1",
+    "rimraf": "^2.2.8",
+    "tap-spec": "^2.1.2",
+    "tape": "^3.0.3"
+  },
+  "author": "",
+  "license": "ISC"
+}

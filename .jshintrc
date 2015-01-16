@@ -1,0 +1,7 @@
+{
+  "node": true,
+  "browser": true,
+  "indent": 2,
+  "laxcomma": true,
+  "globalstrict": true
+}
