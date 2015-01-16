@@ -10,7 +10,7 @@ In the future, we can use the schema information to transform items to newer / o
 - postgresql
 - leveldb
 
-## Actions
+## ACTIONS
 
 At this moment, the only way to communicate with node-projector is via a JSON API.  
 The following commands are available
@@ -112,6 +112,6 @@ Deletes an item in all storage backends
 curl -X DEL http://localhost:2000/api/item/:namespace/:schemaKey
 ```
 
-# Api docs
+# API DOCS
 
 Head over to the [Api docs](http://trappsnl.github.io/node-projector) to learn more about the internals.
