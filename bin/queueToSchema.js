@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var Promise = require('bluebird');
-var app = require('../bootstrap');
+var app = require('../main');
 
 app.get('queue').then(function (queue) {
   return Promise.join(
@@ -18,31 +18,31 @@ app.get('queue').then(function (queue) {
   consumer.consume('create-snapshot', createSnapshot);
 
   function putSchema(command) {
-    console.log('put-schema', command.namespace, command.key);
+    console.log('put-schema', command.namespace || 'no namespace', command.key || 'no key');
 
     return facade.putSchema(command.namespace, command.key, command.schema);
   }
 
   function putAllSchemas(command) {
-    console.log('put-all-schemas', command.namespace);
+    console.log('put-all-schemas', command.namespace || 'no namespace');
 
     return facade.putAllSchemas(command.namespace, command.schemas);
   }
 
   function getSchema(command) {
-    console.log('get-schema', command.namespace, command.key);
+    console.log('get-schema', command.namespace || 'no namespace', command.key || 'no key');
 
     return facade.getSchema(command.namespace, command.key);
   }
 
   function getAllSchemas(command) {
-    console.log('get-all-schemas', command.namespace);
+    console.log('get-all-schemas', command.namespace || 'no namespace');
 
     return facade.getAllSchemas(command.namespace);
   }
 
   function createSnapshot(command) {
-    console.log('create-snapshot.schema', command);
+    console.log('create-snapshot.schema', command.namespace || 'no namespace');
 
     return facade.createSnapshot(command.namespace)
       .then(function (newVersion) {

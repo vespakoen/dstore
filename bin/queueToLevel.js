@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var app = require('../bootstrap');
+var app = require('../main');
 
 Promise.all([
   app.get('queue').then(function (queue) {

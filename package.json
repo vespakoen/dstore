@@ -6,11 +6,11 @@
     "type": "git",
     "url": "git://github.com/trappsnl/node-projector.git"
   },
-  "main": "bootstrap.js",
+  "main": "main.js",
   "scripts": {
     "start": "./bin/start.sh",
-    "docs": "jsduck --title=node-projector lib/* -o /tmp/projector-docs && git stash && git checkout gh-pages && rsync -av /tmp/projector-docs/ . && git add . && git commit -am 'updating docs' && git push origin gh-pages && git checkout master && git stash apply",
-    "test": "tape tests/testSchemaClient.js tests/testSchemaService.js | tap-spec"
+    "docs": "./bin/create_docs.sh",
+    "test": "./bin/test_travis.sh"
   },
   "dependencies": {
     "bluebird": "^2.3.10",

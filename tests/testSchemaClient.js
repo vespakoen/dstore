@@ -1,10 +1,9 @@
 'use strict';
 
-process.env.ENV = 'testing';
 var test = require("tape").test;
 var Promise = require('bluebird');
 var rmRF = Promise.promisify(require('rimraf'));
-var app = require('../bootstrap');
+var app = require('../main');
 var memo = {};
 
 rmRF(app.config.schema.path + '/clienttest')

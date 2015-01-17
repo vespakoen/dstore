@@ -1,7 +1,7 @@
 'use strict';
 
 var restify = require('restify');
-var app = require('../bootstrap');
+var app = require('../main');
 
 var server = restify.createServer({
   name: 'projector',

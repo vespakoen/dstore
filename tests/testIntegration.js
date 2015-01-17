@@ -6,7 +6,7 @@ var pg = require('pg');
 var Promise = require('bluebird');
 var rmRF = Promise.promisify(require('rimraf'));
 var exec = require('child-process-promise').exec;
-var app = require('../bootstrap');
+var app = require('../main');
 Promise.promisifyAll(pg);
 
 var memo = {};
