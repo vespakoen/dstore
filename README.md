@@ -65,11 +65,11 @@ curl -X PUT http://localhost:2000/api/schema/myblog/article -d '\
       "type": "text"\
     },\
     "date_created": {\
-      "type": "date"\
+      "type": "datetime"\
       "rules": [{"type": "isDate"}]\
     },\
     "date_changed": {\
-      "type": "date"\
+      "type": "datetime"\
       "rules": [{"type": "isDate"}]\
     }\
   }\
@@ -89,21 +89,27 @@ Below is a map of the available **column types**, and the type that it translate
   </tr>
   <tr>
     <th>string</th>
+    <td>STRING</td>
     <td>string</td>
-    <td>string</td>
-    <td>string</td>
+    <td>String (json)</td>
   </tr>
   <tr>
     <th>text</th>
+    <td>TEXT</td>
     <td>text</td>
-    <td>text</td>
-    <td>string</td>
+    <td>String (json)</td>
   </tr>
   <tr>
     <th>date</th>
+    <td>DATE</td>
     <td>date</td>
-    <td>date</td>
-    <td>string</td>
+    <td>String (json)</td>
+  </tr>
+  <tr>
+    <th>datetime</th>
+    <td>DATETIME</td>
+    <td>datetime</td>
+    <td>String (json)</td>
   </tr>
 </table>
 
@@ -118,7 +124,7 @@ For LevelDB, it's quite easy. Since it's schemaless we don't have to migrate any
 You can create a snapshot with the [create snapshot](#create-snapshot) command:
 
 ```shell
-curl -X POST http://localhost:2000/api/snapshot/:namespace
+curl -X POST http://localhost:2000/api/snapshot/myblog
 ```
 
 When the request completes, the storage engines are ready to handle data with the new schema.
@@ -132,8 +138,30 @@ The request body is JSON and should, at the very least contain the following key
 - **snapshot_version** An existing snapshot version
 - **id** A UUID that does or does not yet exist in the database
 
-You can also include a **links** key that is an array of UUID's, pointing to other items
-**Internally (and above), we refer to data as an "item", this is the same concept as a elasticsearch document or a table row.**
+You can also include a **links** key that is an array of UUID's, pointing to other items  
+*Internally (and above), we refer to data as an "item", this is the same concept as a elasticsearch document or a table row.*
+
+Below is an example:
+```shell
+curl -X PUT http://localhost:2000/api/item/myblog/article -d '\
+{\
+  "id": "66276124-ebcd-45e1-8013-825346daa283",\
+  "snapshot_version": 1,\
+  "title_nl": "De titel"\
+  "title_en": "Some title"\
+  "intro_nl": "De intro"\
+  "intro_en": "The intro"\
+  "content_nl": "De inhoud"\
+  "content_en": "The content"\
+  "date_created": "2014-01-17 03:50:12"\
+  "date_updated": "2014-01-17 03:50:12"\
+}'
+```
+
+Deleting an item is not so difficult either:
+```shell
+curl -X DELETE http://localhost:2000/api/item/myblog/article/66276124-ebcd-45e1-8013-825346daa283
+```
 
 
 #Commands
