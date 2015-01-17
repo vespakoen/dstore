@@ -10,12 +10,14 @@ var memo = {};
 app.get('schema.adapter')
   .then(function (adapter) {
     memo.adapter = adapter;
-    memo.client = adapter.getClient('test');
+    return rmRF(app.config.schema.path + '/servicetest');
+  })
+  .then(function () {
+    memo.client = memo.adapter.getClient('servicetest');
     return app.get('schema.facade');
   })
   .then(function (facade) {
     memo.facade = facade;
-    return rmRF(memo.client.path);
   })
   .then(function () {
     test("when creating a news schema", function (t) {
@@ -29,7 +31,7 @@ app.get('schema.adapter')
         }
       };
 
-      memo.facade.putSchema('test', 'news', schema)
+      memo.facade.putSchema('servicetest', 'news', schema)
         .then(function () {
           return Promise.join(
             memo.client.getLog(),
@@ -55,7 +57,7 @@ app.get('schema.adapter')
           t.deepEqual(storedSchema, schema, "versions/news/1.json should match with " + JSON.stringify(schema));
         })
         .then(function () {
-          return memo.facade.createSnapshot('test');
+          return memo.facade.createSnapshot('servicetest');
         })
         .then(function() {
           return memo.client.getLog();
@@ -83,7 +85,7 @@ app.get('schema.adapter')
         }
       };
 
-      memo.facade.putSchema('test', 'news', renamedSchema)
+      memo.facade.putSchema('servicetest', 'news', renamedSchema)
         .then(function () {
           return Promise.join(
             memo.client.getLog(),
@@ -140,7 +142,7 @@ app.get('schema.adapter')
           t.deepEqual(cleanArticles1Schema, articles1, "versions/articles/1.json should match with " + JSON.stringify(cleanArticles1Schema));
         })
         .then(function () {
-          return memo.facade.createSnapshot('test');
+          return memo.facade.createSnapshot('servicetest');
         })
         .then(function () {
           t.end();
@@ -161,7 +163,7 @@ app.get('schema.adapter')
         }
       };
 
-      memo.facade.putSchema('test', 'articles', schema)
+      memo.facade.putSchema('servicetest', 'articles', schema)
         .then(function () {
           return Promise.join(
             memo.client.getLog(),

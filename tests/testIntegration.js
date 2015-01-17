@@ -1,6 +1,7 @@
 'use strict';
 
 process.env.ENV = 'testing';
+var test = require("tape").test;
 var pg = require('pg');
 var Promise = require('bluebird');
 var rmRF = Promise.promisify(require('rimraf'));
@@ -10,21 +11,27 @@ Promise.promisifyAll(pg);
 
 var memo = {};
 
+// @todo actually test things
+test('when testing integration', function (t) {
+  t.ok(true, 'the output should be manually checked in the pm2 logs, for now...');
+  t.end();
+}); 
+
 app.get('queue')
   .then(function (queue) {
     memo.queue = queue;
-    return rmRF(__dirname + '/../storage/schema/test');
+    return rmRF(app.config.schema.path + '/integrationtest');
   })
   .then(function () {
-    return exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/test');
+    return exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtest');
   })
   .then(function () {
     var connectionString = 'postgresql://' + app.config.postgresql.username + (app.config.postgresql.password === "" ? '' : ':' + app.config.postgresql.password) + '@' + app.config.postgresql.host + '/postgres';
     return pg.connectAsync(connectionString)
       .spread(function(client, done) {
         return Promise.join(
-          client.queryAsync('DROP DATABASE testv1'),
-          client.queryAsync('DROP DATABASE testv2')
+          client.queryAsync('DROP DATABASE integrationtestv1'),
+          client.queryAsync('DROP DATABASE integrationtestv2')
         )
         .catch(function () {
           // noop
@@ -36,7 +43,7 @@ app.get('queue')
   })
   .then(function (publisher) {
     return publisher.publish('put-schema', {
-      namespace: 'test',
+      namespace: 'integrationtest',
       key: 'kitchensink',
       schema: {
         table: 'kitchensinks',
@@ -80,13 +87,13 @@ app.get('queue')
     })
     .then(function () {
       return publisher.publish('create-snapshot', {
-        namespace: 'test',
+        namespace: 'integrationtest',
         key: 'kitchensink'
       });
     })
     .then(function () {
       return publisher.publish('put-item', {
-        namespace: 'test',
+        namespace: 'integrationtest',
         key: 'kitchensink',
         item: {
           id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
@@ -110,7 +117,7 @@ app.get('queue')
     .then(function () {
       console.log('putting schema');
       return publisher.publish('put-schema', {
-        namespace: 'test',
+        namespace: 'integrationtest',
         key: 'kitchensink',
         schema: {
           table: 'kitchensinks',
@@ -166,13 +173,13 @@ app.get('queue')
     })
     .then(function () {
       return publisher.publish('create-snapshot', {
-        namespace: 'test',
+        namespace: 'integrationtest',
         key: 'kitchensink'
       });
     })
     .then(function () {
       return publisher.publish('put-item', {
-        namespace: 'test',
+        namespace: 'integrationtest',
         key: 'kitchensink',
         item: {
           id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',

@@ -7,12 +7,12 @@ var rmRF = Promise.promisify(require('rimraf'));
 var app = require('../bootstrap');
 var memo = {};
 
-rmRF(app.config.schema.path + '/namespace')
+rmRF(app.config.schema.path + '/clienttest')
   .then(function () {
     return app.get('schema.adapter');
   })
   .then(function (adapter) {
-    memo.client = adapter.getClient('namespace');
+    memo.client = adapter.getClient('clienttest');
 
     test('when putting a schema', function (t) {
       var schema = {
@@ -23,9 +23,9 @@ rmRF(app.config.schema.path + '/namespace')
         }
       };
 
-      memo.client.putSchema('news', 1, schema)
+      memo.client.putSchema('sometype', 1, schema)
         .then(function () {
-          return memo.client.getSchema('news', 1);
+          return memo.client.getSchema('sometype', 1);
         })
         .then(function (contents) {
           t.deepEqual(contents, schema, 'the contents should match');
@@ -35,7 +35,7 @@ rmRF(app.config.schema.path + '/namespace')
 
     test('when putting a version', function (t) {
       var versions = {
-        "news": 1
+        "sometype": 1
       };
 
       memo.client.putSchemaVersions('current', versions)
