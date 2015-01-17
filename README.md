@@ -112,32 +112,32 @@ Below is a map of the available **column types**, and the type that it translate
   </tr>
   <tr>
     <th>point</th>
-    <td>geometry(Point, 4326)</td>
+    <td>GEOMETRY(Point, 4326)</td>
     <td>geo_point</td>
     <td>Object (json)</td>
   </tr>
   <tr>
     <th>linestring</th>
-    <td>geometry(LineString, 4326)</td>
+    <td>GEOMETRY(LineString, 4326)</td>
     <td>geo_shape</td>
     <td>Object (json)</td>
   </tr>
   <tr>
     <th>rectangle</th>
-    <td>geometry(Polygon, 4326)</td>
+    <td>GEOMETRY(Polygon, 4326)</td>
     <td>geo_shape</td>
     <td>Object (json)</td>
   </tr>
   <tr>
     <th>date</th>
     <td>DATE</td>
-    <td>date<br>format: yyyy-MM-dd</td>
+    <td>date<br>*(format: yyyy-MM-dd)*</td>
     <td>String (json)</td>
   </tr>
   <tr>
     <th>datetime</th>
     <td>DATETIME</td>
-    <td>date<br>format: yyyy-MM-dd HH:mm:ss</td>
+    <td>date<br>*(format: yyyy-MM-dd HH:mm:ss)*</td>
     <td>String (json)</td>
   </tr>
   <tr>
