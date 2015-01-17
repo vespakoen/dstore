@@ -1,4 +1,5 @@
 ![build status](https://travis-ci.org/trappsnl/node-projector.svg)
+[![Code Climate](https://codeclimate.com/github/trappsnl/node-projector/badges/gpa.svg)](https://codeclimate.com/github/trappsnl/node-projector)
 
 #Introduction
 
