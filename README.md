@@ -1,79 +1,146 @@
-# node-projector
+#Introduction
 
-node-projector is a schema manager, and data projector.  
-In practice, when we send a schema to it, and create a snapshot,  
-It will create a postgresql database and elasticsearch index and create the necessary tables and mappings.  
-Then, when we store an item, it will automatically serialize it appropiately and store it.  
-In the future, we can use the schema information to transform items to newer / older versions of the schema.  
+node-projector can be viewed as a interface to all your storage engines.
 
-- elasticsearch
-- postgresql
-- leveldb
+Via a simple REST API, you can manage the schema of your data, and store data with a single request and in a simple format.
 
-## REQUIREMENTS
+Currently, node-projector supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, the perfect stack for a modern web application.  
 
-- [Node.js](http://nodejs.org/)
-- [RabbitMQ](https://www.rabbitmq.com)
-- [PostgreSQL](http://www.postgresql.org)
-- [PostgreSQL contrib modules](http://www.postgresql.org/docs/9.3/static/uuid-ossp.html) (for UUID support)
-- [Postgis](http://www.postgis.net) (for spatial support)
-- A "template_postgis" [template](http://www.postgresql.org/docs/9.3/static/sql-createdatabase.html) with uuid and/or postgis support
-- [Elasticsearch](http://www.elasticsearch.org/)
 
-To run the script, you must make the following environment variables available.
+#Overview
+
+![overview](http://trappsnl.github.io/node-projector/overview.png)
+
+
+#Topics
+
+- [Schemas](#schemas)  
+- [Snapshots](#snapshots)
+- [Storing & removing data](#storing-and-retrieving)
+- [Commands](#commands)
+    - Schema management
+        - [Get all schemas](#get-all-schemas)
+        - [Get schema](#get-schema)
+        - [Put all schemas](#put-all-schemas)
+        - [Put schema](#put-schema)
+    - Snapshot management
+        - [Create snapshot](#create-snapshot)
+    - Item storage
+        - [Put item](#put-item)
+        - [Del item](#del-item)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Dive deeper](#dive-deeper)
+
+
+#Schemas
+
+The schema describes your data format, so the projectors know what data they can expect and know how to serialize it.  
+A schema contains information like the table name, elasticsearch type, the columns and the validation rules that should be used when data is stored.  
+Let's look at an example how to create a schema for storing posts on my blog.
+For this, we use the [put schema](#put-schema) command, and use "myblog" as the namespace, and "article" as the schemakey.
 
 ```shell
-export POSTGRESQL_HOST=localhost:5432
-export POSTGRESQL_USER=...
-export POSTGRESQL_PASSWORD=...
-export ELASTICSEARCH_HOST=http://localhost:9200
-export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
+curl -X PUT http://localhost:2000/api/schema/myblog/article -d '\
+{\
+  "table": "articles",\
+  "es_type": "article",\
+  "columns": {\
+    "title_nl": {\
+      "type": "string"\
+    },\
+    "title_en": {\
+      "type": "string"\
+    },\
+    "intro_nl": {\
+      "type": "text"\
+    },\
+    "intro_en": {\
+      "type": "text"\
+    },\
+    "content_nl": {\
+      "type": "text"\
+    },\
+    "content_en": {\
+      "type": "text"\
+    },\
+    "date_created": {\
+      "type": "date"\
+      "rules": [{"type": "isDate"}]\
+    },\
+    "date_changed": {\
+      "type": "date"\
+      "rules": [{"type": "isDate"}]\
+    }\
+  }\
+}'
 ```
 
-## INSTALLATION
+I hope the format explains itself.
 
-These instructions are for Ubuntu 14.04.
+Below is a map of the available **column types**, and the type that it translates to in the storage engine.
 
+<table>
+  <tr>
+    <th>column type</th>
+    <th>postgresql type</th>
+    <th>elasticsearch type</th>
+    <th>leveldb type</th>
+  </tr>
+  <tr>
+    <th>string</th>
+    <td>string</td>
+    <td>string</td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <th>text</th>
+    <td>text</td>
+    <td>text</td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <th>date</th>
+    <td>date</td>
+    <td>date</td>
+    <td>string</td>
+  </tr>
+</table>
+
+
+#Snapshots
+
+When you are done adding schemas, it's time to create a snapshot.
+By creating a snapshot we are saving the current state of all schemas, and assign a snapshot version number to it.
+After the snapshot is stored, the migrators for every projector will kick into action to create new databases / elasticsearch indexes, tables and type mappings.
+For LevelDB, it's quite easy. Since it's schemaless we don't have to migrate anything.
+
+You can create a snapshot with the [create snapshot](#create-snapshot) command:
+
+```shell
+curl -X POST http://localhost:2000/api/snapshot/:namespace
 ```
-# install rabbitmq
-sudo apt-get install rabbitmq-server
 
-# install postgresql
-sudo apt-get install postgresql-9.3 postgresql-contrib
+When the request completes, the storage engines are ready to handle data with the new schema.
 
-# install postgis (only if you need spatial support)
-sudo apt-get install postgresql-9.3-postgis-2.1
 
-# change user to postgres
-sudo su postgres
+#Storing & removing data
 
-# create postgresql database
-createdb -E UTF8 -T template0 template_postgis
+Storing data is done via a simple PUT command.
+The request body is JSON and should, at the very least contain the following keys:
 
-# create postgis template for postgresql (only if you need spatial support)
-psql template_postgis <<EOF
-CREATE EXTENSION "uuid-ossp";
-CREATE EXTENSION postgis;
-UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';
-EOF
+- **snapshot_version** An existing snapshot version
+- **id** A UUID that does or does not yet exist in the database
 
-# install elasticsearch (follow instructions over there!)
-firefox https://gist.github.com/gourneau/66e0bd90c92ad829590b
+You can also include a **links** key that is an array of UUID's, pointing to other items
+**Internally (and above), we refer to data as an "item", this is the same concept as a elasticsearch document or a table row.**
 
-# export necessary config variables
-export POSTGRESQL_HOST=localhost:5432
-export POSTGRESQL_USER=...
-export POSTGRESQL_PASSWORD=...
-export ELASTICSEARCH_HOST=http://localhost:9200
-export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
 
-# start node-projector
-cd path/to/node-projector/bin && ./start.sh
-```
-
-## ACTIONS
+#Commands
 
 At this moment, the only way to communicate with node-projector is via a JSON API.  
+**In the future we might add support for communication with node-projector via RabbitMQ**
+
 The following commands are available
 
 ## get all schemas
@@ -182,6 +249,71 @@ curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d '\
 curl -X DELETE http://localhost:2000/api/item/:namespace/:schemaKey
 ```
 
-# API DOCS
+#Requirements
 
+- [Node.js](http://nodejs.org/)
+- [RabbitMQ](https://www.rabbitmq.com)
+- [PostgreSQL](http://www.postgresql.org)
+- [PostgreSQL contrib modules](http://www.postgresql.org/docs/9.3/static/uuid-ossp.html) (for UUID support)
+- [Postgis](http://www.postgis.net) (for spatial support)
+- A "template_postgis" [template](http://www.postgresql.org/docs/9.3/static/sql-createdatabase.html) with uuid and/or postgis support
+- A PostgreSQL user with premissions for creating databases
+- [Elasticsearch](http://www.elasticsearch.org/)
+
+To run the script, you must make the following environment variables available.
+
+```shell
+export POSTGRESQL_HOST=localhost:5432
+export POSTGRESQL_USER=...
+export POSTGRESQL_PASSWORD=...
+export ELASTICSEARCH_HOST=http://localhost:9200
+export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
+```
+
+#Installation
+
+It's quite a lot to install and configure, so we are planning to include a docker container in the future.
+
+For now, these instructions should get you going on Ubuntu 14.04.
+
+```
+npm install --save node-projector
+
+# install rabbitmq
+sudo apt-get install rabbitmq-server
+
+# install postgresql
+sudo apt-get install postgresql-9.3 postgresql-contrib
+
+# install postgis (only if you need spatial support)
+sudo apt-get install postgresql-9.3-postgis-2.1
+
+# change user to postgres
+sudo su postgres
+
+# create postgresql database
+createdb -E UTF8 -T template0 template_postgis
+
+# create postgis template for postgresql (only if you need spatial support)
+psql template_postgis <<EOF
+CREATE EXTENSION "uuid-ossp";
+CREATE EXTENSION postgis;
+UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';
+EOF
+
+# install elasticsearch (follow instructions over there!)
+firefox https://gist.github.com/gourneau/66e0bd90c92ad829590b
+
+# export necessary config variables
+export POSTGRESQL_HOST=localhost:5432
+export POSTGRESQL_USER=...
+export POSTGRESQL_PASSWORD=...
+export ELASTICSEARCH_HOST=http://localhost:9200
+export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
+
+# start node-projector
+cd path/to/node-projector/bin && ./start.sh
+```
+
+#Dive deeper
 Head over to the [Api docs](http://trappsnl.github.io/node-projector) to learn more about the internals.
