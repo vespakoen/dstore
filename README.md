@@ -93,6 +93,12 @@ Below is a map of the available **column types**, and the type that it translate
     <th>leveldb type</th>
   </tr>
   <tr>
+    <th>uuid</th>
+    <td>UUID</td>
+    <td>string</td>
+    <td>String (json)</td>
+  </tr>
+  <tr>
     <th>string</th>
     <td>STRING</td>
     <td>string</td>
@@ -105,16 +111,52 @@ Below is a map of the available **column types**, and the type that it translate
     <td>String (json)</td>
   </tr>
   <tr>
+    <th>point</th>
+    <td>Point</td>
+    <td>geo_point</td>
+    <td>Object (json)</td>
+  </tr>
+  <tr>
+    <th>linestring</th>
+    <td>LineString</td>
+    <td>geo_shape</td>
+    <td>Object (json)</td>
+  </tr>
+  <tr>
+    <th>rectangle</th>
+    <td>Polygon</td>
+    <td>geo_shape</td>
+    <td>Object (json)</td>
+  </tr>
+  <tr>
     <th>date</th>
     <td>DATE</td>
-    <td>date</td>
+    <td>date<br>format: yyyy-MM-dd</td>
     <td>String (json)</td>
   </tr>
   <tr>
     <th>datetime</th>
     <td>DATETIME</td>
-    <td>datetime</td>
+    <td>date<br>format: yyyy-MM-dd HH:mm:ss</td>
     <td>String (json)</td>
+  </tr>
+  <tr>
+    <th>float</th>
+    <td>FLOAT</td>
+    <td>float</td>
+    <td>Number (json)</td>
+  </tr>
+  <tr>
+    <th>integer</th>
+    <td>INTEGER</td>
+    <td>integer</td>
+    <td>Number (json)</td>
+  </tr>
+  <tr>
+    <th>boolean</th>
+    <td>BOOL</td>
+    <td>boolean</td>
+    <td>Boolean (json)</td>
   </tr>
 </table>
 
