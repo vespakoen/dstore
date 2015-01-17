@@ -21,7 +21,7 @@ Currently, node-projector supports **PostgreSQL**, **Elasticsearch** and **Level
 
 - [Schemas](#schemas)  
 - [Snapshots](#snapshots)
-- [Storing & removing data](#storing-and-retrieving)
+- [Storing & removing data](#storing--removing-data)
 - [Commands](#commands)
     - Schema management
         - [Get all schemas](#get-all-schemas)
