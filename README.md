@@ -5,7 +5,7 @@
 
 #Introduction
 
-node-projector can be viewed as a interface to all your storage engines.
+node-projector can be seen as a interface to all your storage engines.
 
 Via a simple REST API, you can manage the schema of your data, and store data with a single request and in a simple format.
 
