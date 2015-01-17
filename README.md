@@ -287,8 +287,8 @@ curl -X PUT http://localhost:2000/api/schema/:namespace/:schemaKey -d '\
 **Stores the current schemas as a snapshot.**
 
 *The "put schema" and "put all schemas" commands modify the "current" schema*  
-*If you are happy with the schema, you create a snapshot which will give the schema a version number*  
-*This will also trigger the migrations that will:*  
+*If you are happy with the schema, you create a snapshot.*
+*This will trigger the migrations that will:*  
 
 - create a postgresql database (named: namespace + 'v' + snapshotVersion)
 - create database tables
