@@ -10,6 +10,67 @@ In the future, we can use the schema information to transform items to newer / o
 - postgresql
 - leveldb
 
+## REQUIREMENTS
+
+- [Node.js](http://nodejs.org/)
+- [RabbitMQ](https://www.rabbitmq.com)
+- [PostgreSQL](http://www.postgresql.org)
+- [PostgreSQL contrib modules](http://www.postgresql.org/docs/9.3/static/uuid-ossp.html) (for UUID support)
+- [Postgis](http://www.postgis.net) (for spatial support)
+- A "template_postgis" [template](http://www.postgresql.org/docs/9.3/static/sql-createdatabase.html) with uuid and/or postgis support
+- [Elasticsearch](http://www.elasticsearch.org/)
+
+To run the script, you must make the following environment variables available.
+
+```shell
+export POSTGRESQL_HOST=localhost:5432
+export POSTGRESQL_USER=...
+export POSTGRESQL_PASSWORD=...
+export ELASTICSEARCH_HOST=http://localhost:9200
+export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
+```
+
+## INSTALLATION
+
+These instructions are for Ubuntu 14.04.
+
+```
+# install rabbitmq
+sudo apt-get install rabbitmq-server
+
+# install postgresql
+sudo apt-get install postgresql-9.3 postgresql-contrib
+
+# install postgis (only if you need spatial support)
+sudo apt-get install postgresql-9.3-postgis-2.1
+
+# change user to postgres
+sudo su postgres
+
+# create postgresql database
+createdb -E UTF8 -T template0 template_postgis
+
+# create postgis template for postgresql (only if you need spatial support)
+psql template_postgis <<EOF
+CREATE EXTENSION "uuid-ossp";
+CREATE EXTENSION postgis;
+UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';
+EOF
+
+# install elasticsearch (follow instructions over there!)
+firefox https://gist.github.com/gourneau/66e0bd90c92ad829590b
+
+# export necessary config variables
+export POSTGRESQL_HOST=localhost:5432
+export POSTGRESQL_USER=...
+export POSTGRESQL_PASSWORD=...
+export ELASTICSEARCH_HOST=http://localhost:9200
+export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
+
+# start node-projector
+cd path/to/node-projector/bin && ./start.sh
+```
+
 ## ACTIONS
 
 At this moment, the only way to communicate with node-projector is via a JSON API.  
