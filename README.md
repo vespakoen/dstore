@@ -338,11 +338,14 @@ curl -X DELETE http://localhost:2000/api/item/:namespace/:schemaKey
 To run the script, you must make the following environment variables available.
 
 ```shell
-export POSTGRESQL_HOST=localhost:5432
+export POSTGRESQL_HOST=localhost
+export POSTGRESQL_PORT=5432
 export POSTGRESQL_USER=...
 export POSTGRESQL_PASSWORD=...
 export ELASTICSEARCH_HOST=http://localhost:9200
 export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
+export LEVEL_PATH="storage/level"
+export SCHEMA_PATH="storage/schema"
 ```
 
 #Installation
@@ -384,11 +387,14 @@ EOF
 firefox https://gist.github.com/gourneau/66e0bd90c92ad829590b
 
 # export necessary config variables
-export POSTGRESQL_HOST=localhost:5432
+export POSTGRESQL_HOST=localhost
+export POSTGRESQL_PORT=5432
 export POSTGRESQL_USER=...
 export POSTGRESQL_PASSWORD=...
 export ELASTICSEARCH_HOST=http://localhost:9200
 export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
+export LEVEL_PATH="storage/level"
+export SCHEMA_PATH="storage/schema"
 
 # start node-projector
 cd path/to/node-projector/bin && ./start.sh
