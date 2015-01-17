@@ -10,7 +10,7 @@ var memo = {};
 app.get('schema.adapter')
   .then(function (adapter) {
     memo.adapter = adapter;
-    memo.client = adapter.getClient('nltrappsfruiteropuit');
+    memo.client = adapter.getClient('test');
     return app.get('schema.facade');
   })
   .then(function (facade) {
@@ -29,7 +29,7 @@ app.get('schema.adapter')
         }
       };
 
-      memo.facade.putSchema('nltrappsfruiteropuit', 'news', schema)
+      memo.facade.putSchema('test', 'news', schema)
         .then(function () {
           return Promise.join(
             memo.client.getLog(),
@@ -55,7 +55,7 @@ app.get('schema.adapter')
           t.deepEqual(storedSchema, schema, "versions/news/1.json should match with " + JSON.stringify(schema));
         })
         .then(function () {
-          return memo.facade.createSnapshot('nltrappsfruiteropuit');
+          return memo.facade.createSnapshot('test');
         })
         .then(function() {
           return memo.client.getLog();
@@ -83,7 +83,7 @@ app.get('schema.adapter')
         }
       };
 
-      memo.facade.putSchema('nltrappsfruiteropuit', 'news', renamedSchema)
+      memo.facade.putSchema('test', 'news', renamedSchema)
         .then(function () {
           return Promise.join(
             memo.client.getLog(),
@@ -140,7 +140,7 @@ app.get('schema.adapter')
           t.deepEqual(cleanArticles1Schema, articles1, "versions/articles/1.json should match with " + JSON.stringify(cleanArticles1Schema));
         })
         .then(function () {
-          return memo.facade.createSnapshot('nltrappsfruiteropuit');
+          return memo.facade.createSnapshot('test');
         })
         .then(function () {
           t.end();
@@ -161,7 +161,7 @@ app.get('schema.adapter')
         }
       };
 
-      memo.facade.putSchema('nltrappsfruiteropuit', 'articles', schema)
+      memo.facade.putSchema('test', 'articles', schema)
         .then(function () {
           return Promise.join(
             memo.client.getLog(),
@@ -181,7 +181,7 @@ app.get('schema.adapter')
           t.deepEqual(storedSchema, schema, "versions/articles/2.json should match with " + JSON.stringify(schema));
         })
         .then(function () {
-          return memo.facade.createSnapshot('nltrappsfruiteropuit');
+          return memo.facade.createSnapshot('test');
         })
         .then(function () {
           t.end();

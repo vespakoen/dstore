@@ -1,0 +1,25 @@
+language: node_js
+
+node_js:
+  - "0.11"
+
+addons:
+  postgresql: "9.3"
+
+services:
+  - elasticsearch
+
+before_script:
+  - psql -c 'create database template_postgis;' -U postgres
+  - psql -c 'CREATE EXTENSION postgis;' -U postgres -d template_postgis
+  - psql -c 'CREATE EXTENSION postgis_topology;' -U postgres -d template_postgis
+  - psql -c 'CREATE EXTENSION "uuid-ossp";' -U postgres -d template_postgis
+  - psql -c 'UPDATE pg_database SET datistemplate = TRUE WHERE datname = \'template_postgis\';' -U postgres -d template_postgis
+  - npm install -g pm2
+  - export POSTGRESQL_HOST=localhost:5432
+  - export POSTGRESQL_USER=postgres
+  - export POSTGRESQL_PASSWORD=""
+  - export ELASTICSEARCH_HOST=http://localhost:9200
+  - export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
+  - cd node_modules/node-projector/bin && ./start.sh
+

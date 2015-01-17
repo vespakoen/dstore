@@ -16,10 +16,10 @@ app.get('queue')
     return rmRF(__dirname + '/../storage/schema/test');
   })
   .then(function () {
-    return exec('curl -XDELETE http://localhost:9200/_all');
+    return exec('curl -XDELETE http://localhost:9200/test');
   })
   .then(function () {
-    var connectionString = 'postgresql://trapps:trapps@localhost/postgres';
+    var connectionString = 'postgresql://postgres@localhost/postgres';
     return pg.connectAsync(connectionString)
       .spread(function(client, done) {
         return Promise.join(
