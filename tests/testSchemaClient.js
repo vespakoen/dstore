@@ -1,7 +1,7 @@
 'use strict';
 
 process.env.ENV = 'testing';
-var test = require("tap").test;
+var test = require("tape").test;
 var Promise = require('bluebird');
 var rmRF = Promise.promisify(require('rimraf'));
 var app = require('../bootstrap');
