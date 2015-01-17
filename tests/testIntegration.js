@@ -42,6 +42,7 @@ app.get('queue')
       key: 'kitchensink',
       schema: {
         table: 'kitchensinks',
+        es_type: 'kitchensink',
         columns: {
           type_integer: {
             type: 'integer'
@@ -115,6 +116,7 @@ app.get('queue')
         key: 'kitchensink',
         schema: {
           table: 'kitchensinks',
+          es_type: 'kitchensink',
           columns: {
             type_integer: {
               key: 'integer_type',
