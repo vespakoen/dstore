@@ -2,7 +2,7 @@
 
 process.env.ENV = 'testing';
 var test = require('tape').test;
-var BBPromise = require('bluebird');;
+var BBPromise = require('bluebird');
 var rmRF = BBPromise.promisify(require('rimraf'));
 var app = require('../main');
 var memo = {};

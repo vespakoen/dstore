@@ -3,7 +3,7 @@
 process.env.ENV = 'testing';
 var test = require("tape").test;
 var pg = require('pg');
-var BBPromise = require('bluebird');;
+var BBPromise = require('bluebird');
 var rmRF = BBPromise.promisify(require('rimraf'));
 var exec = require('child-process-promise').exec;
 var app = require('../main');

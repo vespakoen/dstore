@@ -1,6 +1,6 @@
 'use strict';
 
-var BBPromise = require('bluebird');;
+var BBPromise = require('bluebird');
 var app = require('../main');
 
 BBPromise.all([
