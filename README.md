@@ -1,3 +1,5 @@
+![build status](https://travis-ci.org/trappsnl/node-projector.svg)
+
 #Introduction
 
 node-projector can be viewed as a interface to all your storage engines.
