@@ -1,6 +1,5 @@
 #!/bin/sh
 
-export ENV=production
 pm2 kill
 pm2 start queueToQueue.js
 pm2 start queueToSchema.js
