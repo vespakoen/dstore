@@ -11,19 +11,16 @@ Promise.promisifyAll(pg);
 
 var memo = {};
 
-// @todo actually test things
-test('when testing integration', function (t) {
-  t.ok(true, 'the output should be manually checked in the pm2 logs, for now...');
-  t.end();
-}); 
-
 app.get('queue')
   .then(function (queue) {
     memo.queue = queue;
     return rmRF(app.config.schema.path + '/integrationtest');
   })
   .then(function () {
-    return exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtest');
+    return Promise.join(
+      exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtestv1'),
+      exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtestv2')
+    );
   })
   .then(function () {
     var connectionString = 'postgresql://' + app.config.postgresql.username + (app.config.postgresql.password === "" ? '' : ':' + app.config.postgresql.password) + '@' + app.config.postgresql.host + '/postgres';
@@ -33,7 +30,7 @@ app.get('queue')
           client.queryAsync('DROP DATABASE integrationtestv1'),
           client.queryAsync('DROP DATABASE integrationtestv2')
         )
-        .catch(function () {
+        .catch(function (err) {
           // noop
         });
       });
@@ -111,11 +108,8 @@ app.get('queue')
           type_boolean: true
         }
       });
-    }, function (err) {
-      throw err;
     })
-    .then(function () {
-      console.log('putting schema');
+    .then(function (item) {
       return publisher.publish('put-schema', {
         namespace: 'integrationtest',
         key: 'kitchensink',
@@ -198,5 +192,12 @@ app.get('queue')
           links: ['e5c20ace-7aa4-4077-983b-717c2ec5427d']
         }
       });
+    });
+  })
+  .then(function () {
+    // @todo actually test things
+    test('when testing integration', function (t) {
+      t.ok(true, 'the output should be manually checked in the pm2 logs, for now');
+      t.end();
     });
   });
