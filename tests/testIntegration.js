@@ -16,10 +16,10 @@ app.get('queue')
     return rmRF(__dirname + '/../storage/schema/test');
   })
   .then(function () {
-    return exec('curl -XDELETE http://localhost:9200/test');
+    return exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/test');
   })
   .then(function () {
-    var connectionString = 'postgresql://postgres@localhost/postgres';
+    var connectionString = 'postgresql://' + app.config.postgresql.username + (app.config.postgresql.password === "" ? '' : ':' + app.config.postgresql.password) + '@' + app.config.postgresql.host + '/postgres';
     return pg.connectAsync(connectionString)
       .spread(function(client, done) {
         return Promise.join(
@@ -27,13 +27,11 @@ app.get('queue')
           client.queryAsync('DROP DATABASE testv2')
         )
         .catch(function () {
-          console.log('drop database', arguments);
           // noop
         });
       });
   })
   .then(function () {
-    console.log('cleared elasticsearch', arguments);
     return memo.queue.setupPublisher();
   })
   .then(function (publisher) {
@@ -107,7 +105,7 @@ app.get('queue')
         }
       });
     }, function (err) {
-      console.error(err);
+      throw err;
     })
     .then(function () {
       console.log('putting schema');

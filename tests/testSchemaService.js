@@ -179,11 +179,6 @@ app.get('schema.adapter')
           };
           t.deepEqual(changes[6], change, "log's seventh change should be " + JSON.stringify(change));
           t.deepEqual(storedSchema, schema, "versions/articles/2.json should match with " + JSON.stringify(schema));
-        })
-        .then(function () {
-          return memo.facade.createSnapshot('test');
-        })
-        .then(function () {
           t.end();
         });
     });
