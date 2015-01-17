@@ -307,7 +307,11 @@ It's quite a lot to install and configure, so we are planning to include a docke
 For now, these instructions should get you going on Ubuntu 14.04.
 
 ```shell
+# install node-projector
 npm install --save node-projector
+
+# install PM2 (node.js process manager)
+sudo npm install -g pm2
 
 # install rabbitmq
 sudo apt-get install rabbitmq-server
