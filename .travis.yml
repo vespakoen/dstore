@@ -22,6 +22,3 @@ before_script:
   - export POSTGRESQL_PASSWORD=""
   - export ELASTICSEARCH_HOST=http://localhost:9200
   - export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
-  - cd bin && ./startForTravis.sh
-  - cd $TRAVIS_BUILD_DIR
-
