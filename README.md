@@ -131,13 +131,13 @@ Below is a map of the available **column types**, and the type that it translate
   <tr>
     <th>date</th>
     <td>DATE</td>
-    <td>date<br>*(format: yyyy-MM-dd)*</td>
+    <td>date<br>(format: yyyy-MM-dd)</td>
     <td>String (json)</td>
   </tr>
   <tr>
     <th>datetime</th>
     <td>DATETIME</td>
-    <td>date<br>*(format: yyyy-MM-dd HH:mm:ss)*</td>
+    <td>date<br>(format: yyyy-MM-dd HH:mm:ss)</td>
     <td>String (json)</td>
   </tr>
   <tr>
