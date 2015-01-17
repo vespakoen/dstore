@@ -304,7 +304,7 @@ It's quite a lot to install and configure, so we are planning to include a docke
 
 For now, these instructions should get you going on Ubuntu 14.04.
 
-```
+```shell
 npm install --save node-projector
 
 # install rabbitmq
