@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "child-process-promise": "^1.0.1",
+    "memdown": "^1.0.0",
     "rimraf": "^2.2.8",
     "tap-spec": "^2.1.2",
     "tape": "^3.0.3"
