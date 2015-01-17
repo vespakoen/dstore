@@ -1,2 +1,4 @@
 node_modules/
 tests/testTrappsSchema.js
+tests/out/level/
+tests/out/schema/
