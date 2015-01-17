@@ -1,8 +1,8 @@
 'use strict';
 
 var test = require("tape").test;
-var Promise = require('bluebird');
-var rmRF = Promise.promisify(require('rimraf'));
+var BBPromise = require('bluebird');;
+var rmRF = BBPromise.promisify(require('rimraf'));
 var app = require('../main');
 var memo = {};
 

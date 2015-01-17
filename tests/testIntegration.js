@@ -3,11 +3,11 @@
 process.env.ENV = 'testing';
 var test = require("tape").test;
 var pg = require('pg');
-var Promise = require('bluebird');
-var rmRF = Promise.promisify(require('rimraf'));
+var BBPromise = require('bluebird');;
+var rmRF = BBPromise.promisify(require('rimraf'));
 var exec = require('child-process-promise').exec;
 var app = require('../main');
-Promise.promisifyAll(pg);
+BBPromise.promisifyAll(pg);
 
 var memo = {};
 
@@ -17,7 +17,7 @@ app.get('queue')
     return rmRF(app.config.schema.path + '/integrationtest');
   })
   .then(function () {
-    return Promise.join(
+    return BBPromise.join(
       exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtestv1'),
       exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtestv2')
     );
@@ -26,7 +26,7 @@ app.get('queue')
     var connectionString = 'postgresql://' + app.config.postgresql.username + (app.config.postgresql.password === "" ? '' : ':' + app.config.postgresql.password) + '@' + app.config.postgresql.host + '/postgres';
     return pg.connectAsync(connectionString)
       .spread(function(client, done) {
-        return Promise.join(
+        return BBPromise.join(
           client.queryAsync('DROP DATABASE integrationtestv1'),
           client.queryAsync('DROP DATABASE integrationtestv2')
         )

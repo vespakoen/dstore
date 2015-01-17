@@ -2,8 +2,8 @@
 
 process.env.ENV = 'testing';
 var test = require('tape').test;
-var Promise = require('bluebird');
-var rmRF = Promise.promisify(require('rimraf'));
+var BBPromise = require('bluebird');;
+var rmRF = BBPromise.promisify(require('rimraf'));
 var app = require('../main');
 var memo = {};
 
@@ -33,7 +33,7 @@ app.get('schema.adapter')
 
       memo.facade.putSchema('servicetest', 'news', schema)
         .then(function () {
-          return Promise.join(
+          return BBPromise.join(
             memo.client.getLog(),
             memo.client.getSchema('news', 1)
           );
@@ -87,7 +87,7 @@ app.get('schema.adapter')
 
       memo.facade.putSchema('servicetest', 'news', renamedSchema)
         .then(function () {
-          return Promise.join(
+          return BBPromise.join(
             memo.client.getLog(),
             memo.client.getSchema('news', 2),
             memo.client.getSchema('articles', 1)
@@ -165,7 +165,7 @@ app.get('schema.adapter')
 
       memo.facade.putSchema('servicetest', 'articles', schema)
         .then(function () {
-          return Promise.join(
+          return BBPromise.join(
             memo.client.getLog(),
             memo.client.getSchema('articles', 2)
           );

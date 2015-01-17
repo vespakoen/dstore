@@ -1,9 +1,9 @@
 'use strict';
 
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');;
 var app = require('../main');
 
-Promise.all([
+BBPromise.all([
   app.get('queue').then(function (queue) {
     return queue.setupConsumer();
   }),

@@ -1,11 +1,11 @@
 'use strict';
 
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');;
 var app = require('../main');
 
 var namespace = 'test';
 
-Promise.all([
+BBPromise.all([
   app.get('queue').then(function (queue) {
     return queue.setupPublisher();
   }),

@@ -1,11 +1,11 @@
 'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');;
 var app = require('../main');
 
 app.get('queue').then(function (queue) {
-  return Promise.join(
+  return BBPromise.join(
     queue.setupConsumer(),
     queue.setupPublisher(),
     app.get('schema.facade')
@@ -47,7 +47,7 @@ app.get('queue').then(function (queue) {
     return facade.createSnapshot(command.namespace)
       .then(function (newVersion) {
         command.version = newVersion;
-        return Promise.join(
+        return BBPromise.join(
           publisher.publish('migrate.postgresql', command),
           publisher.publish('migrate.elasticsearch', command)
         ).then(function () {
@@ -57,7 +57,7 @@ app.get('queue').then(function (queue) {
           //       return levelFacade.getStream(command.namespace, newVersion - 1);
           //     })
           //     .then(function (stream) {
-          //       return new Promise(function (resolve) {
+          //       return new BBPromise(function (resolve) {
           //         var promises = [];
 
           //         stream.on('data', function (data) {
@@ -69,7 +69,7 @@ app.get('queue').then(function (queue) {
           //         });
 
           //         stream.on('end', function () {
-          //           resolve(Promise.all(promises));
+          //           resolve(BBPromise.all(promises));
           //         });
           //       });
           //     });
