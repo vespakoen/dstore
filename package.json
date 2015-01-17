@@ -10,7 +10,7 @@
   "scripts": {
     "start": "./bin/start.sh",
     "docs": "jsduck --title=node-projector lib/* -o /tmp/projector-docs && git stash && git checkout gh-pages && rsync -av /tmp/projector-docs/ . && git add . && git commit -am 'updating docs' && git push origin gh-pages && git checkout master && git stash apply",
-    "test": "cd bin && ./startForTravis.sh && cd - && tape ./tests/*.js | tap-spec"
+    "test": "cd bin && ./startForTravis.sh && tape ./tests/*.js | tap-spec"
   },
   "dependencies": {
     "bluebird": "^2.3.10",

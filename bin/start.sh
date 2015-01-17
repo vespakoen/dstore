@@ -8,4 +8,3 @@ pm2 start queueToElasticsearch.js
 pm2 start queueToPostgresql.js
 pm2 start startApi.js
 pm2 flush
-pm2 logs
