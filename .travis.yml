@@ -22,4 +22,5 @@ before_script:
   - export ELASTICSEARCH_HOST=http://localhost:9200
   - export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
   - cd node_modules/node-projector/bin && ./start.sh
+  - cd $TRAVIS_BUILD_DIR
 
