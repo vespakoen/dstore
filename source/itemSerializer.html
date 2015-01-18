@@ -49,7 +49,8 @@ ItemSerializer.prototype._serializeItem = function (namespace, schemaKey, item) 
     var column;
     var schema = schemas[schemaKey];
     var columns = schema.columns;
-    for (var key in item) {
+    
+    Object.keys(item).forEach(function (key) {
       if (columns[key]) {
         column = columns[key];
         var method = '_serialize' + help.capitalizeFirstLetter(column.type).replace('[]', 'Array');
@@ -57,7 +58,8 @@ ItemSerializer.prototype._serializeItem = function (namespace, schemaKey, item) 
           item[key] = self[method](item[key]);
         }
       }
-    }
+    });
+
     return item;
   });
 };
@@ -70,7 +72,7 @@ ItemSerializer.prototype._serializeItem = function (namespace, schemaKey, item) 
  */
 ItemSerializer.prototype._serializeString = function(value) {
   if (value === &quot;&quot;) {
-    return null;
+    return undefined;
   }
   return value;
 };

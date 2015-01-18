@@ -19,20 +19,45 @@
 
 var knex = require('knex');
 
+<span id='postgresql-PostgresqlAdapter'>/**
+</span> * @class postgresql.PostgresqlAdapter
+ * 
+ * PostgresqlAdapter
+ * @param {Object} config The postgresql connection configuration
+ */
 function PostgresqlAdapter(config) {
   this.config = config;
   this.connections = {};
 }
 
+<span id='postgresql-PostgresqlAdapter-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
 exports.attachKey = 'postgresql.adapter';
 
+<span id='postgresql-PostgresqlAdapter-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ * @return {this} A PostgresqlAdapter instance with resolved dependencies
+ */
 exports.attach = function(app) {
   return new PostgresqlAdapter(app.config.postgresql);
 };
 
+<span id='postgresql-PostgresqlAdapter-method-getClient'>/**
+</span> * Get the postgresql client.
+ *
+ * @param  {String} namespace
+ * @param  {Number} version
+ *
+ * @return {postgresql.PostgresqlClient}
+ */
 PostgresqlAdapter.prototype.getClient = function(namespace, version) {
   if (!this.connections[namespace + version]) {
-    this.connections[namespace + version] = knex({
+    var options = {
       client: 'postgresql',
       connection: {
         host: this.config.host,
@@ -40,7 +65,8 @@ PostgresqlAdapter.prototype.getClient = function(namespace, version) {
         password: this.config.password,
         database: namespace + (version ? 'v' + version : '')
       }
-    });
+    };
+    this.connections[namespace + version] = knex(options);
   }
   return this.connections[namespace + version];
 };

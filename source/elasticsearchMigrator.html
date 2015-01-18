@@ -18,7 +18,7 @@
   <pre class="prettyprint lang-js">&quot;use strict&quot;;
 
 var _ = require('underscore');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 var help = require('../helpers');
 
 <span id='elasticsearch-ElasticsearchMigrator'>/**
@@ -45,10 +45,10 @@ ElasticsearchMigrator.attachKey = 'elasticsearch.migrator';
  *
  * @param {App} app
  *
- * @return {Promise|Object} The object with resolved dependencies
+ * @return {BBPromise|Object} The object with resolved dependencies
  */
 ElasticsearchMigrator.attach = function(app) {
-  return Promise.join(
+  return BBPromise.join(
     app.get('elasticsearch.client'),
     app.get('schema.adapter')
   ).spread(function(client, schemaAdapter) {
@@ -62,7 +62,7 @@ ElasticsearchMigrator.attach = function(app) {
  * @param  {String} namespace
  * @param  {Number} version
  *
- * @return {Promise.&lt;null&gt;}
+ * @return {BBPromise.&lt;undefined&gt;}
  */
 ElasticsearchMigrator.prototype.migrate = function(namespace, version) {
   var self = this;
@@ -88,7 +88,7 @@ ElasticsearchMigrator.prototype.migrate = function(namespace, version) {
  * @param opts
  * @param opts.index The name of the index to create
  *
- * @return {Promise.&lt;null&gt;}
+ * @return {BBPromise.&lt;undefined&gt;}
  */
 ElasticsearchMigrator.prototype._createIndex = function(opts) {
   var self = this;
@@ -113,7 +113,7 @@ ElasticsearchMigrator.prototype._createIndex = function(opts) {
  * @param opts.schemas  The schemas to turn into a mapping
  * @param opts.index    The index to put the mapping to
  *
- * @return {Promise.&lt;null&gt;}
+ * @return {BBPromise.&lt;undefined&gt;}
  */
 ElasticsearchMigrator.prototype._putMapping = function (opts) {
   var self = this;
@@ -128,6 +128,11 @@ ElasticsearchMigrator.prototype._putMapping = function (opts) {
 
     _.each(schema.columns, function(column, columnKey) {
       self['_define' + help.capitalizeFirstLetter(column.type)](mapping, schemaKey, column, columnKey);
+
+      // if extra options are given for elasticsearch, mix them in
+      if (column.elasticsearch) {
+        _.extend(mapping[schemaKey].properties[columnKey], column.elasticsearch);
+      }
     });
 
     return this.client.indices.putMapping({
@@ -137,7 +142,7 @@ ElasticsearchMigrator.prototype._putMapping = function (opts) {
     });
   }, this);
 
-  return Promise.all(promises);
+  return BBPromise.all(promises);
 };
 
 <span id='elasticsearch-ElasticsearchMigrator-method-_defineUuid'>/**

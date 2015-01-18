@@ -18,9 +18,18 @@
   <pre class="prettyprint lang-js">'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 var ItemRepository = require('../item/itemRepository');
 
+<span id='elasticsearch-ElasticsearchReposirory'>/**
+</span> * @class elasticsearch.ElasticsearchReposirory
+ * ElasticsearchRepository
+ * 
+ * @param {elasticsearch.ElasticsearchSerializer} serializer
+ * @param {elasticsearch.ElasticsearchClient}     client
+ * @param {schema.SchemaAdapter}                  schemaAdapter
+ * @param {item.ItemTransformer}                  itemTransformer
+ */
 function ElasticsearchRepository(serializer, client, schemaAdapter, itemTransformer) {
   ItemRepository.call(this, schemaAdapter, itemTransformer);
   this.serializer = serializer;
@@ -29,10 +38,22 @@ function ElasticsearchRepository(serializer, client, schemaAdapter, itemTransfor
 
 ElasticsearchRepository.prototype = Object.create(ItemRepository.prototype);
 
+<span id='elasticsearch-ElasticsearchReposirory-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
 ElasticsearchRepository.attachKey = 'elasticsearch.repository';
 
+<span id='elasticsearch-ElasticsearchReposirory-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ *
+ * @return {BBPromise} A ElasticsearchRepository instance with resolved dependencies
+ */
 ElasticsearchRepository.attach = function (app) {
-  return Promise.join(
+  return BBPromise.join(
     app.get('elasticsearch.serializer'),
     app.get('elasticsearch.client'),
     app.get('schema.adapter'),
@@ -42,6 +63,15 @@ ElasticsearchRepository.attach = function (app) {
   });
 };
 
+<span id='elasticsearch-ElasticsearchReposirory-method-putItem'>/**
+</span> * Insert / update item.
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} item
+ *
+ * @return {BBPromise}
+ */
 ElasticsearchRepository.prototype.putItem = function (namespace, schemaKey, item) {
   var self = this;
   var memo = {};
@@ -63,6 +93,15 @@ ElasticsearchRepository.prototype.putItem = function (namespace, schemaKey, item
     });
 };
 
+<span id='elasticsearch-ElasticsearchReposirory-method-delItem'>/**
+</span> * Delete item.
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} id
+ *
+ * @return {BBPromise}
+ */
 ElasticsearchRepository.prototype.delItem = function (namespace, schemaKey, version, id) {
   var self = this;
 

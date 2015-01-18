@@ -23,6 +23,8 @@ var ItemSerializer = require('../item/itemSerializer');
 
 <span id='elasticsearch-ElasticsearchSerializer'>/**
 </span> * @class elasticsearch.ElasticsearchSerializer
+ * @extends {item.ItemSerializer}
+ * 
  * ElasticsearchSerializer
  */
 function ElasticsearchSerializer(schemaAdapter) {
@@ -43,7 +45,7 @@ ElasticsearchSerializer.attachKey = 'elasticsearch.serializer';
  *
  * @param {App} app
  *
- * @return {Promise.&lt;null&gt;|Object} The object with resolved dependencies
+ * @return {BBPromise} An ElasticsearchSerializer instance with resolved dependencies.
  */
 ElasticsearchSerializer.attach = function(app) {
   return app.get('schema.adapter').then(function(schemaAdapter) {
@@ -75,7 +77,7 @@ ElasticsearchSerializer.prototype._serializePoint = function(value) {
     value = JSON.parse(value);
   }
   if (!value || !value.coordinates) {
-    return null;
+    return undefined;
   }
   return value.coordinates;
 };

@@ -43,7 +43,7 @@ LevelAdapter.attachKey = 'level.adapter';
  *
  * @param {App} app
  *
- * @return {Promise|Object} The object with resolved dependencies
+ * @return {BBPromise|Object} The object with resolved dependencies
  */
 LevelAdapter.attach = function(app) {
   return new LevelAdapter(app.config.level.path);
@@ -59,7 +59,11 @@ LevelAdapter.attach = function(app) {
  */
 LevelAdapter.prototype.getClient = function(namespace, version) {
   if (!this.connections[namespace + version]) {
-    this.connections[namespace + version] = sublevel(level(this.path + '/' + namespace + 'v' + version));
+    var options = {};
+    if (process.env.ENV === 'testing') {
+      options = { db: require('memdown') };
+    }
+    this.connections[namespace + version] = sublevel(level(this.path + '/' + namespace + 'v' + version, options));
   }
   return this.connections[namespace + version];
 };

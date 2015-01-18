@@ -29,8 +29,20 @@ function ItemTransformer(schemaAdapter) {
   this.schemaAdapter = schemaAdapter;
 }
 
+<span id='item-ItemTransformer-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
 ItemTransformer.attachKey = 'item.transformer';
 
+<span id='item-ItemTransformer-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ *
+ * @return {BBPromise} An ItemTransformer instance with resolved dependencies.
+ */
 ItemTransformer.attach = function (app) {
   return app.get('schema.adapter')
     .then(function (schemaAdapter) {
@@ -61,7 +73,7 @@ ItemTransformer.prototype._applyChanges = function(changes, schemaKey, item) {
         schemaKey = change.value;
         break;
       case 'column.create':
-        item[change.column] = null;
+        item[change.column] = undefined;
         break;
       case 'column.rename':
         item[change.value] = item[change.column];
@@ -86,8 +98,8 @@ ItemTransformer.prototype._applyChanges = function(changes, schemaKey, item) {
 
 ItemTransformer.prototype._transformTypeOfItem = function(value, fromType, toType) {
   if (toType === 'string') {
-    if (value === null) {
-      return null;
+    if (value === undefined) {
+      return undefined;
     }
     if (_.isDate(value)) {
       return value.toString();

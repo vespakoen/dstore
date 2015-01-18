@@ -18,7 +18,7 @@
   <pre class="prettyprint lang-js">'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 
 <span id='App'>/**
 </span> * The app object.
@@ -44,14 +44,14 @@ App.prototype.use = function(component) {
 </span> * Get a component from the app (singleton).
  *
  * @param {String} key
- * @returns {Promise} The instatiated component
+ * @returns {BBPromise} The instatiated component
  */
 App.prototype.get = function(key) {
   var component = this.components[key];
   if (!(this[key] || component)) {
     throw new Error(key + ' component not registered in the app!');
   }
-  return new Promise(function(resolve) {
+  return new BBPromise(function(resolve) {
     return component ? resolve(component.attach(this)) : resolve(this[key]);
   }.bind(this));
 };

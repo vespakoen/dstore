@@ -18,7 +18,7 @@
   <pre class="prettyprint lang-js">'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 var map = require('map-stream');
 var bytewiseCodec = require('level-sublevel/codec/bytewise');
 var ItemRepository = require('../item/itemRepository');
@@ -40,10 +40,21 @@ function LevelRepository(serializer, adapter, schemaAdapter, itemTransformer) {
 
 LevelRepository.prototype = Object.create(ItemRepository.prototype);
 
+<span id='level-LevelRepository-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
 LevelRepository.attachKey = 'level.repository';
 
+<span id='level-LevelRepository-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ * @return {BBPromise} A LevelRepository instance with resolved dependencies.
+ */
 LevelRepository.attach = function (app) {
-  return Promise.join(
+  return BBPromise.join(
     app.get('level.serializer'),
     app.get('level.adapter'),
     app.get('schema.adapter'),
@@ -53,6 +64,15 @@ LevelRepository.attach = function (app) {
   });
 };
 
+<span id='level-LevelRepository-method-putItem'>/**
+</span> * Insert / update item
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} item
+ *
+ * @return {BBPromise}
+ */
 LevelRepository.prototype.putItem = function (namespace, schemaKey, item) {
   var self = this;
 
@@ -71,21 +91,28 @@ LevelRepository.prototype.putItem = function (namespace, schemaKey, item) {
       var table = itemByTypeDb.sublevel(schemaKey);
       var itemByTypeAndIdDb = client.sublevel('item-by-type-and-id', bytewiseCodec);
 
-      return Promise.join(
-        Promise.promisify(typeByIdDb.put)(item.id, schemaKey),
-        Promise.promisify(itemByIdDb.put)(item.id, value),
-        Promise.promisify(table.put)(item.id, value),
-        Promise.promisify(itemByTypeAndIdDb.put)([schemaKey, item.id], value)
+      return BBPromise.join(
+        BBPromise.promisify(typeByIdDb.put)(item.id, schemaKey),
+        BBPromise.promisify(itemByIdDb.put)(item.id, value),
+        BBPromise.promisify(table.put)(item.id, value),
+        BBPromise.promisify(itemByTypeAndIdDb.put)([schemaKey, item.id], value)
       )
-      .then(function () {
-        console.log('jeej');
-      })
       .catch(function (err) {
         console.error('leveldb error', err);
       });
     });
 };
 
+<span id='level-LevelRepository-method-delItem'>/**
+</span> * Delete item
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Number} version
+ * @param  {String} id
+ *
+ * @return {BBPromise}
+ */
 LevelRepository.prototype.delItem = function (namespace, schemaKey, version, id) {
   var self = this;
 
@@ -106,20 +133,20 @@ LevelRepository.prototype.delItem = function (namespace, schemaKey, version, id)
  * @param  {String} namespace
  * @param  {Number} version
  * @param  {Array} ids
- * @return {Promise}
+ * @return {BBPromise}
  */
 LevelRepository.prototype.getIdToTypeMap = function(namespace, version, ids) {
   var self = this;
 
-  return new Promise(function(resolve) {
+  return new BBPromise(function(resolve) {
     var i,
         idsMap = {},
         results = {};
 
-    for (i in ids) {
-      idsMap[ids[i]] = true;
-    }
-
+    ids.forEach(function (id) {
+      idsMap[id] = true;
+    });
+    
     var client = self.adapter.getClient(namespace, version);
     var typeByIdDb = client.sublevel('type-by-id');
     typeByIdDb.createReadStream()
@@ -143,13 +170,13 @@ LevelRepository.prototype.getIdToTypeMap = function(namespace, version, ids) {
 LevelRepository.prototype.getStream = function (namespace, version) {
   var self = this;
 
-  return new Promise(function (resolve) {
+  return new BBPromise(function (resolve) {
     var client = self.adapter.getClient(namespace, version);
     var itemByTypeAndIdDb = client.sublevel('item-by-type-and-id', bytewiseCodec);
 
     return itemByTypeAndIdDb.createReadStream()
       .pipe(map(function (data, cb) {
-        cb(null, {
+        cb(undefined, {
           key: data.key.split(',')[0],
           value: JSON.parse(data.value)
         });

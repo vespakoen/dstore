@@ -18,7 +18,7 @@
   <pre class="prettyprint lang-js">'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 
 function SchemaService(adapter, differ) {
   this.adapter = adapter;
@@ -28,7 +28,7 @@ function SchemaService(adapter, differ) {
 SchemaService.attachKey = 'schema.service';
 
 SchemaService.attach = function(app) {
-  return Promise.join(
+  return BBPromise.join(
     app.get('schema.adapter'),
     app.get('schema.differ')
   ).spread(function (adapter, differ) {
@@ -50,8 +50,8 @@ SchemaService.prototype.getAllSchemas = function(namespace) {
 
   return client.getSchemaVersions('current')
     .then(function (schemaVersions) {
-      return Promise.all(_.map(schemaVersions, function (version, schemaKey) {
-        return Promise.join(
+      return BBPromise.all(_.map(schemaVersions, function (version, schemaKey) {
+        return BBPromise.join(
           schemaKey,
           client.getSchema(schemaKey, version)
         );
@@ -93,10 +93,10 @@ SchemaService.prototype.putSchema = function(namespace, schemaKey, schema) {
 
 SchemaService.prototype.putAllSchemas = function(namespace, schemas) {
   var self = this;
-  var chain = Promise.resolve();
+  var chain = BBPromise.resolve();
 
-  return Promise.all(_.map(schemas, function (schema, schemaKey) {
-    return Promise.join(
+  return BBPromise.all(_.map(schemas, function (schema, schemaKey) {
+    return BBPromise.join(
       schemaKey,
       self.putSchema(namespace, schemaKey, schema)
     );
@@ -106,7 +106,7 @@ SchemaService.prototype.putAllSchemas = function(namespace, schemas) {
 };
 
 SchemaService.prototype._validatePutSchema = function(namespace, schemaKey, schema) {
-  return new Promise(function (resolve, reject) {
+  return new BBPromise(function (resolve, reject) {
     if (!namespace) {
       return reject(new Error('The \'namespace\' argument is required!'));
     }

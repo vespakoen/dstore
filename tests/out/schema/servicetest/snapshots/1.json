@@ -1,0 +1,11 @@
+{
+  "news": {
+    "es_type": "news",
+    "table": "news",
+    "columns": {
+      "description_nl": {
+        "type": "text"
+      }
+    }
+  }
+}

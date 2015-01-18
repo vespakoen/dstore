@@ -17,7 +17,7 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">'use strict';
 
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 var _ = require('underscore');
 
 function SchemaClient(differ) {
@@ -94,7 +94,7 @@ SchemaClient.prototype.forEveryVersionOfSchema = function(schemaKey, version, cb
   var self = this;
 
   var allVersions = self.getVersionsForSchema(schemaKey, version);
-  return Promise.all(_.map(allVersions, function(version) {
+  return BBPromise.all(_.map(allVersions, function(version) {
     return cb(version);
   }));
 };

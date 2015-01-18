@@ -18,7 +18,7 @@
   <pre class="prettyprint lang-js">'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 var validator = require('validator');
 
 <span id='item-ItemRepository'>/**
@@ -65,7 +65,7 @@ ItemRepository.prototype.delItemForAllVersions = function (namespace, schemaKey,
 ItemRepository.prototype._validatePutItem = function (namespace, schemaKey, item) {
   var self = this;
 
-  return new Promise(function(resolve, reject) {
+  return new BBPromise(function(resolve, reject) {
     if (!namespace) {
       return reject(new Error('The \'namespace\' argument is required!'));
     }
@@ -127,7 +127,7 @@ ItemRepository.prototype._validatePutItem = function (namespace, schemaKey, item
 };
 
 ItemRepository.prototype._validateDelItem = function (namespace, schemaKey, id) {
-  return new Promise(function(resolve, reject) {
+  return new BBPromise(function(resolve, reject) {
     if (!namespace) {
       return reject(new Error('The \'namespace\' argument is required!'));
     }

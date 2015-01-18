@@ -18,9 +18,18 @@
   <pre class="prettyprint lang-js">'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 var ItemRepository = require('../item/itemRepository');
 
+<span id='postgresql-PostgresqlRepository'>/**
+</span> * @class postgresql.PostgresqlRepository
+ * PostgresqlRepository
+ * 
+ * @param {postgresql.PostgresqlAdapter}    adapter
+ * @param {postgresql.PostgresqlSerializer} serializer
+ * @param {schema.SchemaAdapter}            schemaAdapter
+ * @param {item.ItemTransformer}            itemTransformer
+ */
 function PostgresqlRepository(adapter, serializer, schemaAdapter, itemTransformer) {
   ItemRepository.call(this, schemaAdapter, itemTransformer);
   this.adapter = adapter;
@@ -29,10 +38,21 @@ function PostgresqlRepository(adapter, serializer, schemaAdapter, itemTransforme
 
 PostgresqlRepository.prototype = Object.create(ItemRepository.prototype);
 
+<span id='postgresql-PostgresqlRepository-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
 PostgresqlRepository.attachKey = 'postgresql.repository';
 
+<span id='postgresql-PostgresqlRepository-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ * @return {BBPromise} A PostgresqlRepository instance with resolved dependencies
+ */
 PostgresqlRepository.attach = function(app) {
-  return Promise.join(
+  return BBPromise.join(
     app.get('postgresql.adapter'),
     app.get('postgresql.serializer'),
     app.get('schema.adapter'),
@@ -42,9 +62,20 @@ PostgresqlRepository.attach = function(app) {
   });
 };
 
+<span id='postgresql-PostgresqlRepository-method-putItem'>/**
+</span> * Insert / update item
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} item
+ *
+ * @return {BBPromise}
+ */
 PostgresqlRepository.prototype.putItem = function (namespace, schemaKey, item) {
   var self = this;
-  var opts = {};
+  var opts = {
+    item: item
+  };
 
   return this._validatePutItem(namespace, schemaKey, item)
     .then(function (schema) {
@@ -54,37 +85,27 @@ PostgresqlRepository.prototype.putItem = function (namespace, schemaKey, item) {
     })
     .then(function (compatibleItem) {
       opts.compatibleItem = compatibleItem;
-      var table = opts.table = opts.schema.table;
-      console.log('table', table);
-      return opts.client.table(table)
-        .first()
-        .where({
-          id: item.id
-        })
-        .then(function(row) {
-          return row;
-        });
+      return self._itemExists(opts);
     })
-    .then(function (row) {
-      if (row) {
-        // update
-        return opts.client.table(opts.table)
-          .where({
-            id: item.id
-          })
-          .update(opts.compatibleItem)
-          // triggers knex.js's promise strategy
-          .then(function () {});
+    .then(function (exists) {
+      if (exists) {
+        return self._updateItem(opts);
       } else {
-        // insert
-        return opts.client.table(opts.table)
-          .insert(opts.compatibleItem)
-          // triggers knex.js's promise strategy
-          .then(function () {});
+        return self._insertItem(opts);
       }
     });
 };
 
+<span id='postgresql-PostgresqlRepository-method-delItem'>/**
+</span> * Delete item
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Number} version
+ * @param  {String} id
+ *
+ * @return {BBPromise}
+ */
 PostgresqlRepository.prototype.delItem = function (namespace, schemaKey, version, id) {
   var self = this;
 
@@ -104,8 +125,65 @@ PostgresqlRepository.prototype.delItem = function (namespace, schemaKey, version
           id: id
         })
         .del()
-        .then(function () {}); // triggers knex.js's promise strategy
+        // triggers knex.js's promise strategy
+        .then(function () {});
     });
+};
+
+<span id='postgresql-PostgresqlRepository-method-_itemExists'>/**
+</span> * Checks if an item already exists in the database.
+ * 
+ * @param  {Object} opts        Options
+ * @param  {Object} opts.schema Schema options
+ * @param  {Object} opts.item   The item
+ * 
+ * @return {BBPromise}   Promise resolving true or false (exists or doesn't exist).
+ */
+PostgresqlRepository.prototype._itemExists = function (opts) {
+  return opts.client.table(opts.schema.table)
+    .first()
+    .where({
+      id: opts.item.id
+    })
+    .then(function(row) {
+      return !!row;
+    });
+};
+
+<span id='postgresql-PostgresqlRepository-method-_updateItem'>/**
+</span> * Updates an item in the database.
+ * 
+ * @param  {Object} opts                 Options
+ * @param  {Object} opts.schema          Schema options
+ * @param  {Object} opts.item            The item
+ * @param  {Object} opts.compatibleItem  The serialized item
+ * 
+ * @return {BBPromise}
+ */
+PostgresqlRepository.prototype._updateItem = function (opts) {
+  return opts.client.table(opts.schema.table)
+    .where({
+      id: opts.item.id
+    })
+    .update(opts.compatibleItem)
+    // triggers knex.js's promise strategy
+    .then(function () {});
+};
+
+<span id='postgresql-PostgresqlRepository-method-_updateItem'>/**
+</span> * Inserts a new item into the database.
+ * 
+ * @param  {Object} opts                 Options
+ * @param  {Object} opts.schema          Schema options
+ * @param  {Object} opts.compatibleItem  The serialized item
+ * 
+ * @return {BBPromise}
+ */
+PostgresqlRepository.prototype._updateItem = function (opts) {
+  return opts.client.table(opts.schema.table)
+    .insert(opts.compatibleItem)
+    // triggers knex.js's promise strategy
+    .then(function () {});
 };
 
 module.exports = PostgresqlRepository;

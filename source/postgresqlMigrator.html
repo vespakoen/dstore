@@ -20,8 +20,8 @@
 var _ = require('underscore');
 var pg = require('pg');
 var help = require('../helpers');
-var Promise = require('bluebird');
-Promise.promisifyAll(pg);
+var BBPromise = require('bluebird');
+BBPromise.promisifyAll(pg);
 
 <span id='postgresql-PostgresqlMigrator'>/**
 </span> * @class postgresql.PostgresqlMigrator
@@ -48,11 +48,11 @@ PostgresqlMigrator.attachKey = 'postgresql.migrator';
 </span> * IOC attach.
  *
  * @param {App} app
- * @return {Promise|Object} The object with resolved dependencies
+ * @return {BBPromise} A PostgresqlMigrator instance with resolved dependencies
  */
 PostgresqlMigrator.attach = function(app) {
   var config = app.config.postgresql;
-  return Promise.join(
+  return BBPromise.join(
     app.get('schema.adapter'),
     app.get('postgresql.adapter')
   ).spread(function(schemaAdapter, adapter) {
@@ -66,14 +66,13 @@ PostgresqlMigrator.attach = function(app) {
  * @param  {String} namespace
  * @param  {Number} version
  *
- * @return {Promise.&lt;null&gt;}
+ * @return {BBPromise.&lt;undefined&gt;}
  */
 PostgresqlMigrator.prototype.migrate = function(namespace, version) {
   var self = this;
   var opts = {
     namespace: namespace,
     version: version,
-    database: namespace + 'v' + version,
     connectionString: 'postgresql://' + this.config.username + ':' + this.config.password + '@' + this.config.host + '/postgres'
   };
 
@@ -92,21 +91,44 @@ PostgresqlMigrator.prototype.migrate = function(namespace, version) {
     });
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_createDatabase'>/**
+</span> * Creates a new database for given namespace and version.
+ * 
+ * @param  {Object} opts                  Options for creating the DATABASE
+ * @param  {String} opts.connectionString The postgresql connectionstring
+ * @param  {String} opts.namespace        The project namespace
+ * @return {Number} opts.version          The snapshot version
+ */
 PostgresqlMigrator.prototype._createDatabase = function(opts) {
-  return pg.connectAsync(opts.connectionString).spread(function(client, done) {
-    return client.queryAsync('CREATE DATABASE ' + opts.database + ' TEMPLATE=template_postgis').then(function() {
-      console.log('database created');
-    }).catch(function(err) {
-      console.log('database already exists', err);
+  return pg.connectAsync(opts.connectionString)
+    .spread(function(client, done) {
+      return client.queryAsync('CREATE DATABASE ' + namespace + 'v' + version + ' TEMPLATE=template_postgis');
+    })
+    .then(function () {
+    })
+    .catch(function(err) {
+      console.error('error while creating database', err);
     });
-  });
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_getDatabaseClient'>/**
+</span> * Retrieves the database client for given namespace and version.
+ * 
+ * @param  {Object} opts            Options for retrieving the database
+ * @param  {String} opts.namespace  The project namespace
+ * @return {Number} opts.version    The snapshot version
+ */
 PostgresqlMigrator.prototype._getDatabaseClient = function(opts) {
-  console.log('get database client');
   return this.adapter.getClient(opts.namespace, opts.version);
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_createTables'>/**
+</span> * Creates tables in database based on the given schemas.
+ * 
+ * @param  {Object}                      opts         Options for creating the tables
+ * @param  {postgresql.PostgresqlClient} opts.client  The project namespace
+ * @return {Object}                      opts.schemas The schemas
+ */
 PostgresqlMigrator.prototype._createTables = function(opts) {
   var self = this;
 
@@ -120,54 +142,143 @@ PostgresqlMigrator.prototype._createTables = function(opts) {
       table.specificType('links', 'uuid[]');
     })
     // triger knex.js's promise strategy
-    .then(function() {});
+    .then(function() {
+    }, function (err) {
+      console.error('error while creating tables', err);
+    });
   });
 
-  return Promise.all(promises).then(function() {
-    console.log('done migrating postgres');
-  });
+  return BBPromise.all(promises);
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_defineInteger'>/**
+</span> * Defines an INTEGER column on given table.
+ *
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._defineInteger = function(table, column, columnKey) {
   table.integer(columnKey);
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_defineUuid'>/**
+</span> * Defines an UUID column on given table.
+ * 
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._defineUuid = function(table, column, columnKey) {
   table.uuid(columnKey);
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_defineString'>/**
+</span> * Defines an STRING column on given table.
+ *
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._defineString = function(table, column, columnKey) {
   table.string(columnKey);
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_defineText'>/**
+</span> * Defines an TEXT column on given table.
+ *
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._defineText = function(table, column, columnKey) {
   table.text(columnKey);
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_defineDatetime'>/**
+</span> * Defines an DATETIME column on given table.
+ *
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._defineDatetime = function(table, column, columnKey) {
   table.dateTime(columnKey);
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_defineDate'>/**
+</span> * Defines an DATE column on given table.
+ *
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._defineDate = function(table, column, columnKey) {
   table.date(columnKey);
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_defineFloat'>/**
+</span> * Defines an FLOAT column on given table.
+ *
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._defineFloat = function(table, column, columnKey) {
   table.float(columnKey);
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_definePoint'>/**
+</span> * Defines an GEOMETRY column of type Point on given table.
+ *
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._definePoint = function(table, column, columnKey) {
   table.specificType(columnKey, 'geometry(Point,4326)');
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_defineLinestring'>/**
+</span> * Defines an GEOMETRY column of type LineString on given table.
+ *
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._defineLinestring = function(table, column, columnKey) {
   table.specificType(columnKey, 'geometry(LineString,4326)');
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_defineRectangle'>/**
+</span> * Defines an GEOMETRY column of type Polygon on given table.
+ *
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._defineRectangle = function(table, column, columnKey) {
   table.specificType(columnKey, 'geometry(Polygon,4326)');
 };
 
+<span id='postgresql-PostgresqlMigrator-method-_defineBoolean'>/**
+</span> * Defines an BOOLEAN column on given table.
+ *
+ * @protected
+ * @param  {Object} table     Knex.js table object (given through createTable's callback)
+ * @param  {Object} column    Column definition
+ * @param  {String} columnKey Name of the column
+ */
 PostgresqlMigrator.prototype._defineBoolean = function(table, column, columnKey) {
   table.boolean(columnKey);
 };

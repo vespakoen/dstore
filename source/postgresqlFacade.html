@@ -18,7 +18,7 @@
   <pre class="prettyprint lang-js">'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 
 <span id='postgresql-PostgresqlFacade'>/**
 </span> * @class postgresql.PostgresqlFacade
@@ -44,10 +44,10 @@ PostgresqlFacade.attachKey = 'postgresql.facade';
 </span> * IOC attach.
  *
  * @param {App} app
- * @return {Promise|Object} The object with resolved dependencies
+ * @return {BBPromise} A PostgresqlFacade instance with resolved dependencies
  */
 PostgresqlFacade.attach = function(app) {
-  return Promise.join(
+  return BBPromise.join(
     app.get('postgresql.repository'),
     app.get('postgresql.serializer'),
     app.get('postgresql.migrator')
@@ -63,7 +63,7 @@ PostgresqlFacade.attach = function(app) {
  * @param  {String} schemaKey
  * @param  {Object} item
  *
- * @return {Promise}
+ * @return {BBPromise}
  */
 PostgresqlFacade.prototype.putItem = function(namespace, schemaKey, item) {
   return this.repository.putItem(namespace, schemaKey, item);
@@ -77,7 +77,7 @@ PostgresqlFacade.prototype.putItem = function(namespace, schemaKey, item) {
  * @param  {Number} version
  * @param  {String} id
  *
- * @return {Promise}
+ * @return {BBPromise}
  */
 PostgresqlFacade.prototype.delItem = function(namespace, schemaKey, version, id) {
   return this.repository.delItem(namespace, schemaKey, version, id);
@@ -89,7 +89,7 @@ PostgresqlFacade.prototype.delItem = function(namespace, schemaKey, version, id)
  * @param  {String} namespace
  * @param  {Number} version
  *
- * @return {Promise.&lt;null&gt;}
+ * @return {BBPromise.&lt;undefined&gt;}
  */
 PostgresqlFacade.prototype.migrate = function(namespace, version) {
   return this.migrator.migrate(namespace, version);

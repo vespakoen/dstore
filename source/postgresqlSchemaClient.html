@@ -18,9 +18,9 @@
   <pre class="prettyprint lang-js">'use strict';
 
 var fs = require('fs');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 var SchemaClient = require('./schemaClient');
-Promise.promisifyAll(fs);
+BBPromise.promisifyAll(fs);
 
 function PostgresqlSchemaClient(differ, namespace) {
   SchemaClient.call(this, differ);
@@ -49,12 +49,6 @@ PostgresqlSchemaClient.prototype.getSchemaVersions = function(snapshotVersion) {
 };
 
 PostgresqlSchemaClient.prototype.putSchemaVersions = function(snapshotVersion, schemaVersions) {
-  var client = this.adapter.getClient('schema');
-
-  return client.table('snapshots')
-    .select('schema_key,schema_version')
-    .where({snapshot_version: snapshotVersion})
-    .get();
 };
 
 PostgresqlSchemaClient.prototype.getLog = function() {

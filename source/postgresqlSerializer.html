@@ -23,49 +23,88 @@ var knex = require('knex')({dialect: 'postgres'});
 var st = require('knex-postgis')(knex);
 var ItemSerializer = require('../item/itemSerializer');
 
+<span id='postgresql-PostgresqlSerializer'>/**
+</span> * @class postgresql.PostgresqlSerializer
+ * @extends {item.ItemSerializer}
+ *
+ * PostgresqlSerializer
+ */
 function PostgresqlSerializer(schemaAdapter) {
   ItemSerializer.call(this, schemaAdapter);
 }
 
+PostgresqlSerializer.prototype = Object.create(ItemSerializer.prototype);
+
+<span id='postgresql-PostgresqlSerializer-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
 PostgresqlSerializer.attachKey = 'postgresql.serializer';
 
+<span id='postgresql-PostgresqlSerializer-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ *
+ * @return {BBPromise} A PostgresqlSerializer instance with resolved dependencies.
+ */
 PostgresqlSerializer.attach = function(app) {
   return app.get('schema.adapter').then(function(schemaAdapter) {
     return new PostgresqlSerializer(schemaAdapter);
   });
 };
 
-PostgresqlSerializer.prototype = Object.create(ItemSerializer.prototype);
-
+<span id='postgresql-PostgresqlSerializer-method-serialize'>/**
+</span> * Serialize item for PostgreSQL
+ *
+ * @param  {String} namespace
+ * @param  {String} schemaKey
+ * @param  {Object} item
+ *
+ * @return {Object} The serialized item
+ */
 PostgresqlSerializer.prototype.serialize = function(namespace, schemaKey, item) {
   return this._serializeItem(namespace, schemaKey, item);
 };
 
+<span id='postgresql-PostgresqlSerializer-method-_serializePoint'>/**
+</span> * Serialize a point.
+ *
+ * @protected
+ * @param  {string} value
+ */
 PostgresqlSerializer.prototype._serializePoint = function(value) {
-  if (_.isString(value)) {
-    var geoJson = JSON.parse(value);
-    geoJson.crs = {
-      type: 'name',
-      properties: {name: 'EPSG:4326'}
-    };
-    value = st.geomFromGeoJSON(geoJson);
-  }
-  return value;
+  return this._serializeGeoJSON(value);
 };
 
+<span id='postgresql-PostgresqlSerializer-method-_serializeLinestring'>/**
+</span> * Serialize a linestring.
+ *
+ * @protected
+ * @param  {string} value
+ */
 PostgresqlSerializer.prototype._serializeLinestring = function(value) {
-  if (_.isString(value)) {
-    var geoJson = JSON.parse(value);
-    geoJson.crs = {
-      type: 'name',
-      properties: {name: 'EPSG:4326'}
-    };
-    value = st.geomFromGeoJSON(geoJson);
-  }
-  return value;
+  return this._serializeGeoJSON(value);
 };
 
+<span id='postgresql-PostgresqlSerializer-method-_serializeRectangle'>/**
+</span> * Serialize a rectangle.
+ *
+ * @protected
+ * @param  {string} value
+ */
 PostgresqlSerializer.prototype._serializeRectangle = function(value) {
+  return this._serializeGeoJSON(value);
+};
+
+<span id='postgresql-PostgresqlSerializer-method-_serializeGeoJSON'>/**
+</span> * Serialize to geojson.
+ *
+ * @protected
+ * @param  {string} value
+ */
+PostgresqlSerializer.prototype._serializeGeoJSON = function(value) {
   if (_.isString(value)) {
     var geoJson = JSON.parse(value);
     geoJson.crs = {

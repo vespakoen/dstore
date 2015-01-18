@@ -18,7 +18,7 @@
   <pre class="prettyprint lang-js">'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
+var BBPromise = require('bluebird');
 var ItemSerializer = require('../item/itemSerializer');
 
 <span id='level-LevelSerializer'>/**
@@ -40,7 +40,7 @@ LevelSerializer.attachKey = 'level.serializer';
 </span> * IOC attach.
  *
  * @param {App} app
- * @return {Promise|Object} The object with resolved dependencies
+ * @return {BBPromise|Object} A LevelSerializer instance with resolved dependencies.
  */
 LevelSerializer.attach = function(app) {
   return new LevelSerializer();
@@ -60,7 +60,7 @@ LevelSerializer.prototype = Object.create(ItemSerializer.prototype);
 LevelSerializer.prototype.serialize = function(namespace, schemaKey, item) {
   var self = this;
 
-  return new Promise(function(resolve) {
+  return new BBPromise(function(resolve) {
     item.links = _.uniq(item.links || []);
     resolve(self._sortKeys(item));
   });
