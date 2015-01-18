@@ -194,13 +194,13 @@ curl -X PUT http://localhost:2000/api/item/myblog/article -d '\
 {\
   "id": "66276124-ebcd-45e1-8013-825346daa283",\
   "snapshot_version": 1,\
-  "title_nl": "De titel"\
-  "title_en": "Some title"\
-  "intro_nl": "De intro"\
-  "intro_en": "The intro"\
-  "content_nl": "De inhoud"\
-  "content_en": "The content"\
-  "date_created": "2014-01-17 03:50:12"\
+  "title_nl": "De titel",\
+  "title_en": "Some title",\
+  "intro_nl": "De intro",\
+  "intro_en": "The intro",\
+  "content_nl": "De inhoud",\
+  "content_en": "The content",\
+  "date_created": "2014-01-17 03:50:12",\
   "date_updated": "2014-01-17 03:50:12"\
 }'
 ```
