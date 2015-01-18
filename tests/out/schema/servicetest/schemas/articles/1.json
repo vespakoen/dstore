@@ -1,9 +1,0 @@
-{
-  "es_type": "news",
-  "table": "news",
-  "columns": {
-    "title_nl": {
-      "type": "string"
-    }
-  }
-}
