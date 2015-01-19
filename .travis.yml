@@ -1,5 +1,15 @@
 language: node_js
 
+env:
+  - POSTGRESQL_HOST=localhost
+  - POSTGRESQL_PORT=5432
+  - POSTGRESQL_USER=postgres
+  - POSTGRESQL_PASSWORD=""
+  - ELASTICSEARCH_HOST=http://localhost:9200
+  - QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
+  - LEVEL_PATH="$TRAVIS_BUILD_DIR/tests/out/level"
+  - SCHEMA_PATH="$TRAVIS_BUILD_DIR/tests/out/schema"
+
 node_js:
   - "0.10"
 
@@ -17,9 +27,3 @@ before_script:
   - psql -c 'CREATE EXTENSION "uuid-ossp";' -U postgres -d template_postgis
   - psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis';"
   - npm install -g pm2
-  - export POSTGRESQL_HOST=localhost
-  - export POSTGRESQL_PORT=5432
-  - export POSTGRESQL_USER=postgres
-  - export POSTGRESQL_PASSWORD=""
-  - export ELASTICSEARCH_HOST=http://localhost:9200
-  - export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
