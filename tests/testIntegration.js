@@ -1,203 +1,424 @@
 'use strict';
 
-process.env.ENV = 'testing';
-var test = require("tape").test;
 var pg = require('pg');
+var knex = require('knex');
+var _ = require('underscore');
+var test = require('tape').test;
 var BBPromise = require('bluebird');
-var rmRF = BBPromise.promisify(require('rimraf'));
 var exec = require('child-process-promise').exec;
+var rmRF = BBPromise.promisify(require('rimraf'));
 var app = require('../main');
 BBPromise.promisifyAll(pg);
 
-var memo = {};
+var opts = {};
+
+function removeSchema() {
+  return rmRF(app.config.schema.path + '/integrationtest');
+}
+
+function removeElasticsearchIndexes() {
+  return BBPromise.join(
+    exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtestv1'),
+    exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtestv2')
+  );
+}
+
+function getPostgresqlManageConnection() {
+  var close;
+  var connectionString = 'postgresql://' + app.config.postgresql.username + (app.config.postgresql.password === "" ? '' : ':' + app.config.postgresql.password) + '@' + app.config.postgresql.host + '/postgres';
+  return pg.connectAsync(connectionString)
+    .spread(function(client, done) {
+      opts.closeManageConnection = done;
+      return client;
+    });
+}
+
+function dropTestDatabases(opts) {
+  return opts.client.queryAsync("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'integrationtestv1'")
+    .then(function () {
+      return opts.client.queryAsync('DROP DATABASE integrationtestv1');
+    })
+    .then(function () {
+      return opts.client.queryAsync("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'integrationtestv2'");
+    })
+    .then(function () {
+      return opts.client.queryAsync('DROP DATABASE integrationtestv2');
+    });
+}
+
+function putFirstSchema(opts) {
+  return opts.publisher.publish('put-schema', {
+    namespace: 'integrationtest',
+    key: 'kitchensink',
+    schema: {
+      table: 'kitchensinks',
+      es_type: 'kitchensink',
+      columns: {
+        type_integer: {
+          type: 'integer'
+        },
+        type_uuid: {
+          type: 'uuid'
+        },
+        type_string: {
+          type: 'string'
+        },
+        type_text: {
+          type: 'text'
+        },
+        type_datetime: {
+          type: 'datetime'
+        },
+        type_date: {
+          type: 'date'
+        },
+        type_float: {
+          type: 'float'
+        },
+        type_point: {
+          type: 'point'
+        },
+        type_linestring: {
+          type: 'linestring'
+        },
+        type_rectangle: {
+          type: 'rectangle'
+        },
+        type_boolean: {
+          type: 'boolean'
+        }
+      }
+    }
+  });
+}
+
+function createSnapshot(opts) {
+  return opts.publisher.publish('create-snapshot', {
+    namespace: 'integrationtest'
+  });
+}
+
+function putFirstItem(opts) {
+  return opts.publisher.publish('put-item', {
+    namespace: 'integrationtest',
+    key: 'kitchensink',
+    item: {
+      id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
+      version: 1,
+      type_integer: 15,
+      type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
+      type_string: 'string',
+      type_text: 'text',
+      type_datetime:'12-12-2012 00:11:33',
+      type_date: '12-12-2012',
+      type_float: 11.11111,
+      type_point: '{"type": "Point", "coordinates": [5.9127083, 50.78757]}',
+      type_linestring: '{"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}',
+      type_rectangle: '{"type": "Polygon", "coordinates": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}',
+      type_boolean: true
+    }
+  });
+}
+
+function putSecondSchema(opts) {
+  return opts.publisher.publish('put-schema', {
+    namespace: 'integrationtest',
+    key: 'kitchensink',
+    schema: {
+      table: 'kitchensinks',
+      es_type: 'kitchensink',
+      columns: {
+        type_integer: {
+          key: 'integer_type',
+          type: 'integer'
+        },
+        type_uuid: {
+          key: 'uuid_type',
+          type: 'uuid'
+        },
+        type_string: {
+          key: 'string_type',
+          type: 'string'
+        },
+        type_text: {
+          key: 'text_type',
+          type: 'text'
+        },
+        type_datetime: {
+          key: 'datetime_type',
+          type: 'datetime'
+        },
+        type_date: {
+          key: 'date_type',
+          type: 'date'
+        },
+        type_float: {
+          key: 'float_type',
+          type: 'float'
+        },
+        type_point: {
+          key: 'point_type',
+          type: 'point'
+        },
+        type_linestring: {
+          key: 'linestring_type',
+          type: 'linestring'
+        },
+        type_rectangle: {
+          key: 'rectangle_type',
+          type: 'rectangle'
+        },
+        type_boolean: {
+          key: 'boolean_type',
+          type: 'boolean'
+        }
+      }
+    }
+  });
+}
+
+function putSecondItem(opts) {
+  return opts.publisher.publish('put-item', {
+    namespace: 'integrationtest',
+    key: 'kitchensink',
+    item: {
+      id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
+      version: 1,
+      type_integer: 35235,
+      type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
+      type_string: 'stringetje',
+      type_text: 'textje',
+      type_datetime:'11-05-2013 00:11:33',
+      type_date: '12-12-2022',
+      type_float: 22.222222222222222,
+      type_point: '{"type": "Point", "coordinates": [5.9127083, 50.78757]}',
+      type_linestring: '{"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}',
+      type_rectangle: '{"type": "Polygon", "coordinates": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}',
+      type_boolean: true,
+      links: ['e5c20ace-7aa4-4077-983b-717c2ec5427d']
+    }
+  });
+}
+
+function getElasticsearchClient(opts) {
+  return app.get('elasticsearch.client');
+}
+
+function testElasticsearchResult(opts) {
+  return new BBPromise(function (resolve) {
+    test('when validating the elasticsearch output', function (t) {
+      resolve(opts.elasticsearchClient.search({
+        index: 'integrationtestv1',
+        type: 'kitchensink',
+        id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d'
+      })
+      .then(function (result) {
+        var doc = result.hits.hits[0]._source;
+        t.deepEqual(doc, {
+          "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+          "version": 1,
+          "type_integer": 15,
+          "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+          "type_string": "string",
+          "type_text": "text",
+          "type_datetime": "2012-12-12 00:11:33",
+          "type_date": "2012-12-12",
+          "type_float": 11.11111,
+          "type_point": [
+            5.9127083,
+            50.78757
+          ],
+          "type_linestring": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                5.9127083,
+                50.78757
+              ],
+              [
+                5.9127083,
+                50.78754
+              ]
+            ]
+          },
+          "type_rectangle": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  5.9127083,
+                  50.78757
+                ],
+                [
+                  5.4127083,
+                  50.88757
+                ],
+                [
+                  5.9327083,
+                  50.78757
+                ],
+                [
+                  5.9127083,
+                  50.78753
+                ]
+              ]
+            ]
+          },
+          "type_boolean": true,
+          "links": []
+        }, 'documents should match');
+        t.end();
+      }));
+    });
+  });
+}
+
+function getLevelClient(opts) {
+  return app.get('level.adapter').then(function (levelAdapter) {
+    opts.levelAdapter = levelAdapter;
+    return levelAdapter.getClient('integrationtest', 1);
+  });
+}
+
+function testLevelResult(opts) {
+  return new BBPromise(function (resolve) {
+    test('when validating the leveldb output', function (t) {
+      opts.levelClient.sublevel('item-by-id')
+        .get('e5c20ace-7aa4-4077-983b-717c2ec5427d', function(err, result) {
+          t.deepEqual(JSON.parse(result), {
+            "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+            "links": [],
+            "type_boolean": true,
+            "type_date": "12-12-2012",
+            "type_datetime": "12-12-2012 00:11:33",
+            "type_float": 11.11111,
+            "type_integer": 15,
+            "type_linestring": "{\"type\": \"LineString\", \"coordinates\": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}",
+            "type_point": "{\"type\": \"Point\", \"coordinates\": [5.9127083, 50.78757]}",
+            "type_rectangle": "{\"type\": \"Polygon\", \"coordinates\": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}",
+            "type_string": "string",
+            "type_text": "text",
+            "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+            "version": 1
+          }, 'documents should match');
+          t.end();
+          resolve();
+        });
+    });
+  });
+}
+
+function getPostgresqlClient(opts) {
+  return app.get('postgresql.adapter').then(function (postgresqlAdapter) {
+    opts.postgresqlAdapter = postgresqlAdapter;
+    return postgresqlAdapter.getClient('integrationtest', 1);
+  });
+}
+
+function testPostgresqlResult(opts) {
+  return new BBPromise(function (resolve) {
+    test('when validating the postgresql output', function (t) {
+      opts.postgresqlClient.table('kitchensinks')
+        .first([
+          '*',
+          knex.raw('ST_AsGeoJSON(type_point) as type_point'),
+          knex.raw('ST_AsGeoJSON(type_linestring) as type_linestring'),
+          knex.raw('ST_AsGeoJSON(type_rectangle) as type_rectangle')
+        ])
+        .where({
+          id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d'
+        })
+        .then(function (result) {
+          t.deepEqual(result, {
+            "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+            "version": 1,
+            "type_integer": 15,
+            "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+            "type_string": "string",
+            "type_text": "text",
+            "type_datetime": new Date("2012-12-11T23:11:33.000Z"),
+            "type_date": new Date("2012-12-11T23:00:00.000Z"),
+            "type_float": 11.1111,
+            "type_point": "{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]}",
+            "type_linestring": "{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]}",
+            "type_rectangle": "{\"type\":\"Polygon\",\"coordinates\":[[[5.9127083,50.78757],[5.4127083,50.88757],[5.9327083,50.78757],[5.9127083,50.78753]]]}",
+            "type_boolean": true,
+            "links": []
+          }, 'documents should match');
+          t.end();
+          resolve();
+        });
+    });
+  });
+}
 
 app.get('queue')
   .then(function (queue) {
-    memo.queue = queue;
-    return rmRF(app.config.schema.path + '/integrationtest');
+    opts.queue = queue;
+    return removeSchema();
+  })
+  .then(function () {
+    return removeElasticsearchIndexes();
+  })
+  .then(function () {
+    return getPostgresqlManageConnection();
+  })
+  .then(function (client) {
+    opts.client = client;
+    return dropTestDatabases(opts);
+  })
+  .then(function () {
+    return opts.queue.setupPublisher();
+  })
+  .then(function (publisher) {
+    opts.publisher = publisher;
+    return putFirstSchema(opts);
+  })
+  .then(function () {
+    return createSnapshot(opts);
+  })
+  .then(function () {
+    return putFirstItem(opts);
+  })
+  .then(function () {
+    return putSecondSchema(opts)
+  })
+  .then(function () {
+    return createSnapshot(opts);
+  })
+  .then(function () {
+    return putSecondItem(opts);
   })
   .then(function () {
     return BBPromise.join(
-      exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtestv1'),
-      exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtestv2')
+      getElasticsearchClient(opts),
+      getLevelClient(opts),
+      getPostgresqlClient(opts)
     );
   })
-  .then(function () {
-    var connectionString = 'postgresql://' + app.config.postgresql.username + (app.config.postgresql.password === "" ? '' : ':' + app.config.postgresql.password) + '@' + app.config.postgresql.host + '/postgres';
-    return pg.connectAsync(connectionString)
-      .spread(function(client, done) {
-        return BBPromise.join(
-          client.queryAsync('DROP DATABASE integrationtestv1'),
-          client.queryAsync('DROP DATABASE integrationtestv2')
-        )
-        .catch(function (err) {
-          // noop
-        });
-      });
+  .spread(function (elasticsearchClient, levelClient, postgresqlClient) {
+    opts.elasticsearchClient = elasticsearchClient;
+    opts.levelClient = levelClient;
+    opts.postgresqlClient = postgresqlClient;
+
+    return BBPromise.join(
+      testElasticsearchResult(opts),
+      testLevelResult(opts),
+      testPostgresqlResult(opts)
+    );
   })
-  .then(function () {
-    return memo.queue.setupPublisher();
+  .catch(function (err) {
+    console.error('errors while running test', err);
   })
-  .then(function (publisher) {
-    return publisher.publish('put-schema', {
-      namespace: 'integrationtest',
-      key: 'kitchensink',
-      schema: {
-        table: 'kitchensinks',
-        es_type: 'kitchensink',
-        columns: {
-          type_integer: {
-            type: 'integer'
-          },
-          type_uuid: {
-            type: 'uuid'
-          },
-          type_string: {
-            type: 'string'
-          },
-          type_text: {
-            type: 'text'
-          },
-          type_datetime: {
-            type: 'datetime'
-          },
-          type_date: {
-            type: 'date'
-          },
-          type_float: {
-            type: 'float'
-          },
-          type_point: {
-            type: 'point'
-          },
-          type_linestring: {
-            type: 'linestring'
-          },
-          type_rectangle: {
-            type: 'rectangle'
-          },
-          type_boolean: {
-            type: 'boolean'
-          }
-        }
-      }
-    })
-    .then(function () {
-      return publisher.publish('create-snapshot', {
-        namespace: 'integrationtest',
-        key: 'kitchensink'
-      });
-    })
-    .then(function () {
-      return publisher.publish('put-item', {
-        namespace: 'integrationtest',
-        key: 'kitchensink',
-        item: {
-          id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
-          version: 1,
-          type_integer: 15,
-          type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
-          type_string: 'string',
-          type_text: 'text',
-          type_datetime:'12-12-2012 00:11:33',
-          type_date: '12-12-2012',
-          type_float: 11.11111,
-          type_point: '{"type": "Point", "coordinates": [5.9127083, 50.78757]}',
-          type_linestring: '{"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}',
-          type_rectangle: '{"type": "Polygon", "coordinates": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}',
-          type_boolean: true
-        }
-      });
-    })
-    .then(function (item) {
-      return publisher.publish('put-schema', {
-        namespace: 'integrationtest',
-        key: 'kitchensink',
-        schema: {
-          table: 'kitchensinks',
-          es_type: 'kitchensink',
-          columns: {
-            type_integer: {
-              key: 'integer_type',
-              type: 'integer'
-            },
-            type_uuid: {
-              key: 'uuid_type',
-              type: 'uuid'
-            },
-            type_string: {
-              key: 'string_type',
-              type: 'string'
-            },
-            type_text: {
-              key: 'text_type',
-              type: 'text'
-            },
-            type_datetime: {
-              key: 'datetime_type',
-              type: 'datetime'
-            },
-            type_date: {
-              key: 'date_type',
-              type: 'date'
-            },
-            type_float: {
-              key: 'float_type',
-              type: 'float'
-            },
-            type_point: {
-              key: 'point_type',
-              type: 'point'
-            },
-            type_linestring: {
-              key: 'linestring_type',
-              type: 'linestring'
-            },
-            type_rectangle: {
-              key: 'rectangle_type',
-              type: 'rectangle'
-            },
-            type_boolean: {
-              key: 'boolean_type',
-              type: 'boolean'
-            }
-          }
-        }
-      });
-    })
-    .then(function () {
-      return publisher.publish('create-snapshot', {
-        namespace: 'integrationtest',
-        key: 'kitchensink'
-      });
-    })
-    .then(function () {
-      return publisher.publish('put-item', {
-        namespace: 'integrationtest',
-        key: 'kitchensink',
-        item: {
-          id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
-          version: 1,
-          type_integer: 35235,
-          type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
-          type_string: 'stringetje',
-          type_text: 'textje',
-          type_datetime:'11-05-2013 00:11:33',
-          type_date: '12-12-2022',
-          type_float: 22.222222222222222,
-          type_point: '{"type": "Point", "coordinates": [5.9127083, 50.78757]}',
-          type_linestring: '{"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}',
-          type_rectangle: '{"type": "Polygon", "coordinates": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}',
-          type_boolean: true,
-          links: ['e5c20ace-7aa4-4077-983b-717c2ec5427d']
-        }
-      });
-    });
-  })
-  .then(function () {
-    // @todo actually test things
-    test('when testing integration', function (t) {
-      t.ok(true, 'the output should be manually checked in the pm2 logs, for now');
-      t.end();
-    });
+  .finally(function () {
+    // opts.queue.close();
+    // opts.closeManageConnection();
+    // opts.levelAdapter.closeConnections();
+    // opts.postgresqlAdapter.closeConnections();
+    
+    // somehow, without exiting the process myself, it hangs
+    // (even when closing all connections as seen in the comments above)
+    setTimeout(function () {
+      process.exit();
+    }, 1000);
   });

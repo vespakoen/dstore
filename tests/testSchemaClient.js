@@ -60,4 +60,7 @@ rmRF(app.config.schema.path + '/clienttest')
           t.end();
         });
     });
+  })
+  .catch(function (err) {
+    console.log('Errors while running test', err);
   });

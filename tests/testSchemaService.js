@@ -184,4 +184,7 @@ app.get('schema.adapter')
           t.end();
         });
     });
+  })
+  .catch(function (err) {
+    console.log('Errors while running test', err);
   });
