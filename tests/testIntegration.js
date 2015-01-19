@@ -43,6 +43,10 @@ function dropTestDatabases(opts) {
     })
     .then(function () {
       return opts.client.queryAsync('DROP DATABASE integrationtestv2');
+    })
+    .catch(function () {
+      // the database probably doesn't exist, so we ignore this error
+      // noop
     });
 }
 
