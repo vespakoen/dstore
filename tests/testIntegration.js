@@ -340,7 +340,7 @@ function testPostgresqlResult(opts) {
             "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
             "type_string": "string",
             "type_text": "text",
-            "type_datetime": new Date("2012-12-11T23:11:33.000Z"),
+            "type_datetime": new Date("2012-12-11T00:11:33.000Z"),
             "type_date": new Date("2012-12-11T23:00:00.000Z"),
             "type_float": 11.1111,
             "type_point": "{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]}",
