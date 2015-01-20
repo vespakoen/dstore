@@ -3,8 +3,11 @@
 var BBPromise = require('bluebird');
 var app = require('../main');
 
+var queue;
+
 BBPromise.all([
-  app.get('queue').then(function (queue) {
+  app.get('queue').then(function (q) {
+    queue = q;
     return queue.setupConsumer();
   }),
   app.get('postgresql.facade')
@@ -12,6 +15,7 @@ BBPromise.all([
   consumer.consume('put-item.postgresql', putItem);
   consumer.consume('del-item.postgresql', delItem);
   consumer.consume('migrate.postgresql', migrate);
+  console.log('Queue to postgresql started');
 
   function putItem(command) {
     console.log('put-item.postgresql', command.namespace || 'no namespace', command.key || 'no key', command.item ? command.item.id || 'no item id' : '');
@@ -27,4 +31,11 @@ BBPromise.all([
     console.log('migrate.postgresql', command.namespace || 'no namespace', command.version || 'no version');
     return facade.migrate(command.namespace, command.version);
   }
+});
+
+process.on('SIGTERM', function () {
+  queue.close(function () {
+    console.log('Queue to postgresql stopping...');
+    process.exit(0);
+  });
 });

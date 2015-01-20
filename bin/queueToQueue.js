@@ -3,10 +3,13 @@
 var BBPromise = require('bluebird');
 var app = require('../main');
 
-app.get('queue').then(function (queue) {
+var queue;
+
+app.get('queue').then(function (q) {
+  queue = q;
   return BBPromise.join(
-    queue.setupPublisher(),
-    queue.setupConsumer()
+    q.setupPublisher(),
+    q.setupConsumer()
   );
 })
 .spread(function (publisher, consumer) {
@@ -26,5 +29,13 @@ app.get('queue').then(function (queue) {
       publisher.publish('del-item.postgresql', command),
       publisher.publish('del-item.elasticsearch', command)
     );
+  });
+  console.log('Queue to queue started');
+});
+
+process.on('SIGTERM', function () {
+  queue.close(function () {
+    console.log('Queue to queue stopping...');
+    process.exit(0);
   });
 });

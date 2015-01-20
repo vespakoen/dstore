@@ -3,6 +3,8 @@
 var restify = require('restify');
 var app = require('../main');
 
+var queue;
+
 var server = restify.createServer({
   name: 'projector',
   version: '1.0.0'
@@ -17,8 +19,9 @@ server.use(restify.bodyParser());
 function createHandler(key, createCommand) {
   return function (req, res, next) {
     app.get('queue')
-      .then(function (queue) {
-        queue.publish(key, createCommand ? createCommand(req) : {})
+      .then(function (q) {
+        queue = q;
+        q.publish(key, createCommand ? createCommand(req) : {})
           .then(function (result) {
             res.send(result);
             return next();
@@ -96,6 +99,16 @@ server.del('/api/item/:namespace/:schemaKey', createHandler('del-item', function
   };
 }));
 
-server.listen(process.env.API_PORT, function () {
-  console.log('%s listening at %s', server.name, server.url);
+server.listen(Number(process.env.API_PORT), function () {
+  console.log('API started at %s', server.url);
+});
+
+process.on('SIGTERM', function () {
+  server.close();
+  console.log('API stopping...');
+
+  if ( ! queue) process.exit(0);
+  queue.close(function () {
+    process.exit(0);
+  });
 });

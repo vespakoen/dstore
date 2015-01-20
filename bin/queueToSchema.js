@@ -4,10 +4,13 @@ var _ = require('underscore');
 var BBPromise = require('bluebird');
 var app = require('../main');
 
-app.get('queue').then(function (queue) {
+var queue;
+
+app.get('queue').then(function (q) {
+  queue = q;
   return BBPromise.join(
-    queue.setupConsumer(),
-    queue.setupPublisher(),
+    q.setupConsumer(),
+    q.setupPublisher(),
     app.get('schema.facade')
   );
 }).spread(function (consumer, publisher, facade) {
@@ -16,6 +19,7 @@ app.get('queue').then(function (queue) {
   consumer.consume('put-schema', putSchema);
   consumer.consume('put-all-schemas', putAllSchemas);
   consumer.consume('create-snapshot', createSnapshot);
+  console.log('Queue to schema started');
 
   function putSchema(command) {
     console.log('put-schema', command.namespace || 'no namespace', command.key || 'no key');
@@ -77,4 +81,11 @@ app.get('queue').then(function (queue) {
         });
       });
   }
+});
+
+process.on('SIGTERM', function () {
+  queue.close(function () {
+    console.log('Queue to schema stopping...');
+    process.exit(0);
+  });
 });
