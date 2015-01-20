@@ -96,6 +96,6 @@ server.del('/api/item/:namespace/:schemaKey', createHandler('del-item', function
   };
 }));
 
-server.listen(2000, function () {
+server.listen(process.env.API_PORT, function () {
   console.log('%s listening at %s', server.name, server.url);
 });

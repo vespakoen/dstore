@@ -11,6 +11,7 @@ if ( ! _.isString(process.env.ELASTICSEARCH_HOST))      throw new Error('The ELA
 if ( ! _.isString(process.env.QUEUE_CONNECTIONSTRING))  throw new Error('The QUEUE_CONNECTIONSTRING environment variable is not defined!');
 if ( ! _.isString(process.env.LEVEL_PATH))              throw new Error('The LEVEL_PATH environment variable is not defined!');
 if ( ! _.isString(process.env.SCHEMA_PATH))             throw new Error('The SCHEMA_PATH environment variable is not defined!');
+if ( ! _.isString(process.env.API_PORT))                throw new Error('The API_PORT environment variable is not defined!');
 
 var config = require('./config');
 

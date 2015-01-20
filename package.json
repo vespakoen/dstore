@@ -1,6 +1,6 @@
 {
   "name": "node-projector",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Manage your schema & project data to PostgreSQL, Elasticsearch and LevelDB (more can be added) via a simple API",
   "repository": {
     "type": "git",
