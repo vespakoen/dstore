@@ -346,6 +346,7 @@ export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
 export SCHEMA_PATH="storage/schema"
+export API_PORT="2000"
 ```
 
 #Installation
@@ -395,6 +396,7 @@ export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
 export SCHEMA_PATH="storage/schema"
+export API_PORT="2000"
 
 # start node-projector
 cd path/to/node-projector/bin && ./start.sh

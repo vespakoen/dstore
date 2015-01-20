@@ -3,7 +3,7 @@
 var pg = require('pg');
 var knex = require('knex');
 var _ = require('underscore');
-var test = require('tape').test;
+var test = require('tap').test;
 var BBPromise = require('bluebird');
 var exec = require('child-process-promise').exec;
 var rmRF = BBPromise.promisify(require('rimraf'));
@@ -24,7 +24,6 @@ function removeElasticsearchIndexes() {
 }
 
 function getPostgresqlManageConnection() {
-  var close;
   var connectionString = 'postgresql://' + app.config.postgresql.username + (app.config.postgresql.password === "" ? '' : ':' + app.config.postgresql.password) + '@' + app.config.postgresql.host + '/postgres';
   return pg.connectAsync(connectionString)
     .spread(function(client, done) {
@@ -113,7 +112,7 @@ function putFirstItem(opts) {
       type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
       type_string: 'string',
       type_text: 'text',
-      type_datetime:'12-12-2012 00:11:33',
+      type_datetime: '12-12-2012 00:11:10',
       type_date: '12-12-2012',
       type_float: 11.11111,
       type_point: '{"type": "Point", "coordinates": [5.9127083, 50.78757]}',
@@ -192,7 +191,7 @@ function putSecondItem(opts) {
       type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
       type_string: 'stringetje',
       type_text: 'textje',
-      type_datetime:'11-05-2013 00:11:33',
+      type_datetime:'11-05-2013 00:11:10',
       type_date: '12-12-2022',
       type_float: 22.222222222222222,
       type_point: '{"type": "Point", "coordinates": [5.9127083, 50.78757]}',
@@ -225,7 +224,7 @@ function testElasticsearchResult(opts) {
           "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
           "type_string": "string",
           "type_text": "text",
-          "type_datetime": "2012-12-12 00:11:33",
+          "type_datetime": "2012-12-12 00:11:10",
           "type_date": "2012-12-12",
           "type_float": 11.11111,
           "type_point": [
@@ -294,7 +293,7 @@ function testLevelResult(opts) {
             "links": [],
             "type_boolean": true,
             "type_date": "12-12-2012",
-            "type_datetime": "12-12-2012 00:11:33",
+            "type_datetime": "12-12-2012 00:11:10",
             "type_float": 11.11111,
             "type_integer": 15,
             "type_linestring": "{\"type\": \"LineString\", \"coordinates\": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}",
@@ -340,7 +339,7 @@ function testPostgresqlResult(opts) {
             "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
             "type_string": "string",
             "type_text": "text",
-            "type_datetime": new Date("2012-12-11T00:11:33.000Z"),
+            "type_datetime": new Date("2012-12-11T23:11:10.000Z"),
             "type_date": new Date("2012-12-11T23:00:00.000Z"),
             "type_float": 11.1111,
             "type_point": "{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]}",
@@ -415,14 +414,15 @@ app.get('queue')
     console.error('errors while running test', err);
   })
   .finally(function () {
-    // opts.queue.close();
-    // opts.closeManageConnection();
-    // opts.levelAdapter.closeConnections();
-    // opts.postgresqlAdapter.closeConnections();
-    
+    console.log(opts, opts.closeManageConnection);
+    opts.queue.close();
+    opts.closeManageConnection();
+    opts.levelAdapter.closeConnections();
+    opts.postgresqlAdapter.closeConnections();
+    // opts = null;
     // somehow, without exiting the process myself, it hangs
     // (even when closing all connections as seen in the comments above)
-    setTimeout(function () {
-      process.exit();
-    }, 1000);
+    // setTimeout(function () {
+    //   process.exit();
+    // }, 1000);
   });
