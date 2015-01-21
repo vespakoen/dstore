@@ -207,8 +207,8 @@ function getElasticsearchClient(opts) {
   return app.get('elasticsearch.client');
 }
 
-function testElasticsearchResult(opts) {
-  test('when validating the elasticsearch output', function (t) {
+function testElasticsearchResult(opts, t) {
+  t.test('when validating the elasticsearch output', function (et) {
     return opts.elasticsearchClient.search({
       index: 'integrationtestv1',
       type: 'kitchensink',
@@ -216,7 +216,7 @@ function testElasticsearchResult(opts) {
     })
     .then(function (result) {
       var doc = result.hits.hits[0]._source;
-      t.deepEqual(doc, {
+      et.deepEqual(doc, {
         "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
         "version": 1,
         "type_integer": 15,
@@ -280,11 +280,11 @@ function getLevelClient(opts) {
   });
 }
 
-function testLevelResult(opts) {
-  test('when validating the leveldb output', function (t) {
+function testLevelResult(opts, t) {
+  t.test('when validating the leveldb output', function (lt) {
     return opts.levelClient.sublevel('item-by-id')
-      .get('e5c20ace-7aa4-4077-983b-717c2ec5427d', t.cb(function(err, result) {
-        t.deepEqual(JSON.parse(result), {
+      .get('e5c20ace-7aa4-4077-983b-717c2ec5427d', lt.cb(function(err, result) {
+        lt.deepEqual(JSON.parse(result), {
           "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
           "links": [],
           "type_boolean": true,
@@ -311,8 +311,8 @@ function getPostgresqlClient(opts) {
   });
 }
 
-function testPostgresqlResult(opts) {
-  test('when validating the postgresql output', function (t) {
+function testPostgresqlResult(opts, t) {
+  t.test('when validating the postgresql output', function (pt) {
     return opts.postgresqlClient.table('kitchensinks')
       .first([
         '*',
@@ -324,7 +324,7 @@ function testPostgresqlResult(opts) {
         id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d'
       })
       .then(function (result) {
-        t.deepEqual(result, {
+        pt.deepEqual(result, {
           "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
           "version": 1,
           "type_integer": 15,
@@ -344,61 +344,63 @@ function testPostgresqlResult(opts) {
   });
 }
 
-app.get('queue')
-  .then(function (queue) {
-    opts.queue = queue;
-    return removeSchema();
-  })
-  .then(function () {
-    return removeElasticsearchIndexes();
-  })
-  .then(function () {
-    return getPostgresqlManageConnection();
-  })
-  .then(function (client) {
-    opts.client = client;
-    return dropTestDatabases(opts);
-  })
-  .then(function () {
-    return opts.queue.setupPublisher();
-  })
-  .then(function (publisher) {
-    opts.publisher = publisher;
-    return putFirstSchema(opts);
-  })
-  .then(function () {
-    return createSnapshot(opts);
-  })
-  .then(function () {
-    return putFirstItem(opts);
-  })
-  .then(function () {
-    return putSecondSchema(opts)
-  })
-  .then(function () {
-    return createSnapshot(opts);
-  })
-  .then(function () {
-    return putSecondItem(opts);
-  })
-  .then(function () {
-    return BBPromise.join(
-      getElasticsearchClient(opts),
-      getLevelClient(opts),
-      getPostgresqlClient(opts)
-    );
-  })
-  .spread(function (elasticsearchClient, levelClient, postgresqlClient) {
-    opts.elasticsearchClient = elasticsearchClient;
-    opts.levelClient = levelClient;
-    opts.postgresqlClient = postgresqlClient;
+test('when testing integration', function (t) {
+  return app.get('queue')
+    .then(function (queue) {
+      opts.queue = queue;
+      return removeSchema();
+    })
+    .then(function () {
+      return removeElasticsearchIndexes();
+    })
+    .then(function () {
+      return getPostgresqlManageConnection();
+    })
+    .then(function (client) {
+      opts.client = client;
+      return dropTestDatabases(opts);
+    })
+    .then(function () {
+      return opts.queue.setupPublisher();
+    })
+    .then(function (publisher) {
+      opts.publisher = publisher;
+      return putFirstSchema(opts);
+    })
+    .then(function () {
+      return createSnapshot(opts);
+    })
+    .then(function () {
+      return putFirstItem(opts);
+    })
+    .then(function () {
+      return putSecondSchema(opts)
+    })
+    .then(function () {
+      return createSnapshot(opts);
+    })
+    .then(function () {
+      return putSecondItem(opts);
+    })
+    .then(function () {
+      return BBPromise.join(
+        getElasticsearchClient(opts),
+        getLevelClient(opts),
+        getPostgresqlClient(opts)
+      );
+    })
+    .spread(function (elasticsearchClient, levelClient, postgresqlClient) {
+      opts.elasticsearchClient = elasticsearchClient;
+      opts.levelClient = levelClient;
+      opts.postgresqlClient = postgresqlClient;
 
-    return BBPromise.join(
-      testElasticsearchResult(opts),
-      testLevelResult(opts),
-      testPostgresqlResult(opts)
-    );
-  })
-  .catch(function (err) {
-    console.error('errors while running test', err);
-  });
+      return BBPromise.join(
+        testElasticsearchResult(opts, t),
+        testLevelResult(opts, t),
+        testPostgresqlResult(opts, t)
+      );
+    })
+    .catch(function (err) {
+      console.error('errors while running test', err);
+    });
+});

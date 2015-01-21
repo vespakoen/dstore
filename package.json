@@ -11,7 +11,7 @@
     "start": "./bin/start.sh",
     "docs": "./bin/create_docs.sh",
     "pretest": "./bin/start.sh",
-    "test": "tape tests/testSchemaClient.js tests/testSchemaService.js tests/testIntegration.js"
+    "test": "tape tests/testIntegration.js tests/testSchemaClient.js tests/testSchemaService.js"
   },
   "dependencies": {
     "bluebird": "^2.3.10",
@@ -37,9 +37,7 @@
     "child-process-promise": "^1.0.1",
     "memdown": "^1.0.0",
     "rimraf": "^2.2.8",
-    "tap": "^0.5.0",
-    "tap-spec": "^2.1.2",
-    "tape": "^3.0.3"
+    "trap": "^0.4.2"
   },
   "author": "Koen Schmeets",
   "license": "ISC"
