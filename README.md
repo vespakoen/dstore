@@ -158,6 +158,12 @@ Below is a map of the available **column types**, and the type that it translate
     <td>boolean</td>
     <td>Boolean (json)</td>
   </tr>
+  <tr>
+    <th>json</th>
+    <td>JSON</td>
+    <td>object</td>
+    <td>Object (json)</td>
+  </tr>
 </table>
 
 

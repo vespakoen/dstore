@@ -89,6 +89,9 @@ function putFirstSchema(opts) {
         },
         type_boolean: {
           type: 'boolean'
+        },
+        type_json: {
+          type: 'json'
         }
       }
     }
@@ -118,7 +121,8 @@ function putFirstItem(opts) {
       type_point: '{"type": "Point", "coordinates": [5.9127083, 50.78757]}',
       type_linestring: '{"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}',
       type_rectangle: '{"type": "Polygon", "coordinates": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}',
-      type_boolean: true
+      type_boolean: true,
+      type_json: '{"some": {"random": "json"}}'
     }
   });
 }
@@ -174,6 +178,10 @@ function putSecondSchema(opts) {
         type_boolean: {
           key: 'boolean_type',
           type: 'boolean'
+        },
+        type_json: {
+          key: 'json_type',
+          type: 'json'
         }
       }
     }
@@ -198,6 +206,7 @@ function putSecondItem(opts) {
       type_linestring: '{"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}',
       type_rectangle: '{"type": "Polygon", "coordinates": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}',
       type_boolean: true,
+      type_json: '{"some": {"random": "json"}}',
       links: ['e5c20ace-7aa4-4077-983b-717c2ec5427d']
     }
   });
@@ -269,6 +278,11 @@ function testElasticsearchResult(opts, t) {
           ]
         },
         "type_boolean": true,
+        "type_json": {
+          "some": {
+            "random": "json"
+          }
+        },
         "links": []
       }, 'documents should match');
     });
@@ -294,9 +308,54 @@ function testLevelResult(opts, t) {
           "type_datetime": "2012-11-10 09:08:07",
           "type_float": 11.11111,
           "type_integer": 15,
-          "type_linestring": "{\"type\": \"LineString\", \"coordinates\": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}",
-          "type_point": "{\"type\": \"Point\", \"coordinates\": [5.9127083, 50.78757]}",
-          "type_rectangle": "{\"type\": \"Polygon\", \"coordinates\": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}",
+          "type_json": {
+            "some": {
+              "random": "json"
+            }
+          },
+          "type_linestring": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                5.9127083,
+                50.78757
+              ],
+              [
+                5.9127083,
+                50.78754
+              ]
+            ]
+          },
+          "type_point": {
+            "type": "Point",
+            "coordinates": [
+              5.9127083,
+              50.78757
+            ]
+          },
+          "type_rectangle": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  5.9127083,
+                  50.78757
+                ],
+                [
+                  5.4127083,
+                  50.88757
+                ],
+                [
+                  5.9327083,
+                  50.78757
+                ],
+                [
+                  5.9127083,
+                  50.78753
+                ]
+              ]
+            ]
+          },
           "type_string": "string",
           "type_text": "text",
           "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
@@ -342,6 +401,11 @@ function testPostgresqlResult(opts, t) {
           "type_linestring": "{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]}",
           "type_rectangle": "{\"type\":\"Polygon\",\"coordinates\":[[[5.9127083,50.78757],[5.4127083,50.88757],[5.9327083,50.78757],[5.9127083,50.78753]]]}",
           "type_boolean": true,
+          "type_json": {
+            "some": {
+              "random": "json"
+            }
+          },
           "links": []
         }, 'documents should match');
       });
