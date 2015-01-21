@@ -37,6 +37,7 @@
     "child-process-promise": "^1.0.1",
     "memdown": "^1.0.0",
     "rimraf": "^2.2.8",
+    "tape": "^3.4.0",
     "trap": "^0.4.2"
   },
   "author": "Koen Schmeets",
