@@ -3,7 +3,7 @@
 var pg = require('pg');
 var knex = require('knex');
 var _ = require('underscore');
-var test = require('tap').test;
+var test = require('trap').test;
 var BBPromise = require('bluebird');
 var exec = require('child-process-promise').exec;
 var rmRF = BBPromise.promisify(require('rimraf'));
@@ -208,70 +208,67 @@ function getElasticsearchClient(opts) {
 }
 
 function testElasticsearchResult(opts) {
-  return new BBPromise(function (resolve) {
-    test('when validating the elasticsearch output', function (t) {
-      resolve(opts.elasticsearchClient.search({
-        index: 'integrationtestv1',
-        type: 'kitchensink',
-        id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d'
-      })
-      .then(function (result) {
-        var doc = result.hits.hits[0]._source;
-        t.deepEqual(doc, {
-          "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-          "version": 1,
-          "type_integer": 15,
-          "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-          "type_string": "string",
-          "type_text": "text",
-          "type_datetime": "2012-12-12 00:11:10",
-          "type_date": "2012-12-12",
-          "type_float": 11.11111,
-          "type_point": [
-            5.9127083,
-            50.78757
-          ],
-          "type_linestring": {
-            "type": "LineString",
-            "coordinates": [
+  test('when validating the elasticsearch output', function (t) {
+    return opts.elasticsearchClient.search({
+      index: 'integrationtestv1',
+      type: 'kitchensink',
+      id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d'
+    })
+    .then(function (result) {
+      var doc = result.hits.hits[0]._source;
+      t.deepEqual(doc, {
+        "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+        "version": 1,
+        "type_integer": 15,
+        "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+        "type_string": "string",
+        "type_text": "text",
+        "type_datetime": "2012-12-12 00:11:10",
+        "type_date": "2012-12-12",
+        "type_float": 11.11111,
+        "type_point": [
+          5.9127083,
+          50.78757
+        ],
+        "type_linestring": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              5.9127083,
+              50.78757
+            ],
+            [
+              5.9127083,
+              50.78754
+            ]
+          ]
+        },
+        "type_rectangle": {
+          "type": "Polygon",
+          "coordinates": [
+            [
               [
                 5.9127083,
                 50.78757
               ],
               [
-                5.9127083,
-                50.78754
-              ]
-            ]
-          },
-          "type_rectangle": {
-            "type": "Polygon",
-            "coordinates": [
+                5.4127083,
+                50.88757
+              ],
               [
-                [
-                  5.9127083,
-                  50.78757
-                ],
-                [
-                  5.4127083,
-                  50.88757
-                ],
-                [
-                  5.9327083,
-                  50.78757
-                ],
-                [
-                  5.9127083,
-                  50.78753
-                ]
+                5.9327083,
+                50.78757
+              ],
+              [
+                5.9127083,
+                50.78753
               ]
             ]
-          },
-          "type_boolean": true,
-          "links": []
-        }, 'documents should match');
-        t.end();
-      }));
+          ]
+        },
+        "type_boolean": true,
+        "links": []
+      }, 'documents should match');
     });
   });
 }
@@ -284,30 +281,26 @@ function getLevelClient(opts) {
 }
 
 function testLevelResult(opts) {
-  return new BBPromise(function (resolve) {
-    test('when validating the leveldb output', function (t) {
-      opts.levelClient.sublevel('item-by-id')
-        .get('e5c20ace-7aa4-4077-983b-717c2ec5427d', function(err, result) {
-          t.deepEqual(JSON.parse(result), {
-            "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-            "links": [],
-            "type_boolean": true,
-            "type_date": "12-12-2012",
-            "type_datetime": "12-12-2012 00:11:10",
-            "type_float": 11.11111,
-            "type_integer": 15,
-            "type_linestring": "{\"type\": \"LineString\", \"coordinates\": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}",
-            "type_point": "{\"type\": \"Point\", \"coordinates\": [5.9127083, 50.78757]}",
-            "type_rectangle": "{\"type\": \"Polygon\", \"coordinates\": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}",
-            "type_string": "string",
-            "type_text": "text",
-            "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-            "version": 1
-          }, 'documents should match');
-          t.end();
-          resolve();
-        });
-    });
+  test('when validating the leveldb output', function (t) {
+    return opts.levelClient.sublevel('item-by-id')
+      .get('e5c20ace-7aa4-4077-983b-717c2ec5427d', t.cb(function(err, result) {
+        t.deepEqual(JSON.parse(result), {
+          "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+          "links": [],
+          "type_boolean": true,
+          "type_date": "12-12-2012",
+          "type_datetime": "12-12-2012 00:11:10",
+          "type_float": 11.11111,
+          "type_integer": 15,
+          "type_linestring": "{\"type\": \"LineString\", \"coordinates\": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}",
+          "type_point": "{\"type\": \"Point\", \"coordinates\": [5.9127083, 50.78757]}",
+          "type_rectangle": "{\"type\": \"Polygon\", \"coordinates\": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}",
+          "type_string": "string",
+          "type_text": "text",
+          "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+          "version": 1
+        }, 'documents should match');
+      }));
   });
 }
 
@@ -319,39 +312,35 @@ function getPostgresqlClient(opts) {
 }
 
 function testPostgresqlResult(opts) {
-  return new BBPromise(function (resolve) {
-    test('when validating the postgresql output', function (t) {
-      opts.postgresqlClient.table('kitchensinks')
-        .first([
-          '*',
-          knex.raw('ST_AsGeoJSON(type_point) as type_point'),
-          knex.raw('ST_AsGeoJSON(type_linestring) as type_linestring'),
-          knex.raw('ST_AsGeoJSON(type_rectangle) as type_rectangle')
-        ])
-        .where({
-          id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d'
-        })
-        .then(function (result) {
-          t.deepEqual(result, {
-            "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-            "version": 1,
-            "type_integer": 15,
-            "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-            "type_string": "string",
-            "type_text": "text",
-            "type_datetime": new Date("2012-12-11T23:11:10.000Z"),
-            "type_date": new Date("2012-12-11T23:00:00.000Z"),
-            "type_float": 11.1111,
-            "type_point": "{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]}",
-            "type_linestring": "{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]}",
-            "type_rectangle": "{\"type\":\"Polygon\",\"coordinates\":[[[5.9127083,50.78757],[5.4127083,50.88757],[5.9327083,50.78757],[5.9127083,50.78753]]]}",
-            "type_boolean": true,
-            "links": []
-          }, 'documents should match');
-          t.end();
-          resolve();
-        });
-    });
+  test('when validating the postgresql output', function (t) {
+    return opts.postgresqlClient.table('kitchensinks')
+      .first([
+        '*',
+        knex.raw('ST_AsGeoJSON(type_point) as type_point'),
+        knex.raw('ST_AsGeoJSON(type_linestring) as type_linestring'),
+        knex.raw('ST_AsGeoJSON(type_rectangle) as type_rectangle')
+      ])
+      .where({
+        id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d'
+      })
+      .then(function (result) {
+        t.deepEqual(result, {
+          "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+          "version": 1,
+          "type_integer": 15,
+          "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
+          "type_string": "string",
+          "type_text": "text",
+          "type_datetime": new Date("2012-12-11T23:11:10.000Z"),
+          "type_date": new Date("2012-12-11T23:00:00.000Z"),
+          "type_float": 11.1111,
+          "type_point": "{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]}",
+          "type_linestring": "{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]}",
+          "type_rectangle": "{\"type\":\"Polygon\",\"coordinates\":[[[5.9127083,50.78757],[5.4127083,50.88757],[5.9327083,50.78757],[5.9127083,50.78753]]]}",
+          "type_boolean": true,
+          "links": []
+        }, 'documents should match');
+      });
   });
 }
 
@@ -412,17 +401,4 @@ app.get('queue')
   })
   .catch(function (err) {
     console.error('errors while running test', err);
-  })
-  .finally(function () {
-    console.log(opts, opts.closeManageConnection);
-    opts.queue.close();
-    opts.closeManageConnection();
-    opts.levelAdapter.closeConnections();
-    opts.postgresqlAdapter.closeConnections();
-    // opts = null;
-    // somehow, without exiting the process myself, it hangs
-    // (even when closing all connections as seen in the comments above)
-    // setTimeout(function () {
-    //   process.exit();
-    // }, 1000);
   });

@@ -1,7 +1,6 @@
 'use strict';
 
-process.env.ENV = 'testing';
-var test = require('tape').test;
+var test = require('trap').test;
 var BBPromise = require('bluebird');
 var rmRF = BBPromise.promisify(require('rimraf'));
 var app = require('../main');
@@ -31,7 +30,7 @@ app.get('schema.adapter')
         }
       };
 
-      memo.facade.putSchema('servicetest', 'news', schema)
+      return memo.facade.putSchema('servicetest', 'news', schema)
         .then(function () {
           return BBPromise.join(
             memo.client.getLog(),
@@ -68,7 +67,6 @@ app.get('schema.adapter')
             "value": 1
           };
           t.deepEqual(changes[1], change, "log's second change should be " + JSON.stringify(change));
-          t.end();
         });
     });
 
@@ -85,7 +83,7 @@ app.get('schema.adapter')
         }
       };
 
-      memo.facade.putSchema('servicetest', 'news', renamedSchema)
+      return memo.facade.putSchema('servicetest', 'news', renamedSchema)
         .then(function () {
           return BBPromise.join(
             memo.client.getLog(),
@@ -143,9 +141,6 @@ app.get('schema.adapter')
         })
         .then(function () {
           return memo.facade.createSnapshot('servicetest');
-        })
-        .then(function () {
-          t.end();
         });
     });
 
@@ -163,7 +158,7 @@ app.get('schema.adapter')
         }
       };
 
-      memo.facade.putSchema('servicetest', 'articles', schema)
+      return memo.facade.putSchema('servicetest', 'articles', schema)
         .then(function () {
           return BBPromise.join(
             memo.client.getLog(),
@@ -181,7 +176,6 @@ app.get('schema.adapter')
           };
           t.deepEqual(changes[6], change, "log's seventh change should be " + JSON.stringify(change));
           t.deepEqual(storedSchema, schema, "versions/articles/2.json should match with " + JSON.stringify(schema));
-          t.end();
         });
     });
   })

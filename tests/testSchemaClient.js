@@ -1,6 +1,6 @@
 'use strict';
 
-var test = require("tape").test;
+var test = require('trap').test;
 var BBPromise = require('bluebird');
 var rmRF = BBPromise.promisify(require('rimraf'));
 var app = require('../main');
@@ -22,13 +22,12 @@ rmRF(app.config.schema.path + '/clienttest')
         }
       };
 
-      memo.client.putSchema('sometype', 1, schema)
+      return memo.client.putSchema('sometype', 1, schema)
         .then(function () {
           return memo.client.getSchema('sometype', 1);
         })
         .then(function (contents) {
           t.deepEqual(contents, schema, 'the contents should match');
-          t.end();
         });
     });
 
@@ -37,18 +36,17 @@ rmRF(app.config.schema.path + '/clienttest')
         "sometype": 1
       };
 
-      memo.client.putSchemaVersions('current', versions)
+      return memo.client.putSchemaVersions('current', versions)
         .then(function () {
           return memo.client.getSchemaVersions('current');
         })
         .then(function (contents) {
           t.deepEqual(contents, versions, 'the contents should match');
-          t.end();
         });
     });
 
     test('after logging something twice', function(t) {
-      memo.client.log([{part: 1}])
+      return memo.client.log([{part: 1}])
         .then(function () {
           return memo.client.log([{part: 2}]);
         })
@@ -57,7 +55,6 @@ rmRF(app.config.schema.path + '/clienttest')
         })
         .then(function (changes) {
           t.deepEqual(changes, [{part: 1}, {part: 2}], 'both changes should be in the log');
-          t.end();
         });
     });
   })
