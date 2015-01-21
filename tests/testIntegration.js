@@ -215,6 +215,8 @@ function testElasticsearchResult(opts, t) {
       id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d'
     })
     .then(function (result) {
+      et.ok(!!result.hits, 'es result has hits');
+      if ( ! result) return;
       var doc = result.hits.hits[0]._source;
       et.deepEqual(doc, {
         "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
