@@ -93,79 +93,80 @@ Below is a map of the available **column types**, and the type that it translate
     <th>leveldb type</th>
   </tr>
   <tr>
-    <th>uuid</th>
-    <td>UUID</td>
-    <td>string</td>
-    <td>String (json)</td>
+    <th>uuid<br>uuid[]</th>
+    <td>UUID<br>UUID[]</td>
+    <td>string<br>string</td>
+    <td>String (JSON)<br>Array (JSON)</td>
   </tr>
   <tr>
-    <th>string</th>
-    <td>STRING</td>
-    <td>string</td>
-    <td>String (json)</td>
+    <th>string<br>string[]</th>
+    <td>STRING<br>STRING[]</td>
+    <td>string<br>string</td>
+    <td>String (JSON)<br>Array (JSON)</td>
   </tr>
   <tr>
-    <th>text</th>
-    <td>TEXT</td>
-    <td>text</td>
-    <td>String (json)</td>
+    <th>text<br>text[]</th>
+    <td>TEXT<br>TEXT[]</td>
+    <td>text<br>text</td>
+    <td>String (JSON)<br>Array (JSON)</td>
   </tr>
   <tr>
-    <th>point</th>
-    <td>GEOMETRY(Point, 4326)</td>
-    <td>geo_point</td>
-    <td>Object (json)</td>
+    <th>point<br>point[]</th>
+    <td>GEOMETRY(Point, 4326)<br>GEOMETRY(MultiPoint, 4326)</td>
+    <td>geo_point<br>geo_point</td>
+    <td>Object (GeoJSON)<br>Object (GeoJSON)</td>
   </tr>
   <tr>
-    <th>linestring</th>
-    <td>GEOMETRY(LineString, 4326)</td>
-    <td>geo_shape</td>
-    <td>Object (json)</td>
+    <th>linestring<br>linestring[]</th>
+    <td>GEOMETRY(LineString, 4326)<br>GEOMETRY(MultiLineString, 4326)</td>
+    <td>geo_shape<br>geo_shape</td>
+    <td>Object (GeoJSON)<br>Object (GeoJSON)</td>
   </tr>
   <tr>
-    <th>rectangle</th>
-    <td>GEOMETRY(Polygon, 4326)</td>
-    <td>geo_shape</td>
-    <td>Object (json)</td>
+    <th>polygon<br>polygon[]</th>
+    <td>GEOMETRY(Polygon, 4326)<br>GEOMETRY(MultiPolygon, 4326)</td>
+    <td>geo_shape<br>geo_shape</td>
+    <td>Object (GeoJSON)<br>Object (GeoJSON)</td>
   </tr>
   <tr>
-    <th>date</th>
-    <td>DATE</td>
-    <td>date<br>(format: yyyy-MM-dd)</td>
-    <td>String (json)</td>
+    <th>date<br>date[]</th>
+    <td>DATE<br>DATE[]</td>
+    <td>date (format: yyyy-MM-dd)<br>date (format: yyyy-MM-dd)</td>
+    <td>String (JSON)<br>Array (JSON)</td>
   </tr>
   <tr>
-    <th>datetime</th>
-    <td>DATETIME</td>
-    <td>date<br>(format: yyyy-MM-dd HH:mm:ss)</td>
-    <td>String (json)</td>
+    <th>datetime<br>datetime[]</th>
+    <td>DATETIME<br>DATETIME[]</td>
+    <td>date (format: yyyy-MM-dd HH:mm:ss)<br>date (format: yyyy-MM-dd HH:mm:ss)</td>
+    <td>String (JSON)<br>Array (JSON)</td>
   </tr>
   <tr>
-    <th>float</th>
-    <td>FLOAT</td>
-    <td>float</td>
-    <td>Number (json)</td>
+    <th>float<br>float[]</th>
+    <td>FLOAT<br>FLOAT[]</td>
+    <td>float<br>float</td>
+    <td>Number (JSON)<br>Array (JSON)</td>
   </tr>
   <tr>
-    <th>integer</th>
-    <td>INTEGER</td>
-    <td>integer</td>
-    <td>Number (json)</td>
+    <th>integer<br>integer[]</th>
+    <td>INTEGER<br>INTEGER[]</td>
+    <td>integer<br>integer</td>
+    <td>Number (JSON)<br>Array (JSON)</td>
   </tr>
   <tr>
-    <th>boolean</th>
-    <td>BOOL</td>
-    <td>boolean</td>
-    <td>Boolean (json)</td>
+    <th>boolean<br>boolean[]</th>
+    <td>BOOL<br>BOOL[]</td>
+    <td>boolean<br>boolean</td>
+    <td>Boolean (JSON)<br>Array (JSON)</td>
   </tr>
   <tr>
-    <th>json</th>
-    <td>JSON</td>
-    <td>object</td>
-    <td>Object (json)</td>
+    <th>json<br>json[]</th>
+    <td>JSON<br>JSON[]</td>
+    <td>object<br>object</td>
+    <td>Object (JSON)<br>Array (JSON)</td>
   </tr>
 </table>
 
+As you can see, we follow PostgreSQL's [] notation for defining *an array* of something.
 
 #Snapshots
 

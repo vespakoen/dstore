@@ -84,8 +84,8 @@ function putFirstSchema(opts) {
         type_linestring: {
           type: 'linestring'
         },
-        type_rectangle: {
-          type: 'rectangle'
+        type_polygon: {
+          type: 'polygon'
         },
         type_boolean: {
           type: 'boolean'
@@ -120,7 +120,7 @@ function putFirstItem(opts) {
       type_float: 11.11111,
       type_point: '{"type": "Point", "coordinates": [5.9127083, 50.78757]}',
       type_linestring: '{"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}',
-      type_rectangle: '{"type": "Polygon", "coordinates": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}',
+      type_polygon: '{"type": "Polygon", "coordinates": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}',
       type_boolean: true,
       type_json: '{"some": {"random": "json"}}'
     }
@@ -171,9 +171,9 @@ function putSecondSchema(opts) {
           key: 'linestring_type',
           type: 'linestring'
         },
-        type_rectangle: {
-          key: 'rectangle_type',
-          type: 'rectangle'
+        type_polygon: {
+          key: 'polygon_type',
+          type: 'polygon'
         },
         type_boolean: {
           key: 'boolean_type',
@@ -182,6 +182,42 @@ function putSecondSchema(opts) {
         type_json: {
           key: 'json_type',
           type: 'json'
+        },
+        type_integer_array: {
+          type: 'integer[]'
+        },
+        type_uuid_array: {
+          type: 'uuid[]'
+        },
+        type_string_array: {
+          type: 'string[]'
+        },
+        type_text_array: {
+          type: 'text[]'
+        },
+        type_datetime_array: {
+          type: 'datetime[]'
+        },
+        type_date_array: {
+          type: 'date[]'
+        },
+        type_float_array: {
+          type: 'float[]'
+        },
+        type_point_array: {
+          type: 'point[]'
+        },
+        type_linestring_array: {
+          type: 'linestring[]'
+        },
+        type_polygon_array: {
+          type: 'polygon[]'
+        },
+        type_boolean_array: {
+          type: 'boolean[]'
+        },
+        type_json_array: {
+          type: 'json[]'
         }
       }
     }
@@ -194,19 +230,31 @@ function putSecondItem(opts) {
     key: 'kitchensink',
     item: {
       id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
-      snapshot_version: 1,
-      type_integer: 35235,
-      type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
-      type_string: 'stringetje',
-      type_text: 'textje',
-      type_datetime: '05-06-2007 05:06:07',
-      type_date: '05-06-2007',
-      type_float: 22.222222222222222,
-      type_point: '{"type": "Point", "coordinates": [5.9127083, 50.78757]}',
-      type_linestring: '{"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}',
-      type_rectangle: '{"type": "Polygon", "coordinates": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]}',
-      type_boolean: true,
-      type_json: '{"some": {"random": "json"}}',
+      snapshot_version: 2,
+      integer_type: 35235,
+      uuid_type: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
+      string_type: 'stringetje',
+      text_type: 'textje',
+      datetime_type: '05-06-2007 05:06:07',
+      date_type: '05-06-2007',
+      float_type: 22.222222222222222,
+      point_type: '{"type": "Point", "coordinates": [5.9127083, 50.78757]}',
+      linestring_type: '{"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]}',
+      polygon_type: '{"type":"Polygon","coordinates":[[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0],[100.0,0.0]]]}',
+      boolean_type: true,
+      json_type: '{"some": {"random": "json"}}',
+      type_integer_array: '[1,2,3]',
+      type_uuid_array: '["0c02a6b3-babd-4399-9105-42c40189bb89", "0cf7a1f2-800b-43ee-a4a1-838a76533108"]',
+      type_string_array: '["testing", "it", "out"]',
+      type_text_array: '["testing", "it", "out"]',
+      type_datetime_array: '["05-06-2007 05:06:07", "06-07-2008 06:07:08"]',
+      type_date_array: '["05-06-2007", "06-07-2008"]',
+      type_float_array: '[22.2222, 33.3333]',
+      type_point_array: '{"type": "MultiPoint", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78757]]}',
+      type_linestring_array: '{"type":"MultiLineString","coordinates":[[[100.0,0.0],[101.0,1.0]],[[102.0,2.0],[103.0,3.0]]]}',
+      type_polygon_array: '{"type":"MultiPolygon","coordinates":[[[[102.0,2.0],[103.0,2.0],[103.0,3.0],[102.0,3.0],[102.0,2.0]]],[[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0],[100.0,0.0]],[[100.2,0.2],[100.8,0.2],[100.8,0.8],[100.2,0.8],[100.2,0.2]]]]}',
+      type_boolean_array: '[true,false]',
+      type_json_array: '[{"some": "data"},{"more": "data"}]',
       links: ['e5c20ace-7aa4-4077-983b-717c2ec5427d']
     }
   });
@@ -254,7 +302,7 @@ function testElasticsearchResult(opts, t) {
             ]
           ]
         },
-        "type_rectangle": {
+        "type_polygon": {
           "type": "Polygon",
           "coordinates": [
             [
@@ -298,7 +346,7 @@ function getLevelClient(opts) {
 
 function testLevelResult(opts, t) {
   t.test('when validating the leveldb output', function (lt) {
-    return opts.levelClient.sublevel('item-by-id')
+    opts.levelClient.sublevel('item-by-id')
       .get('e5c20ace-7aa4-4077-983b-717c2ec5427d', lt.cb(function(err, result) {
         lt.deepEqual(JSON.parse(result), {
           "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
@@ -333,7 +381,7 @@ function testLevelResult(opts, t) {
               50.78757
             ]
           },
-          "type_rectangle": {
+          "type_polygon": {
             "type": "Polygon",
             "coordinates": [
               [
@@ -379,7 +427,7 @@ function testPostgresqlResult(opts, t) {
         '*',
         knex.raw('ST_AsGeoJSON(type_point) as type_point'),
         knex.raw('ST_AsGeoJSON(type_linestring) as type_linestring'),
-        knex.raw('ST_AsGeoJSON(type_rectangle) as type_rectangle'),
+        knex.raw('ST_AsGeoJSON(type_polygon) as type_polygon'),
         knex.raw('to_char(type_datetime, \'YYYY-MM-DD HH24:MI:SS\') as type_datetime'),
         knex.raw('to_char(type_date, \'YYYY-MM-DD\') as type_date'),
       ])
@@ -399,7 +447,7 @@ function testPostgresqlResult(opts, t) {
           "type_float": 11.1111,
           "type_point": "{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]}",
           "type_linestring": "{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]}",
-          "type_rectangle": "{\"type\":\"Polygon\",\"coordinates\":[[[5.9127083,50.78757],[5.4127083,50.88757],[5.9327083,50.78757],[5.9127083,50.78753]]]}",
+          "type_polygon": "{\"type\":\"Polygon\",\"coordinates\":[[[5.9127083,50.78757],[5.4127083,50.88757],[5.9327083,50.78757],[5.9127083,50.78753]]]}",
           "type_boolean": true,
           "type_json": {
             "some": {
