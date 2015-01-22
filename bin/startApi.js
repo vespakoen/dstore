@@ -1,6 +1,7 @@
 'use strict';
 
 var restify = require('restify');
+var _ = require('underscore');
 var app = require('../main');
 
 var queue;
@@ -61,7 +62,7 @@ server.get('/api/schema/:namespace/:schemaKey', createHandler('get-schema', func
 server.put('/api/schema/:namespace', createHandler('put-all-schemas', function (req) {
   return {
     namespace: req.params.namespace,
-    schemas: req.params.schemas
+    schemas: _.omit(req.params, 'namespace')
   };
 }));
 
@@ -69,7 +70,7 @@ server.put('/api/schema/:namespace/:schemaKey', createHandler('put-schema', func
   return {
     namespace: req.params.namespace,
     key: req.params.schemaKey,
-    schema: req.params.schema
+    schema: _.omit(req.params, 'namespace', 'schemaKey')
   };
 }));
 
@@ -83,19 +84,19 @@ server.post('/api/snapshot/:namespace', createHandler('create-snapshot', functio
 //////////////////////////// ITEM ACTIONS //////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-server.get('/api/item/:namespace/:schemaKey', createHandler('put-item', function (req) {
+server.put('/api/item/:namespace/:schemaKey', createHandler('put-item', function (req) {
   return {
     namespace: req.params.namespace,
     key: req.params.schemaKey,
-    item: req.params.item
+    item: _.omit(req.params, 'namespace', 'schemaKey')
   };
 }));
-server.del('/api/item/:namespace/:schemaKey', createHandler('del-item', function (req) {
+server.del('/api/item/:namespace/:schemaKey/:snapshotVersion/:id', createHandler('del-item', function (req) {
   return {
     namespace: req.params.namespace,
     key: req.params.schemaKey,
-    version: req.params.version,
-    item: req.params.item
+    snapshot_version: req.params.snapshotVersion,
+    id: req.params.id
   };
 }));
 

@@ -23,13 +23,13 @@ BBPromise.all([
   }
 
   function delItem(command) {
-    console.log('del-item.postgresql', command.namespace || 'no namespace', command.key || 'no key', command.version || 'no version', command.id || 'no id');
-    return facade.delItem(command.namespace, command.key, command.id);
+    console.log('del-item.postgresql', command.namespace || 'no namespace', command.key || 'no key', command.snapshot_version || 'no snapshot version', command.id || 'no id');
+    return facade.delItem(command.namespace, command.key, command.snapshot_version, command.id);
   }
 
   function migrate(command) {
-    console.log('migrate.postgresql', command.namespace || 'no namespace', command.version || 'no version');
-    return facade.migrate(command.namespace, command.version);
+    console.log('migrate.postgresql', command.namespace || 'no namespace', command.snapshot_version || 'no snapshot version');
+    return facade.migrate(command.namespace, command.snapshot_version);
   }
 });
 

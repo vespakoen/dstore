@@ -14,7 +14,7 @@ app.get('queue').then(function (q) {
 })
 .spread(function (publisher, consumer) {
   consumer.consume('put-item', function (command) {
-    console.log('put-item', command.namespace || 'no namespace', command.key || 'no key', command.item ? command.item.id || 'no item id' : '');
+    console.log('put-item', command.namespace || 'no namespace', command.key || 'no key', command.item ? command.item.id || 'no item id' : 'no item');
     return BBPromise.join(
       publisher.publish('put-item.level', command),
       publisher.publish('put-item.postgresql', command),
@@ -23,7 +23,7 @@ app.get('queue').then(function (q) {
   });
 
   consumer.consume('del-item', function (command) {
-    console.log('del-item', command.namespace || 'no namespace', command.key || 'no key', command.version || 'no version', command.id || 'no id');
+    console.log('del-item', command.namespace || 'no namespace', command.key || 'no key', command.snapshot_version || 'no snapshot version', command.id || 'no id');
     return BBPromise.join(
       publisher.publish('del-item.level', command),
       publisher.publish('del-item.postgresql', command),

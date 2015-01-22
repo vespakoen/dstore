@@ -110,7 +110,7 @@ function putFirstItem(opts) {
     key: 'kitchensink',
     item: {
       id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
-      version: 1,
+      snapshot_version: 1,
       type_integer: 15,
       type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
       type_string: 'string',
@@ -194,7 +194,7 @@ function putSecondItem(opts) {
     key: 'kitchensink',
     item: {
       id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
-      version: 1,
+      snapshot_version: 1,
       type_integer: 35235,
       type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
       type_string: 'stringetje',
@@ -229,7 +229,7 @@ function testElasticsearchResult(opts, t) {
       var doc = result.hits.hits[0]._source;
       et.deepEqual(doc, {
         "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-        "version": 1,
+        "snapshot_version": 1,
         "type_integer": 15,
         "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
         "type_string": "string",
@@ -359,7 +359,7 @@ function testLevelResult(opts, t) {
           "type_string": "string",
           "type_text": "text",
           "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-          "version": 1
+          "snapshot_version": 1
         }, 'documents should match');
       }));
   });
@@ -389,7 +389,7 @@ function testPostgresqlResult(opts, t) {
       .then(function (result) {
         pt.deepEqual(result, {
           "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-          "version": 1,
+          "snapshot_version": 1,
           "type_integer": 15,
           "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
           "type_string": "string",

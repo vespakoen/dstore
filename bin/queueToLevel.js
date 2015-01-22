@@ -22,8 +22,8 @@ BBPromise.all([
   }
 
   function delItem(command) {
-    console.log('del-item.level', command.namespace || 'no namespace', command.key || 'no key', command.version || 'no version', command.id || 'no id');
-    return facade.delItem(command.namespace, command.key, command.id);
+    console.log('del-item.level', command.namespace || 'no namespace', command.key || 'no key', command.snapshot_version || 'no snapshot version', command.id || 'no id');
+    return facade.delItem(command.namespace, command.key, command.snapshot_version, command.id);
   }
 });
 

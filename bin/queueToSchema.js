@@ -49,8 +49,8 @@ app.get('queue').then(function (q) {
     console.log('create-snapshot.schema', command.namespace || 'no namespace');
 
     return facade.createSnapshot(command.namespace)
-      .then(function (newVersion) {
-        command.version = newVersion;
+      .then(function (snapshotVersion) {
+        command.snapshot_version = snapshotVersion;
         return BBPromise.join(
           publisher.publish('migrate.postgresql', command),
           publisher.publish('migrate.elasticsearch', command)

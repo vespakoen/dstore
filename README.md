@@ -46,38 +46,38 @@ Let's look at an example how to create a schema for storing posts on my blog.
 For this, we use the [put schema](#put-schema) command, and use "myblog" as the namespace, and "article" as the schemakey.
 
 ```shell
-curl -X PUT http://localhost:2000/api/schema/myblog/article -d '\
-{\
-  "table": "articles",\
-  "es_type": "article",\
-  "columns": {\
-    "title_nl": {\
-      "type": "string"\
-    },\
-    "title_en": {\
-      "type": "string"\
-    },\
-    "intro_nl": {\
-      "type": "text"\
-    },\
-    "intro_en": {\
-      "type": "text"\
-    },\
-    "content_nl": {\
-      "type": "text"\
-    },\
-    "content_en": {\
-      "type": "text"\
-    },\
-    "date_created": {\
-      "type": "datetime"\
-      "rules": [{"type": "isDate"}]\
-    },\
-    "date_changed": {\
-      "type": "datetime"\
-      "rules": [{"type": "isDate"}]\
-    }\
-  }\
+curl -X PUT http://localhost:2000/api/schema/myblog/article -d '
+{
+  "table": "articles",
+  "es_type": "article",
+  "columns": {
+    "title_nl": {
+      "type": "string"
+    },
+    "title_en": {
+      "type": "string"
+    },
+    "intro_nl": {
+      "type": "text"
+    },
+    "intro_en": {
+      "type": "text"
+    },
+    "content_nl": {
+      "type": "text"
+    },
+    "content_en": {
+      "type": "text"
+    },
+    "date_created": {
+      "type": "datetime"
+      "rules": [{"type": "isDate"}]
+    },
+    "date_changed": {
+      "type": "datetime"
+      "rules": [{"type": "isDate"}]
+    }
+  }
 }'
 ```
 
@@ -196,18 +196,18 @@ You can also include a **links** key that is an array of UUID's, pointing to oth
 
 Below is an example:
 ```shell
-curl -X PUT http://localhost:2000/api/item/myblog/article -d '\
-{\
-  "id": "66276124-ebcd-45e1-8013-825346daa283",\
-  "snapshot_version": 1,\
-  "title_nl": "De titel",\
-  "title_en": "Some title",\
-  "intro_nl": "De intro",\
-  "intro_en": "The intro",\
-  "content_nl": "De inhoud",\
-  "content_en": "The content",\
-  "date_created": "2014-01-17 03:50:12",\
-  "date_updated": "2014-01-17 03:50:12"\
+curl -X PUT http://localhost:2000/api/item/myblog/article -d '
+{
+  "id": "66276124-ebcd-45e1-8013-825346daa283",
+  "snapshot_version": 1,
+  "title_nl": "De titel",
+  "title_en": "Some title",
+  "intro_nl": "De intro",
+  "intro_en": "The intro",
+  "content_nl": "De inhoud",
+  "content_en": "The content",
+  "date_created": "2014-01-17 03:50:12",
+  "date_updated": "2014-01-17 03:50:12"
 }'
 ```
 
@@ -254,17 +254,17 @@ curl -X GET http://localhost:2000/api/schema/:namespace/:schemaKey
 *The namespace is an identifier for a project.*  
 
 ```shell
-curl -X PUT http://localhost:2000/api/schema/:namespace -d '\
-{\
-  "article": {\
-    "table": "articles",\
-    "es_type": "article",\
-    "columns": {\
-      "title": {\
-        "type": "text"\
-      }\
-    }\
-  }\
+curl -X PUT http://localhost:2000/api/schema/:namespace -d '
+{
+  "article": {
+    "table": "articles",
+    "es_type": "article",
+    "columns": {
+      "title": {
+        "type": "text"
+      }
+    }
+  }
 }'
 ```
 
@@ -276,15 +276,15 @@ curl -X PUT http://localhost:2000/api/schema/:namespace -d '\
 *The schema key is a string that uniquely identifies your schema*  
 
 ```shell
-curl -X PUT http://localhost:2000/api/schema/:namespace/:schemaKey -d '\
-{\
-  "table": "articles",\
-  "es_type": "article",\
-  "columns": {\
-    "title": {\
-      "type": "string"\
-    }\
-  }\
+curl -X PUT http://localhost:2000/api/schema/:namespace/:schemaKey -d '
+{
+  "table": "articles",
+  "es_type": "article",
+  "columns": {
+    "title": {
+      "type": "string"
+    }
+  }
 }'
 ```
 
@@ -314,11 +314,11 @@ curl -X POST http://localhost:2000/api/snapshot/:namespace
 *The schema key is a string that uniquely identifies your schema*  
 
 ```shell
-curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d '\
-{\
-  "id": "66276124-ebcd-45e1-8013-825346daa283",\
-  "version": 1,\
-  "title": "Some title"\
+curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d '
+{
+  "id": "66276124-ebcd-45e1-8013-825346daa283",
+  "snapshot_version": 1,
+  "title": "Some title"
 }'
 ```
 
