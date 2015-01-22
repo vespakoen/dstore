@@ -136,13 +136,13 @@ Below is a map of the available **column types**, and the type that it translate
   </tr>
   <tr>
     <th>datetime<br>datetime[]</th>
-    <td>DATETIME<br>DATETIME[]</td>
+    <td>TIMESTAMP WITH TIMEZONE<br>TIMESTAMP WITH TIMEZONE[]</td>
     <td>date (format: yyyy-MM-dd HH:mm:ss)<br>date (format: yyyy-MM-dd HH:mm:ss)</td>
     <td>String (JSON)<br>Array (JSON)</td>
   </tr>
   <tr>
     <th>float<br>float[]</th>
-    <td>FLOAT<br>FLOAT[]</td>
+    <td>REAL<br>REAL[]</td>
     <td>float<br>float</td>
     <td>Number (JSON)<br>Array (JSON)</td>
   </tr>
@@ -154,7 +154,7 @@ Below is a map of the available **column types**, and the type that it translate
   </tr>
   <tr>
     <th>boolean<br>boolean[]</th>
-    <td>BOOL<br>BOOL[]</td>
+    <td>BOOLEAN<br>BOOLEAN[]</td>
     <td>boolean<br>boolean</td>
     <td>Boolean (JSON)<br>Array (JSON)</td>
   </tr>
