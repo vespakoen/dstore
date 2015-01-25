@@ -495,7 +495,7 @@ curl http://localhost:9200/testnamespacev1/_mapping?pretty=1
 ```
 
 ```shell
-curl http://localhost:9200/testnamespacev3/_search?pretty=1
+curl http://localhost:9200/testnamespacev1/_search?pretty=1
 ```
 
 **output**
@@ -513,7 +513,7 @@ curl http://localhost:9200/testnamespacev3/_search?pretty=1
     "max_score": 1,
     "hits": [
       {
-        "_index": "testnamespacev3",
+        "_index": "testnamespacev1",
         "_type": "kitchensink",
         "_id": "a4f20ace-7aa4-4077-983b-717c2ec5427d",
         "_score": 1,
