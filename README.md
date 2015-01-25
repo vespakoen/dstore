@@ -41,7 +41,7 @@ Currently, node-projector supports **PostgreSQL**, **Elasticsearch** and **Level
 #Schemas
 
 The schema describes your data format, so the projectors know what data they can expect and know how to serialize it.  
-A schema contains information like the table name, elasticsearch type, the columns and the validation rules that should be used when data is stored.  
+A schema contains information like the table name, elasticsearch type, the columns and the validation options that should be used when data is stored.  
 Let's look at an example how to create a schema for storing posts on my blog.
 For this, we use the [put schema](#put-schema) command, and use "myblog" as the namespace, and "article" as the schemakey.
 
@@ -71,11 +71,15 @@ curl -X PUT http://localhost:2000/api/schema/myblog/article -d '
     },
     "date_created": {
       "type": "datetime"
-      "rules": [{"type": "isDate"}]
+      "validation": {
+        "required": true
+      }
     },
     "date_changed": {
       "type": "datetime"
-      "rules": [{"type": "isDate"}]
+      "validation": {
+        "required": true
+      }
     }
   }
 }'
