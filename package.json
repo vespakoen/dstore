@@ -41,5 +41,5 @@
     "trap": "^0.4.2"
   },
   "author": "Koen Schmeets",
-  "license": "ISC"
+  "license": "MIT"
 }
