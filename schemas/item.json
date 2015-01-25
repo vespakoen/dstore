@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "item",
+  "type": "object",
+  "properties": {
+    "id": { "$ref": "types#/definitions/uuid" },
+    "snapshot_version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "snapshot_version"
+  ]
+}

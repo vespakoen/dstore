@@ -22,7 +22,7 @@ test('when testing the schema service', function (t) {
     .then(function () {
       t.test("when creating a news schema", function (t1) {
         var schema = {
-          "es_type": "news",
+          "elasticsearch_type": "news",
           "table": "news",
           "columns": {
             "description_nl": {
@@ -43,7 +43,7 @@ test('when testing the schema service', function (t) {
               "type": "schema.create",
               "schema": "news",
               "value": {
-                "es_type": "news",
+                "elasticsearch_type": "news",
                 "table": "news",
                 "columns": {
                   "description_nl": {
@@ -74,7 +74,7 @@ test('when testing the schema service', function (t) {
       t.test("when renaming the news schema to articles, and renaming the column and changing the column's type", function (t2) {
         var renamedSchema = {
           "key": "articles",
-          "es_type": "news",
+          "elasticsearch_type": "news",
           "table": "news",
           "columns": {
             "description_nl": {
@@ -119,7 +119,7 @@ test('when testing the schema service', function (t) {
             t2.deepEqual(changes[4], change4, "log's fifth change should be " + JSON.stringify(change4));
 
             var cleanNews1Schema = {
-              "es_type": "news",
+              "elasticsearch_type": "news",
               "table": "news",
               "columns": {
                 "title_nl": {
@@ -130,7 +130,7 @@ test('when testing the schema service', function (t) {
             t2.deepEqual(cleanNews1Schema, news2, "versions/news/2.json should match with " + JSON.stringify(cleanNews1Schema));
 
             var cleanArticles1Schema = {
-              "es_type": "news",
+              "elasticsearch_type": "news",
               "table": "news",
               "columns": {
                 "title_nl": {
@@ -147,7 +147,7 @@ test('when testing the schema service', function (t) {
 
       t.test("when adding a column to the articles schema", function (t3) {
         var schema = {
-          "es_type": "news",
+          "elasticsearch_type": "news",
           "table": "news",
           "columns": {
             "title_nl": {

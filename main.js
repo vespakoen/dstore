@@ -15,8 +15,16 @@ if ( ! _.isString(process.env.API_PORT))                throw new Error('The API
 
 var config = require('./config');
 
+var schemas = [
+  require('./schemas/geojson'),
+  require('./schemas/types'),
+  require('./schemas/item'),
+  require('./schemas/schema')
+];
+
 var app = new App({
-  config: config
+  config: config,
+  schemas: schemas
 });
 
 app.use(require('./lib/elasticsearch/elasticsearchClient'));
@@ -46,6 +54,6 @@ app.use(require('./lib/schema/schemaSnapshotter'));
 app.use(require('./lib/item/itemTransformer'));
 
 app.use(require('./lib/queue'));
+app.use(require('./lib/validator'));
 
 module.exports = app;
-

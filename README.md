@@ -49,7 +49,7 @@ For this, we use the [put schema](#put-schema) command, and use "myblog" as the 
 curl -X PUT http://localhost:2000/api/schema/myblog/article -d '
 {
   "table": "articles",
-  "es_type": "article",
+  "elasticsearch_type": "article",
   "columns": {
     "title_nl": {
       "type": "string"
@@ -259,7 +259,7 @@ curl -X PUT http://localhost:2000/api/schema/:namespace -d '
 {
   "article": {
     "table": "articles",
-    "es_type": "article",
+    "elasticsearch_type": "article",
     "columns": {
       "title": {
         "type": "text"
@@ -280,7 +280,7 @@ curl -X PUT http://localhost:2000/api/schema/:namespace -d '
 curl -X PUT http://localhost:2000/api/schema/:namespace/:schemaKey -d '
 {
   "table": "articles",
-  "es_type": "article",
+  "elasticsearch_type": "article",
   "columns": {
     "title": {
       "type": "string"

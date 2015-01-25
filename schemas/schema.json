@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "schema",
+  "description": "A schema as defined by node-projector",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string"
+    },
+    "elasticsearch_type": {
+      "type": "string"
+    },
+    "table": {
+      "type": "string"
+    },
+    "columns": {
+      "additionalProperties": { "$ref": "#/definitions/column" }
+    }
+  },
+  "required": [
+    "elasticsearch_type",
+    "table",
+    "columns"
+  ],
+  "definitions": {
+    "column": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "uuid",
+            "string",
+            "text",
+            "point",
+            "linestring",
+            "polygon",
+            "date",
+            "datetime",
+            "float",
+            "integer",
+            "boolean",
+            "json",
+            "uuid[]",
+            "string[]",
+            "text[]",
+            "point[]",
+            "linestring[]",
+            "polygon[]",
+            "date[]",
+            "datetime[]",
+            "float[]",
+            "integer[]",
+            "boolean[]",
+            "json[]"
+          ]
+        },
+        "elasticsearch_options": {
+          "type": "object"
+        },
+        "postgresql_options": {
+          "type": "object"
+        },
+        "validation": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    }
+  }
+}

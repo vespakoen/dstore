@@ -31,7 +31,7 @@
     "request": "^2.49.0",
     "restify": "^2.8.4",
     "underscore": "^1.7.0",
-    "validator": "^3.27.0"
+    "tv4": "^1.1.9"
   },
   "devDependencies": {
     "child-process-promise": "^1.0.1",
