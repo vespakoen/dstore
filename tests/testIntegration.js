@@ -52,7 +52,7 @@ function dropTestDatabases(opts) {
 function putFirstSchema(opts) {
   return opts.publisher.publish('put-schema', {
     namespace: 'integrationtest',
-    key: 'kitchensink',
+    schema_key: 'kitchensink',
     schema: {
       table: 'kitchensinks',
       elasticsearch_type: 'kitchensink',
@@ -107,7 +107,8 @@ function createSnapshot(opts) {
 function putFirstItem(opts) {
   return opts.publisher.publish('put-item', {
     namespace: 'integrationtest',
-    key: 'kitchensink',
+    schema_key: 'kitchensink',
+    id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
     item: {
       id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
       snapshot_version: 1,
@@ -130,7 +131,7 @@ function putFirstItem(opts) {
 function putSecondSchema(opts) {
   return opts.publisher.publish('put-schema', {
     namespace: 'integrationtest',
-    key: 'kitchensink',
+    schema_key: 'kitchensink',
     schema: {
       table: 'kitchensinks',
       elasticsearch_type: 'kitchensink',
@@ -227,7 +228,8 @@ function putSecondSchema(opts) {
 function putSecondItem(opts) {
   return opts.publisher.publish('put-item', {
     namespace: 'integrationtest',
-    key: 'kitchensink',
+    schema_key: 'kitchensink',
+    id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
     item: {
       id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
       snapshot_version: 2,

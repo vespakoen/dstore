@@ -31,21 +31,7 @@ test('when testing the schema client', function (t) {
             ts.deepEqual(contents, schema, 'the contents should match');
           });
       });
-
-      t.test('when putting a version', function (tv) {
-        var versions = {
-          "sometype": 1
-        };
-
-        return memo.client.putSchemaVersions('current', versions)
-          .then(function () {
-            return memo.client.getSchemaVersions('current');
-          })
-          .then(function (contents) {
-            tv.deepEqual(contents, versions, 'the contents should match');
-          });
-      });
-
+      
       t.test('after logging something twice', function(tl) {
         return memo.client.log([{part: 1}])
           .then(function () {

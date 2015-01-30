@@ -35,7 +35,7 @@ test('when testing the schema service', function (t) {
           .then(function () {
             return BBPromise.join(
               memo.client.getLog(),
-              memo.client.getSchema('news', 1)
+              memo.client.getSchema('current', 'news')
             );
           })
           .spread(function (changes, storedSchema) {
@@ -88,8 +88,8 @@ test('when testing the schema service', function (t) {
           .then(function () {
             return BBPromise.join(
               memo.client.getLog(),
-              memo.client.getSchema('news', 2),
-              memo.client.getSchema('articles', 1)
+              memo.client.getSchema('current', 'news'),
+              memo.client.getSchema('current', 'articles')
             );
           })
           .spread(function (changes, news2, articles1) {
@@ -163,7 +163,7 @@ test('when testing the schema service', function (t) {
           .then(function () {
             return BBPromise.join(
               memo.client.getLog(),
-              memo.client.getSchema('articles', 2)
+              memo.client.getSchema('current', 'articles')
             );
           })
           .spread(function (changes, storedSchema) {
