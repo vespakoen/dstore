@@ -1,6 +1,6 @@
 {
   "name": "node-projector",
-  "version": "0.1.14",
+  "version": "0.1.17",
   "description": "Manage your schema & project data to PostgreSQL, Elasticsearch and LevelDB (more can be added) via a simple API",
   "repository": {
     "type": "git",
@@ -17,6 +17,7 @@
     "bluebird": "^2.3.10",
     "deep-diff": "^0.3.0",
     "elasticsearch": "^2.4.3",
+    "geojson-coords": "0.0.0",
     "knex": "^0.7.3",
     "knex-postgis": "^0.1.2",
     "level": "^0.18.0",
@@ -30,8 +31,8 @@
     "rabbit.js": "^0.4.2",
     "request": "^2.49.0",
     "restify": "^2.8.4",
-    "underscore": "^1.7.0",
-    "tv4": "^1.1.9"
+    "tv4": "^1.1.9",
+    "underscore": "^1.7.0"
   },
   "devDependencies": {
     "child-process-promise": "^1.0.1",

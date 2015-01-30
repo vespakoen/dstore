@@ -18,17 +18,17 @@ BBPromise.all([
   console.log('Queue to postgresql started');
 
   function putItem(command) {
-    console.log('put-item.postgresql', command.namespace || 'no namespace', command.key || 'no key', command.item ? command.item.id || 'no item id' : '');
-    return facade.putItem(command.namespace, command.key, command.item);
+    console.log('put-item.postgresql', command.namespace || 'no namespace', command.schema_key || 'no schema_key', command.id || 'no id', command.item ? '' : 'no item');
+    return facade.putItem(command.namespace, command.schema_key, command.id, command.item);
   }
 
   function delItem(command) {
-    console.log('del-item.postgresql', command.namespace || 'no namespace', command.key || 'no key', command.snapshot_version || 'no snapshot version', command.id || 'no id');
-    return facade.delItem(command.namespace, command.key, command.snapshot_version, command.id);
+    console.log('del-item.postgresql', command.namespace || 'no namespace', command.schema_key || 'no schema_key', command.id || 'no id');
+    return facade.delItem(command.namespace, command.schema_key, command.id);
   }
 
   function migrate(command) {
-    console.log('migrate.postgresql', command.namespace || 'no namespace', command.snapshot_version || 'no snapshot version');
+    console.log('migrate.postgresql', command.namespace || 'no namespace', command.snapshot_version || 'no snapshot_version');
     return facade.migrate(command.namespace, command.snapshot_version);
   }
 });

@@ -6,9 +6,10 @@ var app = require('../main');
 
 var queue;
 
+var pkg = require('../package');
 var server = restify.createServer({
-  name: 'projector',
-  version: '1.0.0'
+  name: pkg.name,
+  version: pkg.version
 });
 
 server.use(restify.acceptParser(server.acceptable));
@@ -22,11 +23,14 @@ function createHandler(key, createCommand) {
     app.get('queue')
       .then(function (q) {
         queue = q;
+
         q.publish(key, createCommand ? createCommand(req) : {})
           .then(function (result) {
             res.send(result);
             return next();
-          }, function (err) {
+          })
+          .catch(function (err) {
+            // throw err;
             var response = {
               status: err.message
             };
@@ -46,37 +50,39 @@ function createHandler(key, createCommand) {
 /////////////////////////// SCHEMA ACTIONS /////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-server.get('/api/schema/:namespace', createHandler('get-all-schemas', function (req) {
+// schemaFacade.getSnapshotVersions()
+server.get('/projects', createHandler('get-snapshot-versions'));
+
+// schemaFacade.createSnapshot()
+server.post('/projects/:namespace/snapshots', createHandler('create-snapshot', function (req) {
   return {
     namespace: req.params.namespace
-  };
+  }
 }));
 
-server.get('/api/schema/:namespace/:schemaKey', createHandler('get-schema', function (req) {
+// schemaFacade.getSnapshot(namespace, snapshotVersion)
+server.get('/projects/:namespace/snapshots/:snapshot_version', createHandler('get-snapshot', function (req) {
   return {
     namespace: req.params.namespace,
-    key: req.params.schemaKey
+    snapshot_version: req.params.snapshot_version
   };
 }));
 
-server.put('/api/schema/:namespace', createHandler('put-all-schemas', function (req) {
+// schemaFacade.getSchema(namespace, schemaKey, snapshotVersion='current')
+server.get('/projects/:namespace/schemas/:schema_key/:snapshot_version', createHandler('get-schema', function (req) {
   return {
     namespace: req.params.namespace,
-    schemas: _.omit(req.params, 'namespace')
+    snapshot_version: req.params.snapshot_version,
+    schema_key: req.params.schema_key
   };
 }));
 
-server.put('/api/schema/:namespace/:schemaKey', createHandler('put-schema', function (req) {
+// schemaFacade.putSchema(namespace, schemaKey)
+server.put('/projects/:namespace/schemas/:schema_key', createHandler('put-schema', function (req) {
   return {
     namespace: req.params.namespace,
-    key: req.params.schemaKey,
-    schema: _.omit(req.params, 'namespace', 'schemaKey')
-  };
-}));
-
-server.post('/api/snapshot/:namespace', createHandler('create-snapshot', function (req) {
-  return {
-    namespace: req.params.namespace
+    schema_key: req.params.schema_key,
+    schema: req.body
   };
 }));
 
@@ -84,25 +90,45 @@ server.post('/api/snapshot/:namespace', createHandler('create-snapshot', functio
 //////////////////////////// ITEM ACTIONS //////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-server.put('/api/item/:namespace/:schemaKey', createHandler('put-item', function (req) {
+// projector.putItem(namespace, schemaKey, <generated-uuid>, item)
+server.post('/projects/:namespace/item/:schema_key', createHandler('create-item', function (req) {
   return {
     namespace: req.params.namespace,
-    key: req.params.schemaKey,
-    item: _.omit(req.params, 'namespace', 'schemaKey')
+    schema_key: req.params.schema_key,
+    item: req.body
   };
 }));
-server.del('/api/item/:namespace/:schemaKey/:snapshotVersion/:id', createHandler('del-item', function (req) {
+
+// projector.putItem(namespace, schemaKey, id, item)
+server.put('/projects/:namespace/item/:schema_key/:id', createHandler('put-item', function (req) {
   return {
     namespace: req.params.namespace,
-    key: req.params.schemaKey,
-    snapshot_version: req.params.snapshotVersion,
+    schema_key: req.params.schema_key,
+    id: req.params.id,
+    item: req.body
+  };
+}));
+
+// projector.delItem(namespace, schemaKey, id)
+server.del('/projects/:namespace/item/:schema_key/:id', createHandler('del-item', function (req) {
+  return {
+    namespace: req.params.namespace,
+    schema_key: req.params.schema_key,
     id: req.params.id
   };
 }));
 
+////////////////////////////////////////////////////////////////////
+//////////////////////////// SERVER SETUP //////////////////////////
+////////////////////////////////////////////////////////////////////
+
 server.listen(Number(process.env.API_PORT), function () {
   console.log('API started at %s', server.url);
 });
+
+////////////////////////////////////////////////////////////////////
+////////////////////////// GRACEFUL SHUTDOWN////////////////////////
+////////////////////////////////////////////////////////////////////
 
 process.on('SIGTERM', function () {
   server.close();
