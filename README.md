@@ -46,7 +46,7 @@ Let's look at an example how to create a schema for storing posts on my blog.
 For this, we use the [put schema](#put-schema) command, and use "myblog" as the namespace, and "article" as the schemakey.
 
 ```shell
-curl -X PUT http://localhost:2000/api/schema/myblog/article -d '
+curl -X PUT http://localhost:2000/api/projects/myblog/schemas/article -d '
 {
   "table": "articles",
   "elasticsearch_type": "article",
@@ -97,76 +97,148 @@ Below is a map of the available **column types**, and the type that it translate
     <th>leveldb type</th>
   </tr>
   <tr>
-    <th>uuid<br>uuid[]</th>
-    <td>UUID<br>UUID[]</td>
-    <td>string<br>string</td>
-    <td>String (JSON)<br>Array (JSON)</td>
+    <th>uuid</th>
+    <td>UUID</td>
+    <td>string</td>
+    <td>String (JSON)</td>
   </tr>
   <tr>
-    <th>string<br>string[]</th>
-    <td>STRING<br>STRING[]</td>
-    <td>string<br>string</td>
-    <td>String (JSON)<br>Array (JSON)</td>
+    <th>uuid[]</th>
+    <td>UUID[]</td>
+    <td>string</td>
+    <td>Array (JSON)</td>
   </tr>
   <tr>
-    <th>text<br>text[]</th>
-    <td>TEXT<br>TEXT[]</td>
-    <td>text<br>text</td>
-    <td>String (JSON)<br>Array (JSON)</td>
+    <th>string</th>
+    <td>STRING</td>
+    <td>string</td>
+    <td>String (JSON)</td>
   </tr>
   <tr>
-    <th>point<br>point[]</th>
-    <td>GEOMETRY(Point, 4326)<br>GEOMETRY(MultiPoint, 4326)</td>
-    <td>geo_point<br>geo_point</td>
-    <td>Object (GeoJSON)<br>Object (GeoJSON)</td>
+    <th>string[]</th>
+    <td>STRING[]</td>
+    <td>string</td>
+    <td>Array (JSON)</td>
   </tr>
   <tr>
-    <th>linestring<br>linestring[]</th>
-    <td>GEOMETRY(LineString, 4326)<br>GEOMETRY(MultiLineString, 4326)</td>
-    <td>geo_shape<br>geo_shape</td>
-    <td>Object (GeoJSON)<br>Object (GeoJSON)</td>
+    <th>text</th>
+    <td>TEXT</td>
+    <td>text</td>
+    <td>String (JSON)</td>
   </tr>
   <tr>
-    <th>polygon<br>polygon[]</th>
-    <td>GEOMETRY(Polygon, 4326)<br>GEOMETRY(MultiPolygon, 4326)</td>
-    <td>geo_shape<br>geo_shape</td>
-    <td>Object (GeoJSON)<br>Object (GeoJSON)</td>
+    <th>text[]</th>
+    <td>TEXT[]</td>
+    <td>text</td>
+    <td>Array (JSON)</td>
   </tr>
   <tr>
-    <th>date<br>date[]</th>
-    <td>DATE<br>DATE[]</td>
-    <td>date (format: yyyy-MM-dd)<br>date (format: yyyy-MM-dd)</td>
-    <td>String (JSON)<br>Array (JSON)</td>
+    <th>point</th>
+    <td>GEOMETRY(Point, 4326)</td>
+    <td>geo_point</td>
+    <td>Object (GeoJSON)</td>
   </tr>
   <tr>
-    <th>datetime<br>datetime[]</th>
-    <td>TIMESTAMP WITH TIMEZONE<br>TIMESTAMP WITH TIMEZONE[]</td>
-    <td>date (format: yyyy-MM-dd HH:mm:ss)<br>date (format: yyyy-MM-dd HH:mm:ss)</td>
-    <td>String (JSON)<br>Array (JSON)</td>
+    <th>point[]</th>
+    <td>GEOMETRY(MultiPoint, 4326)</td>
+    <td>geo_point</td>
+    <td>Object (GeoJSON)</td>
   </tr>
   <tr>
-    <th>float<br>float[]</th>
-    <td>REAL<br>REAL[]</td>
-    <td>float<br>float</td>
-    <td>Number (JSON)<br>Array (JSON)</td>
+    <th>linestring</th>
+    <td>GEOMETRY(LineString, 4326)</td>
+    <td>geo_shape</td>
+    <td>Object (GeoJSON)</td>
   </tr>
   <tr>
-    <th>integer<br>integer[]</th>
-    <td>INTEGER<br>INTEGER[]</td>
-    <td>integer<br>integer</td>
-    <td>Number (JSON)<br>Array (JSON)</td>
+    <th>linestring[]</th>
+    <td>GEOMETRY(MultiLineString, 4326)</td>
+    <td>geo_shape</td>
+    <td>Object (GeoJSON)</td>
   </tr>
   <tr>
-    <th>boolean<br>boolean[]</th>
-    <td>BOOLEAN<br>BOOLEAN[]</td>
-    <td>boolean<br>boolean</td>
-    <td>Boolean (JSON)<br>Array (JSON)</td>
+    <th>polygon</th>
+    <td>GEOMETRY(Polygon, 4326)</td>
+    <td>geo_shape</td>
+    <td>Object (GeoJSON)</td>
   </tr>
   <tr>
-    <th>json<br>json[]</th>
-    <td>JSON<br>JSON[]</td>
-    <td>object<br>object</td>
-    <td>Object (JSON)<br>Array (JSON)</td>
+    <th>polygon[]</th>
+    <td>GEOMETRY(MultiPolygon, 4326)</td>
+    <td>geo_shape</td>
+    <td>Object (GeoJSON)</td>
+  </tr>
+  <tr>
+    <th>date</th>
+    <td>DATE</td>
+    <td>date (format: yyyy-MM-dd)</td>
+    <td>String (JSON)</td>
+  </tr>
+  <tr>
+    <th>date[]</th>
+    <td>DATE[]</td>
+    <td>date (format: yyyy-MM-dd)</td>
+    <td>Array (JSON)</td>
+  </tr>
+  <tr>
+    <th>datetime</th>
+    <td>TIMESTAMP WITH TIMEZONE</td>
+    <td>date (format: yyyy-MM-dd HH:mm:ss)</td>
+    <td>String (JSON)</td>
+  </tr>
+  <tr>
+    <th>datetime[]</th>
+    <td>TIMESTAMP WITH TIMEZONE[]</td>
+    <td>date (format: yyyy-MM-dd HH:mm:ss)</td>
+    <td>Array (JSON)</td>
+  </tr>
+  <tr>
+    <th>float</th>
+    <td>REAL</td>
+    <td>float</td>
+    <td>Number (JSON)</td>
+  </tr>
+  <tr>
+    <th>float[]</th>
+    <td>REAL[]</td>
+    <td>float</td>
+    <td>Array (JSON)</td>
+  </tr>
+  <tr>
+    <th>integer</th>
+    <td>INTEGER</td>
+    <td>integer</td>
+    <td>Number (JSON)</td>
+  </tr>
+  <tr>
+    <th>integer[]</th>
+    <td>INTEGER[]</td>
+    <td>integer</td>
+    <td>Array (JSON)</td>
+  </tr>
+  <tr>
+    <th>boolean</th>
+    <td>BOOLEAN</td>
+    <td>boolean</td>
+    <td>Boolean (JSON)</td>
+  </tr>
+  <tr>
+    <th>boolean[]</th>
+    <td>BOOLEAN[]</td>
+    <td>boolean</td>
+    <td>Array (JSON)</td>
+  </tr>
+  <tr>
+    <th>json</th>
+    <td>JSON</td>
+    <td>object</td>
+    <td>Object (JSON)</td>
+  </tr>
+  <tr>
+    <th>json[]</th>
+    <td>JSON[]</td>
+    <td>object</td>
+    <td>Array (JSON)</td>
   </tr>
 </table>
 
@@ -182,7 +254,7 @@ For LevelDB, it's quite easy. Since it's schemaless we don't have to migrate any
 You can create a snapshot with the [create snapshot](#create-snapshot) command:
 
 ```shell
-curl -X POST http://localhost:2000/api/snapshot/myblog
+curl -X POST http://localhost:2000/api/projects/myblog/snapshots
 ```
 
 When the request completes, the storage engines are ready to handle data with the new schema.
@@ -201,7 +273,7 @@ You can also include a **links** key that is an array of UUID's, pointing to oth
 
 Below is an example:
 ```shell
-curl -X PUT http://localhost:2000/api/item/myblog/article -d '
+curl -X PUT http://localhost:2000/api/projects/myblog/item/article/66276124-ebcd-45e1-8013-825346daa283 -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
   "snapshot_version": 1,
@@ -218,9 +290,8 @@ curl -X PUT http://localhost:2000/api/item/myblog/article -d '
 
 Deleting an item is not so difficult either:
 ```shell
-curl -X DELETE http://localhost:2000/api/item/myblog/article/66276124-ebcd-45e1-8013-825346daa283
+curl -X DELETE http://localhost:2000/api/projects/myblog/item/article/66276124-ebcd-45e1-8013-825346daa283
 ```
-
 
 #Commands
 
@@ -228,17 +299,6 @@ At this moment, the only way to communicate with node-projector is via a JSON AP
 **In the future we might add support for communication with node-projector via RabbitMQ**
 
 The following commands are available
-
-## get all schemas
-
-**Retrieves all the schema definitions for a given namespace.**
-
-*The namespace is an identifier for a project.*  
-*Say you are making a blog and a homepage, you could use the namespaces: "blog" and "homepage"*
-
-```shell
-curl -X GET http://localhost:2000/api/schema/:namespace
-```
 
 ## get schema
 
@@ -249,28 +309,7 @@ curl -X GET http://localhost:2000/api/schema/:namespace
 *Coninuing from the previous blog example, the schemaKey could be a "post", "author" or a "comment"*
 
 ```shell
-curl -X GET http://localhost:2000/api/schema/:namespace/:schemaKey
-```
-
-## put all schemas
-
-**Stores all schemas for a given namespace.**
-
-*The namespace is an identifier for a project.*  
-
-```shell
-curl -X PUT http://localhost:2000/api/schema/:namespace -d '
-{
-  "article": {
-    "table": "articles",
-    "elasticsearch_type": "article",
-    "columns": {
-      "title": {
-        "type": "text"
-      }
-    }
-  }
-}'
+curl -X GET http://localhost:2000/api/projects/:namespace/schemas/:schema_key/:snapshot_version
 ```
 
 ## put schema
@@ -281,7 +320,7 @@ curl -X PUT http://localhost:2000/api/schema/:namespace -d '
 *The schema key is a string that uniquely identifies your schema*  
 
 ```shell
-curl -X PUT http://localhost:2000/api/schema/:namespace/:schemaKey -d '
+curl -X PUT http://localhost:2000/api/projects/:namespace/schemas/:schema_key -d '
 {
   "table": "articles",
   "elasticsearch_type": "article",
@@ -308,7 +347,7 @@ curl -X PUT http://localhost:2000/api/schema/:namespace/:schemaKey -d '
 - create or replace an alias from "namespace" to "namespace + 'v' + snapshotVersion"
 
 ```shell
-curl -X POST http://localhost:2000/api/snapshot/:namespace
+curl -X POST http://localhost:2000/api/projects/:namespace/snapshots
 ```
 
 ## put item
@@ -319,7 +358,7 @@ curl -X POST http://localhost:2000/api/snapshot/:namespace
 *The schema key is a string that uniquely identifies your schema*  
 
 ```shell
-curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d '
+curl -X PUT /api/projects/:namespace/item/:schema_key/:id -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
   "snapshot_version": 1,
@@ -332,7 +371,7 @@ curl -X PUT http://localhost:2000/api/item/:namespace/:schemaKey -d '
 **Deletes an item in all storage backends.**
 
 ```shell
-curl -X DELETE http://localhost:2000/api/item/:namespace/:schemaKey
+curl -X DELETE /api/projects/:namespace/item/:schema_key/:id
 ```
 
 #Requirements

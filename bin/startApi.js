@@ -51,17 +51,17 @@ function createHandler(key, createCommand) {
 ////////////////////////////////////////////////////////////////////
 
 // schemaFacade.getSnapshotVersions()
-server.get('/projects', createHandler('get-snapshot-versions'));
+server.get('/api/projects', createHandler('get-snapshot-versions'));
 
 // schemaFacade.createSnapshot()
-server.post('/projects/:namespace/snapshots', createHandler('create-snapshot', function (req) {
+server.post('/api/projects/:namespace/snapshots', createHandler('create-snapshot', function (req) {
   return {
     namespace: req.params.namespace
   }
 }));
 
 // schemaFacade.getSnapshot(namespace, snapshotVersion)
-server.get('/projects/:namespace/snapshots/:snapshot_version', createHandler('get-snapshot', function (req) {
+server.get('/api/projects/:namespace/snapshots/:snapshot_version', createHandler('get-snapshot', function (req) {
   return {
     namespace: req.params.namespace,
     snapshot_version: req.params.snapshot_version
@@ -69,7 +69,7 @@ server.get('/projects/:namespace/snapshots/:snapshot_version', createHandler('ge
 }));
 
 // schemaFacade.getSchema(namespace, schemaKey, snapshotVersion='current')
-server.get('/projects/:namespace/schemas/:schema_key/:snapshot_version', createHandler('get-schema', function (req) {
+server.get('/api/projects/:namespace/schemas/:schema_key/:snapshot_version', createHandler('get-schema', function (req) {
   return {
     namespace: req.params.namespace,
     snapshot_version: req.params.snapshot_version,
@@ -78,7 +78,7 @@ server.get('/projects/:namespace/schemas/:schema_key/:snapshot_version', createH
 }));
 
 // schemaFacade.putSchema(namespace, schemaKey)
-server.put('/projects/:namespace/schemas/:schema_key', createHandler('put-schema', function (req) {
+server.put('/api/projects/:namespace/schemas/:schema_key', createHandler('put-schema', function (req) {
   return {
     namespace: req.params.namespace,
     schema_key: req.params.schema_key,
@@ -91,7 +91,7 @@ server.put('/projects/:namespace/schemas/:schema_key', createHandler('put-schema
 ////////////////////////////////////////////////////////////////////
 
 // projector.putItem(namespace, schemaKey, <generated-uuid>, item)
-server.post('/projects/:namespace/item/:schema_key', createHandler('create-item', function (req) {
+server.post('/api/projects/:namespace/item/:schema_key', createHandler('create-item', function (req) {
   return {
     namespace: req.params.namespace,
     schema_key: req.params.schema_key,
@@ -100,7 +100,7 @@ server.post('/projects/:namespace/item/:schema_key', createHandler('create-item'
 }));
 
 // projector.putItem(namespace, schemaKey, id, item)
-server.put('/projects/:namespace/item/:schema_key/:id', createHandler('put-item', function (req) {
+server.put('/api/projects/:namespace/item/:schema_key/:id', createHandler('put-item', function (req) {
   return {
     namespace: req.params.namespace,
     schema_key: req.params.schema_key,
@@ -110,7 +110,7 @@ server.put('/projects/:namespace/item/:schema_key/:id', createHandler('put-item'
 }));
 
 // projector.delItem(namespace, schemaKey, id)
-server.del('/projects/:namespace/item/:schema_key/:id', createHandler('del-item', function (req) {
+server.del('/api/projects/:namespace/item/:schema_key/:id', createHandler('del-item', function (req) {
   return {
     namespace: req.params.namespace,
     schema_key: req.params.schema_key,

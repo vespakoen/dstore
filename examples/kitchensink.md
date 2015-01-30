@@ -1,7 +1,7 @@
 # Create a schema
 
 ```shell
-curl -XPUT http://localhost:2020/api/schema/testnamespace/kitchensink -H 'content-type: application/json' -d '{
+curl -XPUT http://localhost:2020/api/projects/testnamespace/schemas/kitchensink -H 'content-type: application/json' -d '{
   "table": "kitchensinks",
   "elasticsearch_type": "kitchensink",
   "columns": {
@@ -95,12 +95,12 @@ curl -XPUT http://localhost:2020/api/schema/testnamespace/kitchensink -H 'conten
 
 # Create a snapshot
 ```shell
-curl -XPOST -H 'content-type: application/json' http://localhost:2020/api/snapshot/testnamespace
+curl -XPOST -H 'content-type: application/json' http://localhost:2020/api/projects/testnamespace/snapshots
 ```
 
 # Create an item
 ```shell
-curl -XPUT -H 'content-type: application/json' http://localhost:2020/api/item/testnamespace/kitchensink -d '{
+curl -XPUT -H 'content-type: application/json' http://localhost:2020/api/projects/testnamespace/item/kitchensink/a4f20ace-7aa4-4077-983b-717c2ec5427d -d '{
   "id": "a4f20ace-7aa4-4077-983b-717c2ec5427d",
   "snapshot_version": 1,
   "integer_type": 35235,
