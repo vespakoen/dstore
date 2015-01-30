@@ -91,7 +91,7 @@ server.put('/api/projects/:namespace/schemas/:schema_key', createHandler('put-sc
 ////////////////////////////////////////////////////////////////////
 
 // projector.putItem(namespace, schemaKey, <generated-uuid>, item)
-server.post('/api/projects/:namespace/item/:schema_key', createHandler('create-item', function (req) {
+server.post('/api/projects/:namespace/items/:schema_key', createHandler('create-item', function (req) {
   return {
     namespace: req.params.namespace,
     schema_key: req.params.schema_key,
@@ -100,7 +100,7 @@ server.post('/api/projects/:namespace/item/:schema_key', createHandler('create-i
 }));
 
 // projector.putItem(namespace, schemaKey, id, item)
-server.put('/api/projects/:namespace/item/:schema_key/:id', createHandler('put-item', function (req) {
+server.put('/api/projects/:namespace/items/:schema_key/:id', createHandler('put-item', function (req) {
   return {
     namespace: req.params.namespace,
     schema_key: req.params.schema_key,
@@ -110,7 +110,7 @@ server.put('/api/projects/:namespace/item/:schema_key/:id', createHandler('put-i
 }));
 
 // projector.delItem(namespace, schemaKey, id)
-server.del('/api/projects/:namespace/item/:schema_key/:id', createHandler('del-item', function (req) {
+server.del('/api/projects/:namespace/items/:schema_key/:id', createHandler('del-item', function (req) {
   return {
     namespace: req.params.namespace,
     schema_key: req.params.schema_key,

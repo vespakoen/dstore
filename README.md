@@ -273,7 +273,7 @@ You can also include a **links** key that is an array of UUID's, pointing to oth
 
 Below is an example:
 ```shell
-curl -X PUT http://localhost:2000/api/projects/myblog/item/article/66276124-ebcd-45e1-8013-825346daa283 -d '
+curl -X PUT http://localhost:2000/api/projects/myblog/items/article/66276124-ebcd-45e1-8013-825346daa283 -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
   "snapshot_version": 1,
@@ -290,7 +290,7 @@ curl -X PUT http://localhost:2000/api/projects/myblog/item/article/66276124-ebcd
 
 Deleting an item is not so difficult either:
 ```shell
-curl -X DELETE http://localhost:2000/api/projects/myblog/item/article/66276124-ebcd-45e1-8013-825346daa283
+curl -X DELETE http://localhost:2000/api/projects/myblog/items/article/66276124-ebcd-45e1-8013-825346daa283
 ```
 
 #Commands
@@ -358,7 +358,7 @@ curl -X POST http://localhost:2000/api/projects/:namespace/snapshots
 *The schema key is a string that uniquely identifies your schema*  
 
 ```shell
-curl -X PUT /api/projects/:namespace/item/:schema_key/:id -d '
+curl -X PUT /api/projects/:namespace/items/:schema_key/:id -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
   "snapshot_version": 1,
@@ -371,7 +371,7 @@ curl -X PUT /api/projects/:namespace/item/:schema_key/:id -d '
 **Deletes an item in all storage backends.**
 
 ```shell
-curl -X DELETE /api/projects/:namespace/item/:schema_key/:id
+curl -X DELETE /api/projects/:namespace/items/:schema_key/:id
 ```
 
 #Requirements

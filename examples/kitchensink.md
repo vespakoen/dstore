@@ -100,7 +100,7 @@ curl -XPOST -H 'content-type: application/json' http://localhost:2020/api/projec
 
 # Create an item
 ```shell
-curl -XPUT -H 'content-type: application/json' http://localhost:2020/api/projects/testnamespace/item/kitchensink/a4f20ace-7aa4-4077-983b-717c2ec5427d -d '{
+curl -XPUT -H 'content-type: application/json' http://localhost:2020/api/projects/testnamespace/items/kitchensink/a4f20ace-7aa4-4077-983b-717c2ec5427d -d '{
   "id": "a4f20ace-7aa4-4077-983b-717c2ec5427d",
   "snapshot_version": 1,
   "integer_type": 35235,
