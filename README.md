@@ -46,7 +46,7 @@ Let's look at an example how to create a schema for storing posts on my blog.
 For this, we use the [put schema](#put-schema) command, and use "myblog" as the namespace, and "article" as the schemakey.
 
 ```shell
-curl -X PUT http://localhost:2000/api/projects/myblog/schemas/article -d '
+curl -X PUT http://localhost:2000/myblog/schemas/article -d '
 {
   "table": "articles",
   "elasticsearch_type": "article",
@@ -254,7 +254,7 @@ For LevelDB, it's quite easy. Since it's schemaless we don't have to migrate any
 You can create a snapshot with the [create snapshot](#create-snapshot) command:
 
 ```shell
-curl -X POST http://localhost:2000/api/projects/myblog/snapshots
+curl -X POST http://localhost:2000/myblog/snapshots
 ```
 
 When the request completes, the storage engines are ready to handle data with the new schema.
@@ -273,7 +273,7 @@ You can also include a **links** key that is an array of UUID's, pointing to oth
 
 Below is an example:
 ```shell
-curl -X PUT http://localhost:2000/api/projects/myblog/items/article/66276124-ebcd-45e1-8013-825346daa283 -d '
+curl -X PUT http://localhost:2000/myblog/items/article/66276124-ebcd-45e1-8013-825346daa283 -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
   "snapshot_version": 1,
@@ -290,7 +290,7 @@ curl -X PUT http://localhost:2000/api/projects/myblog/items/article/66276124-ebc
 
 Deleting an item is not so difficult either:
 ```shell
-curl -X DELETE http://localhost:2000/api/projects/myblog/items/article/66276124-ebcd-45e1-8013-825346daa283
+curl -X DELETE http://localhost:2000/myblog/items/article/66276124-ebcd-45e1-8013-825346daa283
 ```
 
 #Commands
@@ -309,7 +309,7 @@ The following commands are available
 *Coninuing from the previous blog example, the schemaKey could be a "post", "author" or a "comment"*
 
 ```shell
-curl -X GET http://localhost:2000/api/projects/:namespace/schemas/:schema_key/:snapshot_version
+curl -X GET http://localhost:2000/:namespace/schemas/:schema_key/:snapshot_version
 ```
 
 ## put schema
@@ -320,7 +320,7 @@ curl -X GET http://localhost:2000/api/projects/:namespace/schemas/:schema_key/:s
 *The schema key is a string that uniquely identifies your schema*  
 
 ```shell
-curl -X PUT http://localhost:2000/api/projects/:namespace/schemas/:schema_key -d '
+curl -X PUT http://localhost:2000/:namespace/schemas/:schema_key -d '
 {
   "table": "articles",
   "elasticsearch_type": "article",
@@ -347,7 +347,7 @@ curl -X PUT http://localhost:2000/api/projects/:namespace/schemas/:schema_key -d
 - create or replace an alias from "namespace" to "namespace + 'v' + snapshotVersion"
 
 ```shell
-curl -X POST http://localhost:2000/api/projects/:namespace/snapshots
+curl -X POST http://localhost:2000/:namespace/snapshots
 ```
 
 ## put item
@@ -358,7 +358,7 @@ curl -X POST http://localhost:2000/api/projects/:namespace/snapshots
 *The schema key is a string that uniquely identifies your schema*  
 
 ```shell
-curl -X PUT /api/projects/:namespace/items/:schema_key/:id -d '
+curl -X PUT /:namespace/items/:schema_key/:id -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
   "snapshot_version": 1,
@@ -371,7 +371,7 @@ curl -X PUT /api/projects/:namespace/items/:schema_key/:id -d '
 **Deletes an item in all storage backends.**
 
 ```shell
-curl -X DELETE /api/projects/:namespace/items/:schema_key/:id
+curl -X DELETE /:namespace/items/:schema_key/:id
 ```
 
 #Requirements
