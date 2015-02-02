@@ -519,6 +519,6 @@ test('when testing integration', function (t) {
       );
     })
     .catch(function (err) {
-      console.error('errors while running test', err);
+      t.ok(false, "Test failed with error " + err.message);
     });
 });

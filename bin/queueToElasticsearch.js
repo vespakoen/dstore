@@ -29,8 +29,8 @@ BBPromise.all([
   }
 
   function migrate(command) {
-    console.log('migrate.elasticsearch', command.namespace || 'no namespace', command.snapshot_version || 'no snapshot version');
-    return facade.migrate(command.namespace, command.snapshot_version);
+    console.log('migrate.elasticsearch', command.namespace || 'no namespace', command.snapshot_version || 'no snapshot version', command.schemas ? '' : 'no schemas');
+    return facade.migrate(command.namespace, command.snapshot_version, command.schemas);
   }
 });
 
