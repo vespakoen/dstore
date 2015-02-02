@@ -55,6 +55,11 @@ app.get('queue').then(function (q) {
       })
       .then(function () {
         return facade.createSnapshot(command.namespace);
+      })
+      .then(function (snapshotVersion) {
+        return {
+          snapshot_version: snapshotVersion
+        };
       });
   }
 
