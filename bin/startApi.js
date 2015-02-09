@@ -122,7 +122,7 @@ server.del('/:namespace/items/:schema_key/:id', createHandler('del-item', functi
 //////////////////////////// SERVER SETUP //////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-server.listen(Number(process.env.API_PORT), function () {
+server.listen(Number(process.env.PORT), function () {
   console.log('API started at %s', server.url);
 });
 
