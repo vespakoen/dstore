@@ -43,7 +43,8 @@ function dropTestDatabases(opts) {
     .then(function () {
       return opts.client.queryAsync('DROP DATABASE integrationtestv2');
     })
-    .catch(function () {
+    .catch(function (err) {
+      console.log('Errors while dropping databases', err);
       // the database probably doesn't exist, so we ignore this error
       // noop
     });
@@ -467,6 +468,17 @@ test('when testing integration', function (t) {
     .then(function (queue) {
       opts.queue = queue;
       return removeSchema();
+    })
+    .then(function () {
+      return app.get('postgresql.adapter');
+    })
+    .then(function (adapter) {
+      var client = adapter.getClient('projector', 1);
+      return BBPromise.join(
+        client.table('log').where({ namespace: 'testintegration' }).del().then(function () {}),
+        client.table('snapshots').where({ namespace: 'testintegration' }).del().then(function () {}),
+        client.table('versions').where({ namespace: 'testintegration' }).del().then(function () {})
+      );
     })
     .then(function () {
       return removeElasticsearchIndexes();

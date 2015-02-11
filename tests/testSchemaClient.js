@@ -4,10 +4,24 @@ var test = require('trap').test;
 var BBPromise = require('bluebird');
 var rmRF = BBPromise.promisify(require('rimraf'));
 var app = require('../main');
+var pg = require('pg');
+BBPromise.promisifyAll(pg);
+
 var memo = {};
 
 test('when testing the schema client', function (t) {
   return rmRF(app.config.schema.path + '/clienttest')
+    .then(function () {
+      return app.get('postgresql.adapter');
+    })
+    .then(function (adapter) {
+      var client = adapter.getClient('projector', 1);
+      return BBPromise.join(
+        client.table('log').where({ namespace: 'clienttest' }).del().then(function () {}),
+        client.table('snapshots').where({ namespace: 'clienttest' }).del().then(function () {}),
+        client.table('versions').where({ namespace: 'clienttest' }).del().then(function () {})
+      );
+    })
     .then(function () {
       return app.get('schema.adapter');
     })
@@ -23,9 +37,9 @@ test('when testing the schema client', function (t) {
           }
         };
 
-        return memo.client.putSchema('sometype', 1, schema)
+        return memo.client.putSchema(1, 'sometype', schema)
           .then(function () {
-            return memo.client.getSchema('sometype', 1);
+            return memo.client.getSchema(1, 'sometype');
           })
           .then(function (contents) {
             ts.deepEqual(contents, schema, 'the contents should match');

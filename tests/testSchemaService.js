@@ -20,6 +20,17 @@ test('when testing the schema service', function (t) {
       memo.facade = facade;
     })
     .then(function () {
+      return app.get('postgresql.adapter');
+    })
+    .then(function (adapter) {
+      var client = adapter.getClient('projector', 1);
+      return BBPromise.join(
+        client.table('log').where({ namespace: 'servicetest' }).del().then(function () {}),
+        client.table('snapshots').where({ namespace: 'servicetest' }).del().then(function () {}),
+        client.table('versions').where({ namespace: 'servicetest' }).del().then(function () {})
+      );
+    })
+    .then(function () {
       t.test("when creating a news schema", function (t1) {
         var schema = {
           "elasticsearch_type": "news",
