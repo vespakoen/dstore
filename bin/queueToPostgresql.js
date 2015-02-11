@@ -12,8 +12,8 @@ BBPromise.all([
   }),
   app.get('postgresql.facade')
 ]).spread(function (consumer, facade) {
-  consumer.consume('put-item.postgresql', putItem);
-  consumer.consume('del-item.postgresql', delItem);
+  consumer.consume('put-item.postgresql', putItem, true);
+  consumer.consume('del-item.postgresql', delItem, true);
   consumer.consume('migrate.postgresql', migrate);
   console.log('Queue to postgresql started');
 

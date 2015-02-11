@@ -12,8 +12,8 @@ BBPromise.all([
   }),
   app.get('elasticsearch.facade')
 ]).spread(function (consumer, facade) {
-  consumer.consume('put-item.elasticsearch', putItem);
-  consumer.consume('del-item.elasticsearch', delItem);
+  consumer.consume('put-item.elasticsearch', putItem, true);
+  consumer.consume('del-item.elasticsearch', delItem, true);
   consumer.consume('migrate.elasticsearch', migrate);
 
   console.log('Queue to elasticsearch started');

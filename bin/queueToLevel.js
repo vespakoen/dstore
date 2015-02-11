@@ -12,8 +12,8 @@ BBPromise.all([
   }),
   app.get('level.facade')
 ]).spread(function (consumer, facade) {
-  consumer.consume('put-item.level', putItem);
-  consumer.consume('del-item.level', delItem);
+  consumer.consume('put-item.level', putItem, true);
+  consumer.consume('del-item.level', delItem, true);
   console.log('Queue to level started');
 
   function putItem(command) {
