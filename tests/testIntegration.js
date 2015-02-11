@@ -44,7 +44,6 @@ function dropTestDatabases(opts) {
       return opts.client.queryAsync('DROP DATABASE integrationtestv2');
     })
     .catch(function (err) {
-      console.log('Errors while dropping databases', err);
       // the database probably doesn't exist, so we ignore this error
       // noop
     });
