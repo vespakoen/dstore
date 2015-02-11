@@ -478,7 +478,9 @@ test('when testing integration', function (t) {
         client.table('log').where({ namespace: 'testintegration' }).del().then(function () {}),
         client.table('snapshots').where({ namespace: 'testintegration' }).del().then(function () {}),
         client.table('versions').where({ namespace: 'testintegration' }).del().then(function () {})
-      );
+      ).catch(function () {
+        // noop
+      });
     })
     .then(function () {
       return removeElasticsearchIndexes();
