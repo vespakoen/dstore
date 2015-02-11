@@ -20,7 +20,9 @@ test('when testing the schema client', function (t) {
         client.table('log').where({ namespace: 'clienttest' }).del().then(function () {}),
         client.table('snapshots').where({ namespace: 'clienttest' }).del().then(function () {}),
         client.table('versions').where({ namespace: 'clienttest' }).del().then(function () {})
-      );
+      ).catch(function () {
+        // noop
+      });
     })
     .then(function () {
       return app.get('schema.adapter');

@@ -28,7 +28,9 @@ test('when testing the schema service', function (t) {
         client.table('log').where({ namespace: 'servicetest' }).del().then(function () {}),
         client.table('snapshots').where({ namespace: 'servicetest' }).del().then(function () {}),
         client.table('versions').where({ namespace: 'servicetest' }).del().then(function () {})
-      );
+      ).catch(function () {
+        // noop
+      });
     })
     .then(function () {
       t.test("when creating a news schema", function (t1) {
