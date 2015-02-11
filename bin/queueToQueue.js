@@ -13,6 +13,10 @@ app.get('queue').then(function (q) {
   );
 })
 .spread(function (publisher, consumer) {
+  consumer.consume('queue', function (data) {
+    return publisher.publish(data.key, data.command);
+  }, true);
+
   consumer.consume('put-item', function (command) {
     console.log('put-item', command.namespace || 'no namespace', command.schema_key || 'no key', command.id || 'no id', command.item ? '' : 'no item');
     return BBPromise.join(

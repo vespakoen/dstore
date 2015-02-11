@@ -24,26 +24,29 @@ function createHandler(key, createCommand) {
       .then(function (q) {
         queue = q;
 
-        q.publish(key, createCommand ? createCommand(req) : {})
-          .then(function (result) {
-            res.send(result);
-            return next();
-          })
-          .catch(function (err) {
-            console.error(err);
+        q.publish('queue', {
+          key: key,
+          command: createCommand ? createCommand(req) : {}
+        })
+        .then(function (result) {
+          res.send(result);
+          return next();
+        })
+        .catch(function (err) {
+          console.error(err);
 
-            // throw err;
-            var response = {
-              status: err.message
-            };
+          // throw err;
+          var response = {
+            status: err.message
+          };
 
-            if (err.errors) {
-              response.errors = err.errors;
-            }
+          if (err.errors) {
+            response.errors = err.errors;
+          }
 
-            res.send(400, response);
-            return next();
-          });
+          res.send(400, response);
+          return next();
+        });
       });
   };
 }

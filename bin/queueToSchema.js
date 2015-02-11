@@ -18,7 +18,7 @@ app.get('queue').then(function (q) {
   consumer.consume('get-snapshot', getSnapshot);
   consumer.consume('create-snapshot', createSnapshot);
   consumer.consume('get-schema', getSchema);
-  consumer.consume('put-schema', putSchema, true);
+  consumer.consume('put-schema', putSchema);
   console.log('Queue to schema started');
 
   function getSnapshotVersions() {
