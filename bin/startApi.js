@@ -30,6 +30,8 @@ function createHandler(key, createCommand) {
             return next();
           })
           .catch(function (err) {
+            console.error(err);
+
             // throw err;
             var response = {
               status: err.message
