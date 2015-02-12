@@ -20,7 +20,7 @@ module.exports = {
     path: process.env.LEVEL_PATH
   },
 
-  schema: {
-    path: process.env.SCHEMA_PATH
+  blueprint: {
+    path: process.env.BLUEPRINT_PATH
   }
 };

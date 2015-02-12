@@ -11,15 +11,15 @@ app.get('queue').then(function (q) {
   return BBPromise.join(
     q.setupConsumer(),
     q.setupPublisher(),
-    app.get('schema.facade')
+    app.get('blueprint.facade')
   );
 }).spread(function (consumer, publisher, facade) {
   consumer.consume('get-snapshot-versions', getSnapshotVersions);
   consumer.consume('get-snapshot', getSnapshot);
   consumer.consume('create-snapshot', createSnapshot);
-  consumer.consume('get-schema', getSchema);
-  consumer.consume('put-schema', putSchema);
-  console.log('Queue to schema started');
+  consumer.consume('get-blueprint', getBlueprint);
+  consumer.consume('put-blueprint', putBlueprint);
+  console.log('Queue to blueprint started');
 
   function getSnapshotVersions() {
     console.log('get-snapshot-versions');
@@ -36,7 +36,7 @@ app.get('queue').then(function (q) {
   function createSnapshot(command) {
     console.log('create-snapshot', command.namespace || 'no namespace');
 
-    return app.get('schema.adapter')
+    return app.get('blueprint.adapter')
       .then(function (adapter) {
         var client = adapter.getClient(command.namespace);
         return BBPromise.join(
@@ -44,8 +44,8 @@ app.get('queue').then(function (q) {
           client.getLatestSnapshotVersion()
         );
       })
-      .spread(function (schemas, snapshotVersion) {
-        command.schemas = schemas;
+      .spread(function (blueprints, snapshotVersion) {
+        command.blueprints = blueprints;
         command.snapshot_version = snapshotVersion + 1;
         
         return BBPromise.join(
@@ -63,22 +63,22 @@ app.get('queue').then(function (q) {
       });
   }
 
-  function putSchema(command) {
-    console.log('put-schema', command.namespace || 'no namespace', command.schema_key || 'no schema_key');
+  function putBlueprint(command) {
+    console.log('put-blueprint', command.namespace || 'no namespace', command.blueprint_key || 'no blueprint_key');
 
-    return facade.putSchema(command.namespace, command.schema_key, command.schema);
+    return facade.putBlueprint(command.namespace, command.blueprint_key, command.blueprint);
   }
 
-  function getSchema(command) {
-    console.log('get-schema', command.namespace || 'no namespace', command.schema_key || 'no schema_key', command.snapshot_version || 'no snapshot_version');
+  function getBlueprint(command) {
+    console.log('get-blueprint', command.namespace || 'no namespace', command.blueprint_key || 'no blueprint_key', command.snapshot_version || 'no snapshot_version');
 
-    return facade.getSchema(command.namespace, command.schema_key, command.snapshot_version);
+    return facade.getBlueprint(command.namespace, command.blueprint_key, command.snapshot_version);
   }
 });
 
 process.on('SIGTERM', function () {
   queue.close(function () {
-    console.log('Queue to schema stopping...');
+    console.log('Queue to blueprint stopping...');
     process.exit(0);
   });
 });

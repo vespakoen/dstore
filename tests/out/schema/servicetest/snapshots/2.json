@@ -1,0 +1,20 @@
+{
+  "news": {
+    "elasticsearch_type": "news",
+    "table": "news",
+    "columns": {
+      "title_nl": {
+        "type": "string"
+      }
+    }
+  },
+  "articles": {
+    "elasticsearch_type": "news",
+    "table": "news",
+    "columns": {
+      "title_nl": {
+        "type": "string"
+      }
+    }
+  }
+}

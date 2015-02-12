@@ -36,7 +36,7 @@ function migrate (migrator) {
         version: {
           type: 'string'
         },
-        schemas: {
+        blueprints: {
           type: 'json'
         }
       }

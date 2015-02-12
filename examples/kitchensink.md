@@ -1,7 +1,7 @@
-# Create a schema
+# Create a blueprint
 
 ```shell
-curl -XPUT http://localhost:2020/testnamespace/schemas/kitchensink -H 'content-type: application/json' -d '{
+curl -XPUT http://localhost:2020/testnamespace/blueprints/kitchensink -H 'content-type: application/json' -d '{
   "table": "kitchensinks",
   "elasticsearch_type": "kitchensink",
   "columns": {

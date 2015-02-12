@@ -24,5 +24,5 @@ before_script:
   - export ELASTICSEARCH_HOST=http://localhost:9200
   - export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
   - export LEVEL_PATH="$TRAVIS_BUILD_DIR/tests/out/level"
-  - export SCHEMA_PATH="$TRAVIS_BUILD_DIR/tests/out/schema"
+  - export BLUEPRINT_PATH="$TRAVIS_BUILD_DIR/tests/out/blueprint"
   - export PORT=2000

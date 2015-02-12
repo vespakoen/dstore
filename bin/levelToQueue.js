@@ -15,19 +15,19 @@ BBPromise.all([
         return client.sublevel('item-by-type');
       });
   }),
-  app.get('schema')
-]).spread(function (publisher, client, schema) {
-  var schemaKeys = Object.keys(schema);
-  schemaKeys.forEach(function (schemaKey) {
-    client.sublevel(schemaKey)
+  app.get('blueprint')
+]).spread(function (publisher, client, blueprint) {
+  var blueprintKeys = Object.keys(blueprint);
+  blueprintKeys.forEach(function (blueprintKey) {
+    client.sublevel(blueprintKey)
       .createReadStream()
       .on('data', function (data) {
         var item = JSON.parse(data.value);
 
-        console.log('queuing ' + namespace + ':' + schemaKey + ':' + item.id);
+        console.log('queuing ' + namespace + ':' + blueprintKey + ':' + item.id);
         publisher.publish('put-item', {
           namespace: namespace,
-          key: schemaKey,
+          key: blueprintKey,
           item: item
         });
       });

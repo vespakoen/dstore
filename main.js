@@ -10,7 +10,7 @@ if ( ! _.isString(process.env.POSTGRESQL_PASSWORD))     throw new Error('The POS
 if ( ! _.isString(process.env.ELASTICSEARCH_HOST))      throw new Error('The ELASTICSEARCH_HOST environment variable is not defined!');
 if ( ! _.isString(process.env.QUEUE_CONNECTIONSTRING))  throw new Error('The QUEUE_CONNECTIONSTRING environment variable is not defined!');
 if ( ! _.isString(process.env.LEVEL_PATH))              throw new Error('The LEVEL_PATH environment variable is not defined!');
-if ( ! _.isString(process.env.SCHEMA_PATH))             throw new Error('The SCHEMA_PATH environment variable is not defined!');
+if ( ! _.isString(process.env.BLUEPRINT_PATH))          throw new Error('The BLUEPRINT_PATH environment variable is not defined!');
 if ( ! _.isString(process.env.PORT))                    throw new Error('The PORT environment variable is not defined!');
 
 var config = require('./config');
@@ -19,7 +19,7 @@ var schemas = [
   require('./schemas/geojson'),
   require('./schemas/types'),
   require('./schemas/item'),
-  require('./schemas/schema')
+  require('./schemas/blueprint')
 ];
 
 var app = new App({
@@ -44,12 +44,12 @@ app.use(require('./lib/postgresql/postgresqlMigrator'));
 app.use(require('./lib/postgresql/postgresqlRepository'));
 app.use(require('./lib/postgresql/postgresqlSerializer'));
 
-app.use(require('./lib/schema/client/fileSchemaClient'));
-app.use(require('./lib/schema/schemaAdapter'));
-app.use(require('./lib/schema/schemaDiffer'));
-app.use(require('./lib/schema/schemaFacade'));
-app.use(require('./lib/schema/schemaService'));
-app.use(require('./lib/schema/schemaSnapshotter'));
+app.use(require('./lib/blueprint/client/fileBlueprintClient'));
+app.use(require('./lib/blueprint/blueprintAdapter'));
+app.use(require('./lib/blueprint/blueprintDiffer'));
+app.use(require('./lib/blueprint/blueprintFacade'));
+app.use(require('./lib/blueprint/blueprintService'));
+app.use(require('./lib/blueprint/blueprintSnapshotter'));
 
 app.use(require('./lib/item/itemTransformer'));
 

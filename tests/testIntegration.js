@@ -12,8 +12,8 @@ BBPromise.promisifyAll(pg);
 
 var opts = {};
 
-function removeSchema() {
-  return rmRF(app.config.schema.path + '/integrationtest');
+function removeBlueprint() {
+  return rmRF(app.config.blueprint.path + '/integrationtest');
 }
 
 function removeElasticsearchIndexes() {
@@ -49,11 +49,11 @@ function dropTestDatabases(opts) {
     });
 }
 
-function putFirstSchema(opts) {
-  return opts.publisher.publish('put-schema', {
+function putFirstBlueprint(opts) {
+  return opts.publisher.publish('put-blueprint', {
     namespace: 'integrationtest',
-    schema_key: 'kitchensink',
-    schema: {
+    blueprint_key: 'kitchensink',
+    blueprint: {
       table: 'kitchensinks',
       elasticsearch_type: 'kitchensink',
       columns: {
@@ -107,7 +107,7 @@ function createSnapshot(opts) {
 function putFirstItem(opts) {
   return opts.publisher.publish('put-item', {
     namespace: 'integrationtest',
-    schema_key: 'kitchensink',
+    blueprint_key: 'kitchensink',
     id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
     item: {
       id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
@@ -128,11 +128,11 @@ function putFirstItem(opts) {
   });
 }
 
-function putSecondSchema(opts) {
-  return opts.publisher.publish('put-schema', {
+function putSecondBlueprint(opts) {
+  return opts.publisher.publish('put-blueprint', {
     namespace: 'integrationtest',
-    schema_key: 'kitchensink',
-    schema: {
+    blueprint_key: 'kitchensink',
+    blueprint: {
       table: 'kitchensinks',
       elasticsearch_type: 'kitchensink',
       columns: {
@@ -228,7 +228,7 @@ function putSecondSchema(opts) {
 function putSecondItem(opts) {
   return opts.publisher.publish('put-item', {
     namespace: 'integrationtest',
-    schema_key: 'kitchensink',
+    blueprint_key: 'kitchensink',
     id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
     item: {
       id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
@@ -466,7 +466,7 @@ test('when testing integration', function (t) {
   return app.get('queue')
     .then(function (queue) {
       opts.queue = queue;
-      return removeSchema();
+      return removeBlueprint();
     })
     .then(function () {
       return app.get('postgresql.adapter');
@@ -496,7 +496,7 @@ test('when testing integration', function (t) {
     })
     .then(function (publisher) {
       opts.publisher = publisher;
-      return putFirstSchema(opts);
+      return putFirstBlueprint(opts);
     })
     .then(function () {
       return createSnapshot(opts);
@@ -505,7 +505,7 @@ test('when testing integration', function (t) {
       return putFirstItem(opts);
     })
     .then(function () {
-      return putSecondSchema(opts)
+      return putSecondBlueprint(opts)
     })
     .then(function () {
       return createSnapshot(opts);

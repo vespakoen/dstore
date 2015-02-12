@@ -9,8 +9,8 @@ BBPromise.promisifyAll(pg);
 
 var memo = {};
 
-test('when testing the schema client', function (t) {
-  return rmRF(app.config.schema.path + '/clienttest')
+test('when testing the blueprint client', function (t) {
+  return rmRF(app.config.blueprint.path + '/clienttest')
     .then(function () {
       return app.get('postgresql.adapter');
     })
@@ -25,13 +25,13 @@ test('when testing the schema client', function (t) {
       });
     })
     .then(function () {
-      return app.get('schema.adapter');
+      return app.get('blueprint.adapter');
     })
     .then(function (adapter) {
       memo.client = adapter.getClient('clienttest');
 
-      t.test('when putting a schema', function (ts) {
-        var schema = {
+      t.test('when putting a blueprint', function (ts) {
+        var blueprint = {
           "columns": {
             "description_nl": {
               "type": "text"
@@ -39,12 +39,12 @@ test('when testing the schema client', function (t) {
           }
         };
 
-        return memo.client.putSchema(1, 'sometype', schema)
+        return memo.client.putBlueprint(1, 'sometype', blueprint)
           .then(function () {
-            return memo.client.getSchema(1, 'sometype');
+            return memo.client.getBlueprint(1, 'sometype');
           })
           .then(function (contents) {
-            ts.deepEqual(contents, schema, 'the contents should match');
+            ts.deepEqual(contents, blueprint, 'the contents should match');
           });
       });
       

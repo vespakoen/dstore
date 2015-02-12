@@ -52,20 +52,20 @@ function createHandler(key, createCommand) {
 }
 
 ////////////////////////////////////////////////////////////////////
-/////////////////////////// SCHEMA ACTIONS /////////////////////////
+/////////////////////////// BLUEPRINT ACTIONS /////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-// schemaFacade.getSnapshotVersions()
+// blueprintFacade.getSnapshotVersions()
 server.get('/api', createHandler('get-snapshot-versions'));
 
-// schemaFacade.createSnapshot()
+// blueprintFacade.createSnapshot()
 server.post('/api/:namespace/snapshots', createHandler('create-snapshot', function (req) {
   return {
     namespace: req.params.namespace
   }
 }));
 
-// schemaFacade.getSnapshot(namespace, snapshotVersion)
+// blueprintFacade.getSnapshot(namespace, snapshotVersion)
 server.get('/api/:namespace/snapshots/:snapshot_version', createHandler('get-snapshot', function (req) {
   return {
     namespace: req.params.namespace,
@@ -73,21 +73,21 @@ server.get('/api/:namespace/snapshots/:snapshot_version', createHandler('get-sna
   };
 }));
 
-// schemaFacade.getSchema(namespace, schemaKey, snapshotVersion='current')
-server.get('/api/:namespace/schemas/:schema_key/:snapshot_version', createHandler('get-schema', function (req) {
+// blueprintFacade.getBlueprint(namespace, blueprintKey, snapshotVersion='current')
+server.get('/api/:namespace/blueprints/:blueprint_key/:snapshot_version', createHandler('get-blueprint', function (req) {
   return {
     namespace: req.params.namespace,
     snapshot_version: req.params.snapshot_version,
-    schema_key: req.params.schema_key
+    blueprint_key: req.params.blueprint_key
   };
 }));
 
-// schemaFacade.putSchema(namespace, schemaKey)
-server.put('/api/:namespace/schemas/:schema_key', createHandler('put-schema', function (req) {
+// blueprintFacade.putBlueprint(namespace, blueprintKey)
+server.put('/api/:namespace/blueprints/:blueprint_key', createHandler('put-blueprint', function (req) {
   return {
     namespace: req.params.namespace,
-    schema_key: req.params.schema_key,
-    schema: req.body
+    blueprint_key: req.params.blueprint_key,
+    blueprint: req.body
   };
 }));
 
@@ -95,30 +95,30 @@ server.put('/api/:namespace/schemas/:schema_key', createHandler('put-schema', fu
 //////////////////////////// ITEM ACTIONS //////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-// projector.putItem(namespace, schemaKey, <generated-uuid>, item)
-server.post('/api/:namespace/items/:schema_key', createHandler('create-item', function (req) {
+// projector.putItem(namespace, blueprintKey, <generated-uuid>, item)
+server.post('/api/:namespace/items/:blueprint_key', createHandler('create-item', function (req) {
   return {
     namespace: req.params.namespace,
-    schema_key: req.params.schema_key,
+    blueprint_key: req.params.blueprint_key,
     item: req.body
   };
 }));
 
-// projector.putItem(namespace, schemaKey, id, item)
-server.put('/api/:namespace/items/:schema_key/:id', createHandler('put-item', function (req) {
+// projector.putItem(namespace, blueprintKey, id, item)
+server.put('/api/:namespace/items/:blueprint_key/:id', createHandler('put-item', function (req) {
   return {
     namespace: req.params.namespace,
-    schema_key: req.params.schema_key,
+    blueprint_key: req.params.blueprint_key,
     id: req.params.id,
     item: req.body
   };
 }));
 
-// projector.delItem(namespace, schemaKey, id)
-server.del('/api/:namespace/items/:schema_key/:id', createHandler('del-item', function (req) {
+// projector.delItem(namespace, blueprintKey, id)
+server.del('/api/:namespace/items/:blueprint_key/:id', createHandler('del-item', function (req) {
   return {
     namespace: req.params.namespace,
-    schema_key: req.params.schema_key,
+    blueprint_key: req.params.blueprint_key,
     id: req.params.id
   };
 }));

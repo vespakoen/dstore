@@ -7,7 +7,7 @@
 
 node-projector can be seen as a interface to all your storage engines.
 
-Via a simple REST API, you can manage the schema of your data, and store data with a single request and in a simple format.
+Via a simple REST API, you can manage the blueprint of your data, and store data with a single request and in a simple format.
 
 Currently, node-projector supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, the perfect stack for a modern web application.  
 
@@ -19,15 +19,15 @@ Currently, node-projector supports **PostgreSQL**, **Elasticsearch** and **Level
 
 #Topics
 
-- [Schemas](#schemas)  
+- [Blueprints](#blueprints)  
 - [Snapshots](#snapshots)
 - [Storing & removing data](#storing--removing-data)
 - [Commands](#commands)
-    - Schema management
-        - [Get all schemas](#get-all-schemas)
-        - [Get schema](#get-schema)
-        - [Put all schemas](#put-all-schemas)
-        - [Put schema](#put-schema)
+    - Blueprint management
+        - [Get all blueprints](#get-all-blueprints)
+        - [Get blueprint](#get-blueprint)
+        - [Put all blueprints](#put-all-blueprints)
+        - [Put blueprint](#put-blueprint)
     - Snapshot management
         - [Create snapshot](#create-snapshot)
     - Item storage
@@ -38,15 +38,15 @@ Currently, node-projector supports **PostgreSQL**, **Elasticsearch** and **Level
 - [Dive deeper](#dive-deeper)
 
 
-#Schemas
+#Blueprints
 
-The schema describes your data format, so the projectors know what data they can expect and know how to serialize it.  
-A schema contains information like the table name, elasticsearch type, the columns and the validation options that should be used when data is stored.  
-Let's look at an example how to create a schema for storing posts on my blog.
-For this, we use the [put schema](#put-schema) command, and use "myblog" as the namespace, and "article" as the schemakey.
+The blueprint describes your data format, so the projectors know what data they can expect and know how to serialize it.  
+A blueprint contains information like the table name, elasticsearch type, the columns and the validation options that should be used when data is stored.  
+Let's look at an example how to create a blueprint for storing posts on my blog.
+For this, we use the [put blueprint](#put-blueprint) command, and use "myblog" as the namespace, and "article" as the blueprintkey.
 
 ```shell
-curl -X PUT http://localhost:2000/myblog/schemas/article -d '
+curl -X PUT http://localhost:2000/myblog/blueprints/article -d '
 {
   "table": "articles",
   "elasticsearch_type": "article",
@@ -246,10 +246,10 @@ As you can see, we follow PostgreSQL's [] notation for defining *an array* of so
 
 #Snapshots
 
-When you are done adding schemas, it's time to create a snapshot.
-By creating a snapshot we are saving the current state of all schemas, and assign a snapshot version number to it.
+When you are done adding blueprints, it's time to create a snapshot.
+By creating a snapshot we are saving the current state of all blueprints, and assign a snapshot version number to it.
 After the snapshot is stored, the migrators for every projector will kick into action to create new databases / elasticsearch indexes, tables and type mappings.
-For LevelDB, it's quite easy. Since it's schemaless we don't have to migrate anything.
+For LevelDB, it's quite easy. Since it's blueprintless we don't have to migrate anything.
 
 You can create a snapshot with the [create snapshot](#create-snapshot) command:
 
@@ -257,7 +257,7 @@ You can create a snapshot with the [create snapshot](#create-snapshot) command:
 curl -X POST http://localhost:2000/myblog/snapshots
 ```
 
-When the request completes, the storage engines are ready to handle data with the new schema.
+When the request completes, the storage engines are ready to handle data with the new blueprint.
 
 
 #Storing & removing data
@@ -300,27 +300,27 @@ At this moment, the only way to communicate with node-projector is via a JSON AP
 
 The following commands are available
 
-## get schema
+## get blueprint
 
-**Retrieves a single schema for a given namespace and schema key.**
+**Retrieves a single blueprint for a given namespace and blueprint key.**
 
 *The namespace is an identifier for a project.*  
-*The schema key is a string that uniquely identifies your schema*  
-*Coninuing from the previous blog example, the schemaKey could be a "post", "author" or a "comment"*
+*The blueprint key is a string that uniquely identifies your blueprint*  
+*Coninuing from the previous blog example, the blueprintKey could be a "post", "author" or a "comment"*
 
 ```shell
-curl -X GET http://localhost:2000/:namespace/schemas/:schema_key/:snapshot_version
+curl -X GET http://localhost:2000/:namespace/blueprints/:blueprint_key/:snapshot_version
 ```
 
-## put schema
+## put blueprint
 
-**Stores a single schema for a given namespace and schema key.**
+**Stores a single blueprint for a given namespace and blueprint key.**
 
 *The namespace is an identifier for a project.*  
-*The schema key is a string that uniquely identifies your schema*  
+*The blueprint key is a string that uniquely identifies your blueprint*  
 
 ```shell
-curl -X PUT http://localhost:2000/:namespace/schemas/:schema_key -d '
+curl -X PUT http://localhost:2000/:namespace/blueprints/:blueprint_key -d '
 {
   "table": "articles",
   "elasticsearch_type": "article",
@@ -334,10 +334,10 @@ curl -X PUT http://localhost:2000/:namespace/schemas/:schema_key -d '
 
 ## create snapshot
 
-**Stores the current schemas as a snapshot.**
+**Stores the current blueprints as a snapshot.**
 
-*The "put schema" and "put all schemas" commands modify the "current" schema*  
-*If you are happy with the schema, you create a snapshot.*
+*The "put blueprint" and "put all blueprints" commands modify the "current" blueprint*  
+*If you are happy with the blueprint, you create a snapshot.*
 *This will trigger the migrations that will:*  
 
 - create a postgresql database (named: namespace + 'v' + snapshotVersion)
@@ -355,10 +355,10 @@ curl -X POST http://localhost:2000/:namespace/snapshots
 **Projects an item to all storage backends.**
 
 *The namespace is an identifier for a project.*  
-*The schema key is a string that uniquely identifies your schema*  
+*The blueprint key is a string that uniquely identifies your blueprint*  
 
 ```shell
-curl -X PUT /:namespace/items/:schema_key/:id -d '
+curl -X PUT /:namespace/items/:blueprint_key/:id -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
   "snapshot_version": 1,
@@ -371,7 +371,7 @@ curl -X PUT /:namespace/items/:schema_key/:id -d '
 **Deletes an item in all storage backends.**
 
 ```shell
-curl -X DELETE /:namespace/items/:schema_key/:id
+curl -X DELETE /:namespace/items/:blueprint_key/:id
 ```
 
 #Requirements
@@ -395,7 +395,7 @@ export POSTGRESQL_PASSWORD="..."
 export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
-export SCHEMA_PATH="storage/schema"
+export BLUEPRINT_PATH="storage/blueprint"
 export PORT="2000"
 ```
 
@@ -445,7 +445,7 @@ export POSTGRESQL_PASSWORD="..."
 export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
-export SCHEMA_PATH="storage/schema"
+export BLUEPRINT_PATH="storage/blueprint"
 export PORT="2000"
 
 # start node-projector

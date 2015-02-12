@@ -1,0 +1,80 @@
+{
+  "kitchensink": {
+    "table": "kitchensinks",
+    "elasticsearch_type": "kitchensink",
+    "columns": {
+      "type_integer_array": {
+        "type": "integer[]"
+      },
+      "type_uuid_array": {
+        "type": "uuid[]"
+      },
+      "type_string_array": {
+        "type": "string[]"
+      },
+      "type_text_array": {
+        "type": "text[]"
+      },
+      "type_datetime_array": {
+        "type": "datetime[]"
+      },
+      "type_date_array": {
+        "type": "date[]"
+      },
+      "type_float_array": {
+        "type": "float[]"
+      },
+      "type_point_array": {
+        "type": "point[]"
+      },
+      "type_linestring_array": {
+        "type": "linestring[]"
+      },
+      "type_polygon_array": {
+        "type": "polygon[]"
+      },
+      "type_boolean_array": {
+        "type": "boolean[]"
+      },
+      "type_json_array": {
+        "type": "json[]"
+      },
+      "integer_type": {
+        "type": "integer"
+      },
+      "uuid_type": {
+        "type": "uuid"
+      },
+      "string_type": {
+        "type": "string"
+      },
+      "text_type": {
+        "type": "text"
+      },
+      "datetime_type": {
+        "type": "datetime"
+      },
+      "date_type": {
+        "type": "date"
+      },
+      "float_type": {
+        "type": "float"
+      },
+      "point_type": {
+        "type": "point"
+      },
+      "linestring_type": {
+        "type": "linestring"
+      },
+      "polygon_type": {
+        "type": "polygon"
+      },
+      "boolean_type": {
+        "type": "boolean"
+      },
+      "json_type": {
+        "type": "json"
+      }
+    }
+  }
+}

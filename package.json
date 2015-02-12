@@ -1,7 +1,7 @@
 {
   "name": "node-projector",
   "version": "0.1.24",
-  "description": "Manage your schema & project data to PostgreSQL, Elasticsearch and LevelDB (more can be added) via a simple API",
+  "description": "Store data to PostgreSQL, Elasticsearch and LevelDB (more can be added) via a simple API",
   "repository": {
     "type": "git",
     "url": "git://github.com/trappsnl/node-projector.git"
@@ -11,7 +11,7 @@
     "start": "./bin/start.sh",
     "docs": "./bin/create_docs.sh",
     "pretest": "./bin/start.sh",
-    "test": "tape tests/testIntegration.js tests/testSchemaClient.js tests/testSchemaService.js"
+    "test": "tape tests/testIntegration.js tests/testBlueprintClient.js tests/testBlueprintService.js"
   },
   "dependencies": {
     "bluebird": "^2.3.10",

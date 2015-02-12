@@ -1,0 +1,50 @@
+[
+  {
+    "type": "blueprint.create",
+    "blueprint": "news",
+    "value": {
+      "elasticsearch_type": "news",
+      "table": "news",
+      "columns": {
+        "description_nl": {
+          "type": "text"
+        }
+      }
+    }
+  },
+  {
+    "type": "snapshot.create",
+    "value": 1
+  },
+  {
+    "type": "column.update",
+    "blueprint": "news",
+    "column": "description_nl",
+    "key": "type",
+    "oldValue": "text",
+    "value": "string"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "news",
+    "column": "description_nl",
+    "value": "title_nl"
+  },
+  {
+    "type": "blueprint.rename",
+    "blueprint": "news",
+    "value": "articles"
+  },
+  {
+    "type": "snapshot.create",
+    "value": 2
+  },
+  {
+    "type": "column.create",
+    "blueprint": "articles",
+    "column": "image",
+    "value": {
+      "type": "string"
+    }
+  }
+]

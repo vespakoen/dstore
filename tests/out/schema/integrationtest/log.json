@@ -1,0 +1,224 @@
+[
+  {
+    "type": "blueprint.create",
+    "blueprint": "kitchensink",
+    "value": {
+      "table": "kitchensinks",
+      "elasticsearch_type": "kitchensink",
+      "columns": {
+        "type_integer": {
+          "type": "integer"
+        },
+        "type_uuid": {
+          "type": "uuid"
+        },
+        "type_string": {
+          "type": "string"
+        },
+        "type_text": {
+          "type": "text"
+        },
+        "type_datetime": {
+          "type": "datetime"
+        },
+        "type_date": {
+          "type": "date"
+        },
+        "type_float": {
+          "type": "float"
+        },
+        "type_point": {
+          "type": "point"
+        },
+        "type_linestring": {
+          "type": "linestring"
+        },
+        "type_polygon": {
+          "type": "polygon"
+        },
+        "type_boolean": {
+          "type": "boolean"
+        },
+        "type_json": {
+          "type": "json"
+        }
+      }
+    }
+  },
+  {
+    "type": "snapshot.create",
+    "value": 1
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_integer_array",
+    "value": {
+      "type": "integer[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_uuid_array",
+    "value": {
+      "type": "uuid[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_string_array",
+    "value": {
+      "type": "string[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_text_array",
+    "value": {
+      "type": "text[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_datetime_array",
+    "value": {
+      "type": "datetime[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_date_array",
+    "value": {
+      "type": "date[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_float_array",
+    "value": {
+      "type": "float[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_point_array",
+    "value": {
+      "type": "point[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_linestring_array",
+    "value": {
+      "type": "linestring[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_polygon_array",
+    "value": {
+      "type": "polygon[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_boolean_array",
+    "value": {
+      "type": "boolean[]"
+    }
+  },
+  {
+    "type": "column.create",
+    "blueprint": "kitchensink",
+    "column": "type_json_array",
+    "value": {
+      "type": "json[]"
+    }
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_integer",
+    "value": "integer_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_uuid",
+    "value": "uuid_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_string",
+    "value": "string_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_text",
+    "value": "text_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_datetime",
+    "value": "datetime_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_date",
+    "value": "date_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_float",
+    "value": "float_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_point",
+    "value": "point_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_linestring",
+    "value": "linestring_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_polygon",
+    "value": "polygon_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_boolean",
+    "value": "boolean_type"
+  },
+  {
+    "type": "column.rename",
+    "blueprint": "kitchensink",
+    "column": "type_json",
+    "value": "json_type"
+  },
+  {
+    "type": "snapshot.create",
+    "value": 2
+  }
+]
