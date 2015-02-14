@@ -21,18 +21,8 @@ Currently, node-projector supports **PostgreSQL**, **Elasticsearch** and **Level
 
 - [Blueprints](#blueprints)  
 - [Snapshots](#snapshots)
-- [Storing & removing data](#storing--removing-data)
-- [Commands](#commands)
-    - Blueprint management
-        - [Get all blueprints](#get-all-blueprints)
-        - [Get blueprint](#get-blueprint)
-        - [Put all blueprints](#put-all-blueprints)
-        - [Put blueprint](#put-blueprint)
-    - Snapshot management
-        - [Create snapshot](#create-snapshot)
-    - Item storage
-        - [Put item](#put-item)
-        - [Del item](#del-item)
+- [Items](#items)
+- [API](#api)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Dive deeper](#dive-deeper)
@@ -260,9 +250,9 @@ curl -X POST http://localhost:2000/myblog/snapshots
 When the request completes, the storage engines are ready to handle data with the new blueprint.
 
 
-#Storing & removing data
+#Items
 
-Storing data is done via a simple PUT command.
+Storing items is done via a simple PUT command.
 The request body is JSON and should, at the very least contain the following keys:
 
 - **snapshot_version** An existing snapshot version
@@ -293,86 +283,13 @@ Deleting an item is not so difficult either:
 curl -X DELETE http://localhost:2000/myblog/items/article/66276124-ebcd-45e1-8013-825346daa283
 ```
 
-#Commands
+#API
 
 At this moment, the only way to communicate with node-projector is via a JSON API.  
 **In the future we might add support for communication with node-projector via RabbitMQ**
 
-The following commands are available
-
-## get blueprint
-
-**Retrieves a single blueprint for a given namespace and blueprint key.**
-
-*The namespace is an identifier for a project.*  
-*The blueprint key is a string that uniquely identifies your blueprint*  
-*Coninuing from the previous blog example, the blueprintKey could be a "post", "author" or a "comment"*
-
-```shell
-curl -X GET http://localhost:2000/:namespace/blueprints/:blueprint_key/:snapshot_version
-```
-
-## put blueprint
-
-**Stores a single blueprint for a given namespace and blueprint key.**
-
-*The namespace is an identifier for a project.*  
-*The blueprint key is a string that uniquely identifies your blueprint*  
-
-```shell
-curl -X PUT http://localhost:2000/:namespace/blueprints/:blueprint_key -d '
-{
-  "table": "articles",
-  "elasticsearch_type": "article",
-  "columns": {
-    "title": {
-      "type": "string"
-    }
-  }
-}'
-```
-
-## create snapshot
-
-**Stores the current blueprints as a snapshot.**
-
-*The "put blueprint" and "put all blueprints" commands modify the "current" blueprint*  
-*If you are happy with the blueprint, you create a snapshot.*
-*This will trigger the migrations that will:*  
-
-- create a postgresql database (named: namespace + 'v' + snapshotVersion)
-- create database tables
-- create an elasticsearch index (named: namespace + 'v' + snapshotVersion)
-- put the elasticsearch mappings
-- create or replace an alias from "namespace" to "namespace + 'v' + snapshotVersion"
-
-```shell
-curl -X POST http://localhost:2000/:namespace/snapshots
-```
-
-## put item
-
-**Projects an item to all storage backends.**
-
-*The namespace is an identifier for a project.*  
-*The blueprint key is a string that uniquely identifies your blueprint*  
-
-```shell
-curl -X PUT /:namespace/items/:blueprint_key/:id -d '
-{
-  "id": "66276124-ebcd-45e1-8013-825346daa283",
-  "snapshot_version": 1,
-  "title": "Some title"
-}'
-```
-
-## del item
-
-**Deletes an item in all storage backends.**
-
-```shell
-curl -X DELETE /:namespace/items/:blueprint_key/:id
-```
+Please check the [API documentation](http://docs.nodeprojector.apiary.io/) over at apiary.io.
+(**NOTE:** The API is currently being updated to reflect the examples in the apiary docs.)
 
 #Requirements
 
