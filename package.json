@@ -32,11 +32,11 @@
     "request": "^2.49.0",
     "restify": "^2.8.4",
     "tv4": "^1.1.9",
+    "event-stream": "^3.2.2",
     "underscore": "^1.7.0"
   },
   "devDependencies": {
     "child-process-promise": "^1.0.1",
-    "event-stream": "^3.2.2",
     "jquery": "^2.1.3",
     "memdown": "^1.0.0",
     "request": "^2.53.0",
