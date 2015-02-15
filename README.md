@@ -43,7 +43,7 @@ Currently, node-projector supports **PostgreSQL**, **Elasticsearch** and **Level
 The blueprint describes your data format, so the projectors know what data they can expect and know how to serialize it.  
 A blueprint contains information like the table name, elasticsearch type, the columns and the validation options that should be used when data is stored.  
 Let's look at an example how to create a blueprint for storing posts on my blog.
-For this, we use the [put blueprint](#put-blueprint) command, and use "myblog" as the namespace, and "article" as the blueprintkey.
+For this, we use the [put blueprint](#put-blueprint) command, and use "myblog" as the project, and "article" as the type.
 
 ```shell
 curl -X PUT http://localhost:2000/myblog/blueprints/article -d '
@@ -254,7 +254,7 @@ For LevelDB, it's quite easy. Since it's blueprintless we don't have to migrate 
 You can create a snapshot with the [create snapshot](#create-snapshot) command:
 
 ```shell
-curl -X POST http://localhost:2000/myblog/snapshots
+curl -X POST http://localhost:2000/myblog/_snapshot
 ```
 
 When the request completes, the storage engines are ready to handle data with the new blueprint.
@@ -273,7 +273,7 @@ You can also include a **links** key that is an array of UUID's, pointing to oth
 
 Below is an example:
 ```shell
-curl -X PUT http://localhost:2000/myblog/items/article/66276124-ebcd-45e1-8013-825346daa283 -d '
+curl -X PUT http://localhost:2000/myblog/article/66276124-ebcd-45e1-8013-825346daa283 -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
   "snapshot_version": 1,
@@ -290,7 +290,7 @@ curl -X PUT http://localhost:2000/myblog/items/article/66276124-ebcd-45e1-8013-8
 
 Deleting an item is not so difficult either:
 ```shell
-curl -X DELETE http://localhost:2000/myblog/items/article/66276124-ebcd-45e1-8013-825346daa283
+curl -X DELETE http://localhost:2000/myblog/article/66276124-ebcd-45e1-8013-825346daa283
 ```
 
 #Commands
@@ -302,25 +302,25 @@ The following commands are available
 
 ## get blueprint
 
-**Retrieves a single blueprint for a given namespace and blueprint key.**
+**Retrieves a single blueprint for a given project and type.**
 
-*The namespace is an identifier for a project.*  
-*The blueprint key is a string that uniquely identifies your blueprint*  
+*The project is an identifier for a project.*  
+*The type is a string that uniquely identifies your blueprint*  
 *Coninuing from the previous blog example, the blueprintKey could be a "post", "author" or a "comment"*
 
 ```shell
-curl -X GET http://localhost:2000/:namespace/blueprints/:blueprint_key/:snapshot_version
+curl -X GET http://localhost:2000/:project/:type/_blueprint/:snapshot_version
 ```
 
 ## put blueprint
 
-**Stores a single blueprint for a given namespace and blueprint key.**
+**Stores a single blueprint for a given project and type.**
 
-*The namespace is an identifier for a project.*  
-*The blueprint key is a string that uniquely identifies your blueprint*  
+*The project is an identifier for a project.*  
+*The type is a string that uniquely identifies your blueprint*  
 
 ```shell
-curl -X PUT http://localhost:2000/:namespace/blueprints/:blueprint_key -d '
+curl -X PUT http://localhost:2000/:project/:type/blueprints -d '
 {
   "table": "articles",
   "elasticsearch_type": "article",
@@ -340,25 +340,25 @@ curl -X PUT http://localhost:2000/:namespace/blueprints/:blueprint_key -d '
 *If you are happy with the blueprint, you create a snapshot.*
 *This will trigger the migrations that will:*  
 
-- create a postgresql database (named: namespace + 'v' + snapshotVersion)
+- create a postgresql database (named: project + 'v' + snapshotVersion)
 - create database tables
-- create an elasticsearch index (named: namespace + 'v' + snapshotVersion)
+- create an elasticsearch index (named: project + 'v' + snapshotVersion)
 - put the elasticsearch mappings
-- create or replace an alias from "namespace" to "namespace + 'v' + snapshotVersion"
+- create or replace an alias from "project" to "project + 'v' + snapshotVersion"
 
 ```shell
-curl -X POST http://localhost:2000/:namespace/snapshots
+curl -X POST http://localhost:2000/:project/_snapshot
 ```
 
 ## put item
 
 **Projects an item to all storage backends.**
 
-*The namespace is an identifier for a project.*  
-*The blueprint key is a string that uniquely identifies your blueprint*  
+*The project is an identifier for a project.*  
+*The type is a string that uniquely identifies your blueprint*  
 
 ```shell
-curl -X PUT /:namespace/items/:blueprint_key/:id -d '
+curl -X PUT /:project/:type/:id -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
   "snapshot_version": 1,
@@ -371,7 +371,7 @@ curl -X PUT /:namespace/items/:blueprint_key/:id -d '
 **Deletes an item in all storage backends.**
 
 ```shell
-curl -X DELETE /:namespace/items/:blueprint_key/:id
+curl -X DELETE /:project/:type/:id
 ```
 
 #Requirements
