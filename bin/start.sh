@@ -1,10 +1,8 @@
 #!/bin/sh
 
-pm2 kill
-pm2 start bin/queueToQueue.js
-pm2 start bin/queueToBlueprint.js
-pm2 start bin/queueToLevel.js
-pm2 start bin/queueToElasticsearch.js
-pm2 start bin/queueToPostgresql.js
-pm2 start bin/startApi.js
-pm2 flush
+pm2 start /opt/node-projector/bin/queueToQueue.js
+pm2 start /opt/node-projector/bin/queueToBlueprint.js
+pm2 start /opt/node-projector/bin/queueToLevel.js
+pm2 start /opt/node-projector/bin/queueToElasticsearch.js
+pm2 start /opt/node-projector/bin/queueToPostgresql.js
+pm2 start /opt/node-projector/bin/startApi.js
