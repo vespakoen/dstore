@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Node Projector
+Comment=Api documentation
+Exec=xdg-open http://docs.nodeprojector.apiary.io/#
+Terminal=false
+Type=Application
+Icon=node-projector
+Categories=Network;WebBrowser
+StartupNotify=true

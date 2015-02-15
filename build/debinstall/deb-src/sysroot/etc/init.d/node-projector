@@ -1,0 +1,47 @@
+#! /bin/bash
+# /etc/init.d/node-projector
+ 
+### BEGIN INIT INFO
+# Provides:          node-projector
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+### END INIT INFO
+ 
+path_to_start=/opt/node-projector/bin/start.sh
+path_to_stop=/opt/node-projector/bin/stop.sh
+node=`which node`
+app_name=node-projector
+log_file=/var/log/$app_name.log
+ 
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "* starting $app_name * "
+    echo "* starting $app_name * [`date`]" >> $log_file
+    while read -r line; do
+        export "$line"
+    done < /etc/node-projector/node-projector.conf
+    export API_PORT=$PORT
+    export HOME=/etc/node-projector
+    exec $path_to_start >> $log_file 2>&1&
+    ;;
+  stop)
+    echo "* stopping $app_name * "
+    echo "* stopping $app_name * [`date`]" >> $log_file
+    $path_to_stop > /dev/null
+    ;;
+  restart)
+    echo "* restarting $app_name * "
+    echo "* restarting $app_name * [`date`]" >> $log_file
+    service node-projector stop
+    service node-projector start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/node-projector {start|stop|restart}"
+    exit 1
+    ;;
+esac
+ 
+exit 0

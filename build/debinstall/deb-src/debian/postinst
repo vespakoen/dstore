@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Updating npm
+echo "Updating npm"
+npm install -g npm > /dev/null
+
+# Install pm2
+echo "Installing pm2 globally via npm"
+npm install -g pm2 > /dev/null
+
+# Install dependencies
+echo "Installing node dependencies via npm"
+cd /opt/node-projector && npm install --production > /dev/null
+
+# Create user
+echo "Creating PostgreSQL user"
+read -s -p "Enter password for user 'projector': " pp
+sed -i "s/POSTGRESQL_PASSWORD=projector/POSTGRESQL_PASSWORD=$pp/g" /etc/node-projector/node-projector.conf
+su postgres -c psql > /dev/null <<EOF
+  CREATE USER projector WITH PASSWORD '$pp';
+EOF
+
+# Create postgis template
+echo "Creating postgis template"
+su postgres -c "createdb -E UTF8 -T template0 template_postgis" > /dev/null
+su postgres -c psql template_postgis > /dev/null <<EOF
+  CREATE EXTENSION "uuid-ossp";
+  CREATE EXTENSION postgis;
+  UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';
+EOF
+
+# Start the services!
+service node-projector start

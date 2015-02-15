@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Stopping the service
+service node-projector stop > /dev/null || true
+
+rm -rf /opt/node-projector
+rm -rf /etc/node-projector
