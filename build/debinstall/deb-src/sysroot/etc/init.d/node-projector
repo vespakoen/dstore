@@ -30,7 +30,8 @@ case "$1" in
   stop)
     echo "* stopping $app_name * "
     echo "* stopping $app_name * [`date`]" >> $log_file
-    $path_to_stop > /dev/null
+    export HOME=/etc/node-projector
+    exec $path_to_stop > /dev/null
     ;;
   restart)
     echo "* restarting $app_name * "

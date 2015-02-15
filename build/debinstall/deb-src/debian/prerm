@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Stopping the service
-service node-projector stop > /dev/null || true
+service node-projector stop || true
 
+# Removing files
 rm -rf /opt/node-projector
 rm -rf /etc/node-projector
+rm /etc/init.d/node-projector
