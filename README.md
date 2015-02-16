@@ -313,6 +313,7 @@ export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
 export BLUEPRINT_PATH="storage/blueprint"
+export PROJECTOR_PATH="."
 export PORT=2000
 ```
 
@@ -329,8 +330,11 @@ wget https://github.com/trappsnl/node-projector/raw/master/build/debinstall/node
 sudo dpkg -i node-projector-1.deb
 
 # missing dependencies ?
-# if you don't already have elasticsearch installed, add the repository as described here
-# http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/setup-repositories.html
+# if you don't already have elasticsearch installed, add the repository as described below
+wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -
+sudo add-apt-repository "deb http://packages.elasticsearch.org/elasticsearch/1.4/debian stable main"
+sudo apt-get update
+
 # you can now install all missing dependencies them like this:
 sudo apt-get -f install
 
@@ -381,6 +385,7 @@ export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
 export BLUEPRINT_PATH="storage/blueprint"
+export PROJECTOR_PATH="."
 export PORT=2000
 
 # start node-projector

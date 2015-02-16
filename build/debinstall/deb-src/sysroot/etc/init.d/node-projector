@@ -20,9 +20,7 @@ case "$1" in
   start)
     echo "* starting $app_name * "
     echo "* starting $app_name * [`date`]" >> $log_file
-    while read -r line; do
-        export "$line"
-    done < /etc/node-projector/node-projector.conf
+    source /etc/node-projector/node-projector.conf
     export API_PORT=$PORT
     export HOME=/etc/node-projector
     exec $path_to_start >> $log_file 2>&1&

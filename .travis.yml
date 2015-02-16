@@ -25,4 +25,5 @@ before_script:
   - export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
   - export LEVEL_PATH="$TRAVIS_BUILD_DIR/tests/out/level"
   - export BLUEPRINT_PATH="$TRAVIS_BUILD_DIR/tests/out/blueprint"
+  - export PROJECTOR_PATH="$TRAVIS_BUILD_DIR"
   - export PORT=2000

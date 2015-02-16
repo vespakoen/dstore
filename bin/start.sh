@@ -1,8 +1,8 @@
 #!/bin/sh
 
-pm2 start /opt/node-projector/bin/queueToQueue.js
-pm2 start /opt/node-projector/bin/queueToBlueprint.js
-pm2 start /opt/node-projector/bin/queueToLevel.js
-pm2 start /opt/node-projector/bin/queueToElasticsearch.js
-pm2 start /opt/node-projector/bin/queueToPostgresql.js
-pm2 start /opt/node-projector/bin/startApi.js
+pm2 start $PROJECTOR_PATH/bin/queueToQueue.js
+pm2 start $PROJECTOR_PATH/bin/queueToBlueprint.js
+pm2 start $PROJECTOR_PATH/bin/queueToLevel.js
+pm2 start $PROJECTOR_PATH/bin/queueToElasticsearch.js
+pm2 start $PROJECTOR_PATH/bin/queueToPostgresql.js
+pm2 start $PROJECTOR_PATH/bin/startApi.js
