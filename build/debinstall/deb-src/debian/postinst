@@ -28,6 +28,3 @@ su postgres -c "psql template_postgis <<EOF
   CREATE EXTENSION postgis;
   UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';  
 EOF"
-
-# Start the services!
-service node-projector start
