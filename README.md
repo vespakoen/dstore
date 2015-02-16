@@ -313,14 +313,32 @@ export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
 export BLUEPRINT_PATH="storage/blueprint"
-export PORT="2000"
+export PORT=2000
 ```
 
 #Installation
 
-It's quite a lot to install and configure, so we are planning to include a docker container in the future.
+We build a .deb file that installs node-projector on your system.
+It is made & tested on Ubuntu 14.04, but probably works in debian as well.
+It will go through all the instructions as seen in [DIY](#diy).
 
-For now, these instructions should get you going on Ubuntu 14.04.
+## APT
+
+```shell
+wget https://github.com/trappsnl/node-projector/raw/master/build/debinstall/node-projector-1.deb
+sudo dpkg -i node-projector-1.deb
+
+# missing dependencies ?
+# if you don't already have elasticsearch installed, add the repository as described here
+# http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/setup-repositories.html
+# you can now install all missing dependencies them like this:
+sudo apt-get -f install
+
+# now try again
+sudo dpkg -i node-projector-1.deb
+```
+
+## DIY
 
 ```shell
 # install node-projector
@@ -363,7 +381,7 @@ export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
 export BLUEPRINT_PATH="storage/blueprint"
-export PORT="2000"
+export PORT=2000
 
 # start node-projector
 cd path/to/node-projector/bin && ./start.sh
