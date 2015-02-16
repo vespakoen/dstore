@@ -2,9 +2,9 @@
 # vi: set ft=ruby :
 
 $script = <<-SCRIPT
-echo "Installing node"
+echo "Installing dependencies"
 curl -sL https://deb.nodesource.com/setup | sudo bash -
-sudo apt-get install -y nodejs build-essential
+sudo apt-get install -y nodejs build-essential openjdk-7-jre
 
 echo "Installing pm2"
 npm install pm2
