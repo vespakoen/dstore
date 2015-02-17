@@ -2,33 +2,33 @@
 # vi: set ft=ruby :
 
 $script = <<-SCRIPT
-echo "Installing dependencies"
+echo "==> Grab elasticsearch key"
+wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -
+
+echo "==> Add elasticsearch repository"
+sudo add-apt-repository -y "deb http://packages.elasticsearch.org/elasticsearch/1.4/debian stable main"
+
+echo "==> Installing dependencies"
 curl -sL https://deb.nodesource.com/setup | sudo bash -
 sudo apt-get install -y nodejs build-essential openjdk-7-jdk htop
 
-echo "Grab elasticsearch key"
-wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -
-
-echo "Add elasticsearch repository"
-sudo add-apt-repository -y "deb http://packages.elasticsearch.org/elasticsearch/1.4/debian stable main"
-
-echo "Grab node-projector .deb"
+echo "==> Grab node-projector .deb"
 wget https://github.com/trappsnl/node-projector/raw/master/build/debinstall/node-projector-1.deb
 
 cho "Installing deb"
 sudo dpkg -i node-projector-1.deb
 
-echo "Running apt-get -f install"
+echo "==> Running apt-get -f install"
 sudo apt-get -f -y install
 
-echo "Starting elasticsearch on boot"
+echo "==> Starting elasticsearch on startup"
 sudo service elasticsearch start
 sudo update-rc.d elasticsearch defaults 95 10
 
-echo "Updating node-projector config"
+echo "==> Updating node-projector config"
 sed -i "s/PROJECTOR_PATH=\\/opt\\/node-projector/PROJECTOR_PATH=\\/vagrant/g" /etc/node-projector/node-projector.conf
 
-echo "Start node-projector"
+echo "==> Start node-projector"
 sudo service node-projector start
 SCRIPT
 
