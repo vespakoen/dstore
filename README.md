@@ -244,7 +244,7 @@ For LevelDB, it's quite easy. Since it's blueprintless we don't have to migrate 
 You can create a snapshot with the [create snapshot](#create-snapshot) command:
 
 ```shell
-curl -X POST http://localhost:2000/myblog/_snapshot
+curl -X POST http://localhost:2000/myblog/snapshots
 ```
 
 When the request completes, the storage engines are ready to handle data with the new blueprint.
