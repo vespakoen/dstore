@@ -17,6 +17,7 @@ server.use(restify.CORS());
 server.use(restify.fullResponse());
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
+server.pre(restify.pre.sanitizePath());
 
 function createHandler(key, createCommand) {
   return function (req, res, next) {
@@ -52,73 +53,106 @@ function createHandler(key, createCommand) {
 }
 
 ////////////////////////////////////////////////////////////////////
-/////////////////////////// BLUEPRINT ACTIONS /////////////////////////
+///////////////////////// BLUEPRINT ACTIONS ////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-// blueprintFacade.getSnapshotVersions()
-server.get('/', createHandler('get-snapshot-versions'));
-
-// blueprintFacade.createSnapshot()
-server.post('/:namespace/snapshots', createHandler('create-snapshot', function (req) {
+// blueprintFacade.getBlueprint(project_id, blueprint_id, snapshotVersion)
+server.get('/:project_id/:blueprint_id/_blueprint/:snapshot_version', createHandler('get-blueprint', function (req) {
   return {
-    namespace: req.params.namespace
-  }
-}));
-
-// blueprintFacade.getSnapshot(namespace, snapshotVersion)
-server.get('/:namespace/snapshots/:snapshot_version', createHandler('get-snapshot', function (req) {
-  return {
-    namespace: req.params.namespace,
+    project_id: req.params.project_id,
+    blueprint_id: req.params.blueprint_id,
     snapshot_version: req.params.snapshot_version
   };
 }));
 
-// blueprintFacade.getBlueprint(namespace, blueprintKey, snapshotVersion='current')
-server.get('/:namespace/blueprints/:blueprint_key/:snapshot_version', createHandler('get-blueprint', function (req) {
+// blueprintFacade.getBlueprint(project_id, blueprint_id, 'current')
+server.get('/:project_id/:blueprint_id/_blueprint', createHandler('get-blueprint', function (req) {
   return {
-    namespace: req.params.namespace,
-    snapshot_version: req.params.snapshot_version,
-    blueprint_key: req.params.blueprint_key
+    project_id: req.params.project_id,
+    blueprint_id: req.params.blueprint_id,
+    snapshot_version: 'current'
   };
 }));
 
-// blueprintFacade.putBlueprint(namespace, blueprintKey)
-server.put('/:namespace/blueprints/:blueprint_key', createHandler('put-blueprint', function (req) {
+// blueprintFacade.putBlueprint(project_id, blueprint_id, blueprintId)
+server.put('/:project_id/:blueprint_id/_blueprint', createHandler('put-blueprint', function (req) {
   return {
-    namespace: req.params.namespace,
-    blueprint_key: req.params.blueprint_key,
-    blueprint: JSON.parse(req.body)
+    project_id: req.params.project_id,
+    blueprint_id: req.params.blueprint_id,
+    blueprint: req.body
   };
+}));
+
+// blueprintFacade.getAllBlueprints(project_id, snapshotVersion)
+server.get('/:project_id/_blueprint/:snapshot_version', createHandler('get-all-blueprints', function (req) {
+  return {
+    project_id: req.params.project_id,
+    snapshot_version: req.params.snapshot_version
+  };
+}));
+
+// blueprintFacade.getAllBlueprints(project_id, 'current')
+server.get('/:project_id/_blueprint', createHandler('get-all-blueprints', function (req) {
+  return {
+    project_id: req.params.project_id,
+    snapshot_version: 'current'
+  };
+}));
+
+// blueprintFacade.getBlueprintVersions(project_id)
+server.get('/:project_id/:blueprint_id/_version', createHandler('get-blueprint-versions', function (req) {
+  return {
+    project_id: req.params.project_id,
+    blueprint_id: req.params.blueprint_id
+  }
+}));
+
+////////////////////////////////////////////////////////////////////
+////////////////////////// SNAPSHOT ACTIONS ////////////////////////
+////////////////////////////////////////////////////////////////////
+
+// blueprintFacade.createSnapshot()
+server.post('/:project_id/_snapshot', createHandler('create-snapshot', function (req) {
+  return {
+    project_id: req.params.project_id
+  }
+}));
+
+// blueprintFacade.getSnapshotVersion()
+server.get('/:project_id/_version', createHandler('get-snapshot-version', function (req) {
+  return {
+    project_id: req.params.project_id
+  }
 }));
 
 ////////////////////////////////////////////////////////////////////
 //////////////////////////// ITEM ACTIONS //////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-// projector.putItem(namespace, blueprintKey, <generated-uuid>, item)
-server.post('/:namespace/items/:blueprint_key', createHandler('create-item', function (req) {
+// projector.createItem(project_id, blueprint_id, item)
+server.post('/:project_id/:blueprint_id', createHandler('create-item', function (req) {
   return {
-    namespace: req.params.namespace,
-    blueprint_key: req.params.blueprint_key,
-    item: JSON.parse(req.body)
+    project_id: req.params.project_id,
+    blueprint_id: req.params.blueprint_id,
+    item: req.body
   };
 }));
 
-// projector.putItem(namespace, blueprintKey, id, item)
-server.put('/:namespace/items/:blueprint_key/:id', createHandler('put-item', function (req) {
+// projector.putItem(project_id, blueprint_id, id, item)
+server.put('/:project_id/:blueprint_id/:id', createHandler('put-item', function (req) {
   return {
-    namespace: req.params.namespace,
-    blueprint_key: req.params.blueprint_key,
+    project_id: req.params.project_id,
+    blueprint_id: req.params.blueprint_id,
     id: req.params.id,
-    item: JSON.parse(req.body)
+    item: req.body
   };
 }));
 
-// projector.delItem(namespace, blueprintKey, id)
-server.del('/:namespace/items/:blueprint_key/:id', createHandler('del-item', function (req) {
+// projector.delItem(project_id, blueprint_id, id)
+server.del('/:project_id/:blueprint_id/:id', createHandler('del-item', function (req) {
   return {
-    namespace: req.params.namespace,
-    blueprint_key: req.params.blueprint_key,
+    project_id: req.params.project_id,
+    blueprint_id: req.params.blueprint_id,
     id: req.params.id
   };
 }));
@@ -127,12 +161,12 @@ server.del('/:namespace/items/:blueprint_key/:id', createHandler('del-item', fun
 //////////////////////////// SERVER SETUP //////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-server.listen(Number(process.env.PORT), function () {
+server.listen(Number(process.env.API_PORT || process.env.PORT), function () {
   console.log('API started at %s', server.url);
 });
 
 ////////////////////////////////////////////////////////////////////
-////////////////////////// GRACEFUL SHUTDOWN////////////////////////
+////////////////////////// GRACEFUL SHUTDOWN ///////////////////////
 ////////////////////////////////////////////////////////////////////
 
 process.on('SIGTERM', function () {

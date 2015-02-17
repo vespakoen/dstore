@@ -25,9 +25,9 @@ test('when testing the blueprint service', function (t) {
     .then(function (adapter) {
       var client = adapter.getClient('projector', 1);
       return BBPromise.join(
-        client.table('log').where({ namespace: 'servicetest' }).del().then(function () {}),
-        client.table('snapshots').where({ namespace: 'servicetest' }).del().then(function () {}),
-        client.table('versions').where({ namespace: 'servicetest' }).del().then(function () {})
+        client.table('log').where({ project_id: 'servicetest' }).del().then(function () {}),
+        client.table('snapshots').where({ project_id: 'servicetest' }).del().then(function () {}),
+        client.table('versions').where({ project_id: 'servicetest' }).del().then(function () {})
       ).catch(function () {
         // noop
       });

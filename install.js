@@ -8,7 +8,7 @@ function migrate (migrator) {
     log: {
       table: 'log',
       columns: {
-        namespace: {
+        project_id: {
           type: 'string'
         },
         log: {
@@ -19,7 +19,7 @@ function migrate (migrator) {
     versions: {
       table: 'versions',
       columns: {
-        namespace: {
+        project_id: {
           type: 'string'
         },
         version: {
@@ -30,7 +30,7 @@ function migrate (migrator) {
     snapshots: {
       table: 'snapshots',
       columns: {
-        namespace: {
+        project_id: {
           type: 'string'
         },
         version: {

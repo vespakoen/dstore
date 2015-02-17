@@ -95,12 +95,12 @@ curl -XPUT http://localhost:2020/testnamespace/blueprints/kitchensink -H 'conten
 
 # Create a snapshot
 ```shell
-curl -XPOST -H 'content-type: application/json' http://localhost:2020/testnamespace/snapshots
+curl -XPOST -H 'content-type: application/json' http://localhost:2020/testproject/snapshots
 ```
 
 # Create an item
 ```shell
-curl -XPUT -H 'content-type: application/json' http://localhost:2020/testnamespace/items/kitchensink/a4f20ace-7aa4-4077-983b-717c2ec5427d -d '{
+curl -XPUT -H 'content-type: application/json' http://localhost:2020/testproject/items/kitchensink/a4f20ace-7aa4-4077-983b-717c2ec5427d -d '{
   "id": "a4f20ace-7aa4-4077-983b-717c2ec5427d",
   "snapshot_version": 1,
   "integer_type": 35235,
@@ -327,7 +327,7 @@ curl -XPUT -H 'content-type: application/json' http://localhost:2020/testnamespa
 
 # PostgreSQL output
 ```shell
-pg_dump testnamespacev1 --inserts
+pg_dump testprojectv1 --inserts
 ```
 
 **output**
@@ -373,13 +373,13 @@ ALTER TABLE ONLY kitchensinks
 
 # Elasticsearch output
 ```shell
-curl http://localhost:9200/testnamespacev1/_mapping?pretty=1
+curl http://localhost:9200/testprojectv1/_mapping?pretty=1
 ```
 
 **output**
 ```json
 {
-  "testnamespacev1" : {
+  "testprojectv1" : {
     "mappings" : {
       "kitchensink" : {
         "_id" : {
@@ -495,7 +495,7 @@ curl http://localhost:9200/testnamespacev1/_mapping?pretty=1
 ```
 
 ```shell
-curl http://localhost:9200/testnamespacev1/_search?pretty=1
+curl http://localhost:9200/testprojectv1/_search?pretty=1
 ```
 
 **output**
@@ -513,7 +513,7 @@ curl http://localhost:9200/testnamespacev1/_search?pretty=1
     "max_score": 1,
     "hits": [
       {
-        "_index": "testnamespacev1",
+        "_index": "testprojectv1",
         "_type": "kitchensink",
         "_id": "a4f20ace-7aa4-4077-983b-717c2ec5427d",
         "_score": 1,
@@ -743,7 +743,7 @@ curl http://localhost:9200/testnamespacev1/_search?pretty=1
 # LevelDB output
 
 ```shell
-superlevel storage/level/testnamespacev1/ createReadStream
+superlevel storage/level/testprojectv1/ createReadStream
 ```
 
 **output**

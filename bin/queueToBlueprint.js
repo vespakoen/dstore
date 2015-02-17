@@ -14,31 +14,41 @@ app.get('queue').then(function (q) {
     app.get('blueprint.facade')
   );
 }).spread(function (consumer, publisher, facade) {
-  consumer.consume('get-snapshot-versions', getSnapshotVersions);
-  consumer.consume('get-snapshot', getSnapshot);
+  consumer.consume('get-all-snapshot-versions', getAllSnapshotVersions);
+  consumer.consume('get-snapshot-version', getSnapshotVersion);
+  // consumer.consume('get-snapshot', getSnapshot);
   consumer.consume('create-snapshot', createSnapshot);
   consumer.consume('get-blueprint', getBlueprint);
+  consumer.consume('get-all-blueprints', getAllBlueprints);
+  consumer.consume('get-blueprint-versions', getBlueprintVersions);
   consumer.consume('put-blueprint', putBlueprint);
+
   console.log('Queue to blueprint started');
 
-  function getSnapshotVersions() {
+  function getAllSnapshotVersions() {
     console.log('get-snapshot-versions');
 
-    return facade.getSnapshotVersions();
+    return facade.getAllSnapshotVersions();
   }
 
-  function getSnapshot(command) {
-    console.log('get-snapshot', command.namespace || 'no namespace', command.snapshot_version || 'no snapshot_version');
+  function getSnapshotVersion(command) {
+    console.log('get-snapshot-version', command.project_id || 'no project_id');
 
-    return facade.getSnapshot(command.namespace, command.snapshot_version);
+    return facade.getSnapshotVersion(command.project_id);
   }
+
+  // function getSnapshot(command) {
+  //   console.log('get-snapshot', command.project_id || 'no project_id', command.snapshot_version || 'no snapshot_version');
+
+  //   return facade.getSnapshot(command.project_id, command.snapshot_version);
+  // }
 
   function createSnapshot(command) {
-    console.log('create-snapshot', command.namespace || 'no namespace');
+    console.log('create-snapshot', command.project_id || 'no project_id');
 
     return app.get('blueprint.adapter')
       .then(function (adapter) {
-        var client = adapter.getClient(command.namespace);
+        var client = adapter.getClient(command.project_id);
         return BBPromise.join(
           client.getSnapshot('current'),
           client.getLatestSnapshotVersion()
@@ -54,7 +64,7 @@ app.get('queue').then(function (q) {
         );
       })
       .then(function () {
-        return facade.createSnapshot(command.namespace);
+        return facade.createSnapshot(command.project_id);
       })
       .then(function (snapshotVersion) {
         return {
@@ -64,15 +74,27 @@ app.get('queue').then(function (q) {
   }
 
   function putBlueprint(command) {
-    console.log('put-blueprint', command.namespace || 'no namespace', command.blueprint_key || 'no blueprint_key');
+    console.log('put-blueprint', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id');
 
-    return facade.putBlueprint(command.namespace, command.blueprint_key, command.blueprint);
+    return facade.putBlueprint(command.project_id, command.blueprint_id, command.blueprint);
   }
 
   function getBlueprint(command) {
-    console.log('get-blueprint', command.namespace || 'no namespace', command.blueprint_key || 'no blueprint_key', command.snapshot_version || 'no snapshot_version');
+    console.log('get-blueprint', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id', command.snapshot_version || 'no snapshot_version');
 
-    return facade.getBlueprint(command.namespace, command.blueprint_key, command.snapshot_version);
+    return facade.getBlueprint(command.project_id, command.blueprint_id, command.snapshot_version);
+  }
+
+  function getAllBlueprints(command) {
+    console.log('get-all-blueprint', command.project_id || 'no project_id', command.snapshot_version || 'no snapshot_version');
+
+    return facade.getAllBlueprints(command.project_id, command.snapshot_version);
+  }
+
+  function getBlueprintVersions(command) {
+    console.log('get-blueprint', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id');
+
+    return facade.getBlueprintVersions(command.project_id, command.blueprint_id);
   }
 });
 

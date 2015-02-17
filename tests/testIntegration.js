@@ -51,8 +51,8 @@ function dropTestDatabases(opts) {
 
 function putFirstBlueprint(opts) {
   return opts.publisher.publish('put-blueprint', {
-    namespace: 'integrationtest',
-    blueprint_key: 'kitchensink',
+    project_id: 'integrationtest',
+    blueprint_id: 'kitchensink',
     blueprint: {
       table: 'kitchensinks',
       elasticsearch_type: 'kitchensink',
@@ -100,14 +100,14 @@ function putFirstBlueprint(opts) {
 
 function createSnapshot(opts) {
   return opts.publisher.publish('create-snapshot', {
-    namespace: 'integrationtest'
+    project_id: 'integrationtest'
   });
 }
 
 function putFirstItem(opts) {
   return opts.publisher.publish('put-item', {
-    namespace: 'integrationtest',
-    blueprint_key: 'kitchensink',
+    project_id: 'integrationtest',
+    blueprint_id: 'kitchensink',
     id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
     item: {
       id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
@@ -130,8 +130,8 @@ function putFirstItem(opts) {
 
 function putSecondBlueprint(opts) {
   return opts.publisher.publish('put-blueprint', {
-    namespace: 'integrationtest',
-    blueprint_key: 'kitchensink',
+    project_id: 'integrationtest',
+    blueprint_id: 'kitchensink',
     blueprint: {
       table: 'kitchensinks',
       elasticsearch_type: 'kitchensink',
@@ -227,8 +227,8 @@ function putSecondBlueprint(opts) {
 
 function putSecondItem(opts) {
   return opts.publisher.publish('put-item', {
-    namespace: 'integrationtest',
-    blueprint_key: 'kitchensink',
+    project_id: 'integrationtest',
+    blueprint_id: 'kitchensink',
     id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
     item: {
       id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
@@ -474,9 +474,9 @@ test('when testing integration', function (t) {
     .then(function (adapter) {
       var client = adapter.getClient('projector', 1);
       return BBPromise.join(
-        client.table('log').where({ namespace: 'testintegration' }).del().then(function () {}),
-        client.table('snapshots').where({ namespace: 'testintegration' }).del().then(function () {}),
-        client.table('versions').where({ namespace: 'testintegration' }).del().then(function () {})
+        client.table('log').where({ project_id: 'testintegration' }).del().then(function () {}),
+        client.table('snapshots').where({ project_id: 'testintegration' }).del().then(function () {}),
+        client.table('versions').where({ project_id: 'testintegration' }).del().then(function () {})
       ).catch(function () {
         // noop
       });

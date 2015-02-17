@@ -18,7 +18,7 @@ app.get('queue').then(function (q) {
   }, true);
 
   consumer.consume('put-item', function (command) {
-    console.log('put-item', command.namespace || 'no namespace', command.blueprint_key || 'no key', command.id || 'no id', command.item ? '' : 'no item');
+    console.log('put-item', command.project_id || 'no project_id', command.blueprint_id || 'no key', command.id || 'no id', command.item ? '' : 'no item');
     return BBPromise.join(
       publisher.publish('put-item.level', command),
       publisher.publish('put-item.postgresql', command),
@@ -31,7 +31,7 @@ app.get('queue').then(function (q) {
   });
 
   consumer.consume('del-item', function (command) {
-    console.log('del-item', command.namespace || 'no namespace', command.blueprint_key || 'no blueprint_key', command.id || 'no id');
+    console.log('del-item', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id', command.id || 'no id');
     return BBPromise.join(
       publisher.publish('del-item.level', command),
       publisher.publish('del-item.postgresql', command),
