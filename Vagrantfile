@@ -4,13 +4,7 @@
 $script = <<-SCRIPT
 echo "Installing dependencies"
 curl -sL https://deb.nodesource.com/setup | sudo bash -
-sudo apt-get install -y nodejs build-essential openjdk-7-jdk
-
-echo "Installing pm2"
-npm install pm2
-
-echo "Grab node-projector .deb"
-wget https://github.com/trappsnl/node-projector/raw/master/build/debinstall/node-projector-1.deb
+sudo apt-get install -y nodejs build-essential openjdk-7-jdk htop
 
 echo "Grab elasticsearch key"
 wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -
@@ -18,10 +12,10 @@ wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-k
 echo "Add elasticsearch repository"
 sudo add-apt-repository -y "deb http://packages.elasticsearch.org/elasticsearch/1.4/debian stable main"
 
-echo "Running apt-get update"
-sudo apt-get update
+echo "Grab node-projector .deb"
+wget https://github.com/trappsnl/node-projector/raw/master/build/debinstall/node-projector-1.deb
 
-echo "Installing deb"
+cho "Installing deb"
 sudo dpkg -i node-projector-1.deb
 
 echo "Running apt-get -f install"
