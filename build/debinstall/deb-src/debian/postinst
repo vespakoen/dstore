@@ -1,12 +1,8 @@
 #!/bin/bash
 
-# Updating npm
-echo "Updating npm"
-npm install -g npm > /dev/null
-
 # Install pm2
 echo "Installing pm2 globally via npm"
-npm install -g pm2 > /dev/null
+npm install -g --production pm2 > /dev/null
 
 # Install dependencies
 echo "Installing node dependencies via npm"
