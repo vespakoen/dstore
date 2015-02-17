@@ -4,7 +4,7 @@
 $script = <<-SCRIPT
 echo "Installing dependencies"
 curl -sL https://deb.nodesource.com/setup | sudo bash -
-sudo apt-get install -y nodejs build-essential openjdk-7-jre
+sudo apt-get install -y nodejs build-essential openjdk-7-jdk
 
 echo "Installing pm2"
 npm install pm2
@@ -32,7 +32,7 @@ sudo service elasticsearch start
 sudo update-rc.d elasticsearch defaults 95 10
 
 echo "Updating node-projector config"
-sed -i "s/PROJECTOR_PATH=\/opt\/node-projector/PROJECTOR_PATH=\/vagrant/g" /etc/node-projector/node-projector.conf
+sed -i "s/PROJECTOR_PATH=\\/opt\\/node-projector/PROJECTOR_PATH=\\/vagrant/g" /etc/node-projector/node-projector.conf
 
 echo "Start node-projector"
 sudo service node-projector start
