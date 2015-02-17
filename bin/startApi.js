@@ -87,7 +87,7 @@ server.put('/:namespace/blueprints/:blueprint_key', createHandler('put-blueprint
   return {
     namespace: req.params.namespace,
     blueprint_key: req.params.blueprint_key,
-    blueprint: req.body
+    blueprint: JSON.parse(req.body)
   };
 }));
 
@@ -100,7 +100,7 @@ server.post('/:namespace/items/:blueprint_key', createHandler('create-item', fun
   return {
     namespace: req.params.namespace,
     blueprint_key: req.params.blueprint_key,
-    item: req.body
+    item: JSON.parse(req.body)
   };
 }));
 
@@ -110,7 +110,7 @@ server.put('/:namespace/items/:blueprint_key/:id', createHandler('put-item', fun
     namespace: req.params.namespace,
     blueprint_key: req.params.blueprint_key,
     id: req.params.id,
-    item: req.body
+    item: JSON.parse(req.body)
   };
 }));
 
