@@ -56,17 +56,17 @@ function createHandler(key, createCommand) {
 ////////////////////////////////////////////////////////////////////
 
 // blueprintFacade.getSnapshotVersions()
-server.get('/api', createHandler('get-snapshot-versions'));
+server.get('/', createHandler('get-snapshot-versions'));
 
 // blueprintFacade.createSnapshot()
-server.post('/api/:namespace/snapshots', createHandler('create-snapshot', function (req) {
+server.post('/:namespace/snapshots', createHandler('create-snapshot', function (req) {
   return {
     namespace: req.params.namespace
   }
 }));
 
 // blueprintFacade.getSnapshot(namespace, snapshotVersion)
-server.get('/api/:namespace/snapshots/:snapshot_version', createHandler('get-snapshot', function (req) {
+server.get('/:namespace/snapshots/:snapshot_version', createHandler('get-snapshot', function (req) {
   return {
     namespace: req.params.namespace,
     snapshot_version: req.params.snapshot_version
@@ -74,7 +74,7 @@ server.get('/api/:namespace/snapshots/:snapshot_version', createHandler('get-sna
 }));
 
 // blueprintFacade.getBlueprint(namespace, blueprintKey, snapshotVersion='current')
-server.get('/api/:namespace/blueprints/:blueprint_key/:snapshot_version', createHandler('get-blueprint', function (req) {
+server.get('/:namespace/blueprints/:blueprint_key/:snapshot_version', createHandler('get-blueprint', function (req) {
   return {
     namespace: req.params.namespace,
     snapshot_version: req.params.snapshot_version,
@@ -83,7 +83,7 @@ server.get('/api/:namespace/blueprints/:blueprint_key/:snapshot_version', create
 }));
 
 // blueprintFacade.putBlueprint(namespace, blueprintKey)
-server.put('/api/:namespace/blueprints/:blueprint_key', createHandler('put-blueprint', function (req) {
+server.put('/:namespace/blueprints/:blueprint_key', createHandler('put-blueprint', function (req) {
   return {
     namespace: req.params.namespace,
     blueprint_key: req.params.blueprint_key,
@@ -96,7 +96,7 @@ server.put('/api/:namespace/blueprints/:blueprint_key', createHandler('put-bluep
 ////////////////////////////////////////////////////////////////////
 
 // projector.putItem(namespace, blueprintKey, <generated-uuid>, item)
-server.post('/api/:namespace/items/:blueprint_key', createHandler('create-item', function (req) {
+server.post('/:namespace/items/:blueprint_key', createHandler('create-item', function (req) {
   return {
     namespace: req.params.namespace,
     blueprint_key: req.params.blueprint_key,
@@ -105,7 +105,7 @@ server.post('/api/:namespace/items/:blueprint_key', createHandler('create-item',
 }));
 
 // projector.putItem(namespace, blueprintKey, id, item)
-server.put('/api/:namespace/items/:blueprint_key/:id', createHandler('put-item', function (req) {
+server.put('/:namespace/items/:blueprint_key/:id', createHandler('put-item', function (req) {
   return {
     namespace: req.params.namespace,
     blueprint_key: req.params.blueprint_key,
@@ -115,7 +115,7 @@ server.put('/api/:namespace/items/:blueprint_key/:id', createHandler('put-item',
 }));
 
 // projector.delItem(namespace, blueprintKey, id)
-server.del('/api/:namespace/items/:blueprint_key/:id', createHandler('del-item', function (req) {
+server.del('/:namespace/items/:blueprint_key/:id', createHandler('del-item', function (req) {
   return {
     namespace: req.params.namespace,
     blueprint_key: req.params.blueprint_key,
