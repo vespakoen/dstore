@@ -323,6 +323,13 @@ We build a .deb file that installs node-projector on your system.
 It is made & tested on Ubuntu 14.04, but probably works in debian as well.
 It will go through all the instructions as seen in [DIY](#diy).
 
+## Vagrant
+```shell
+git clone https://github.com/trappsnl/node-projector.git
+cd node-projector
+vagrant up
+```
+
 ## APT
 
 ```shell
