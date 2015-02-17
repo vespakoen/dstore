@@ -19,7 +19,11 @@ cho "Installing deb"
 sudo dpkg -i node-projector-1.deb
 
 echo "==> Running apt-get -f install"
-sudo apt-get -f -y install
+sudo apt-get -f -y install << INPUT
+
+projector
+projector
+INPUT
 
 echo "==> Starting elasticsearch on startup"
 sudo service elasticsearch start
