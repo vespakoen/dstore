@@ -18,7 +18,7 @@ app.get('queue').then(function (q) {
   }, true);
 
   consumer.consume('put-item', function (command) {
-    console.log('put-item', command.project_id || 'no project_id', command.blueprint_id || 'no key', command.id || 'no id', command.item ? '' : 'no item');
+    console.log('put-item', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id', command.id || 'no id', command.item ? '' : 'no item');
     return BBPromise.join(
       publisher.publish('put-item.level', command),
       publisher.publish('put-item.postgresql', command),
@@ -46,6 +46,7 @@ app.get('queue').then(function (q) {
 });
 
 process.on('SIGTERM', function () {
+  if ( ! queue) return;
   queue.close(function () {
     console.log('Queue to queue stopping...');
     process.exit(0);

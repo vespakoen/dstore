@@ -10,7 +10,7 @@ BBPromise.all([
     queue = q;
     return q.setupConsumer();
   }),
-  app.get('level.facade')
+  app.get('storage.level.facade')
 ]).spread(function (consumer, facade) {
   consumer.consume('put-item.level', putItem);
   consumer.consume('del-item.level', delItem);
@@ -28,6 +28,7 @@ BBPromise.all([
 });
 
 process.on('SIGTERM', function () {
+  if ( ! queue) return;
   queue.close(function () {
     console.log('Queue to level stopping...');
     process.exit(0);

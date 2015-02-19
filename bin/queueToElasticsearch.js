@@ -10,7 +10,7 @@ BBPromise.all([
     queue = q;
     return q.setupConsumer();
   }),
-  app.get('elasticsearch.facade')
+  app.get('storage.elasticsearch.facade')
 ]).spread(function (consumer, facade) {
   consumer.consume('put-item.elasticsearch', putItem);
   consumer.consume('del-item.elasticsearch', delItem);
@@ -29,12 +29,13 @@ BBPromise.all([
   }
 
   function migrate(command) {
-    console.log('migrate.elasticsearch', command.project_id || 'no project_id', command.snapshot_version || 'no snapshot version', command.blueprints ? '' : 'no blueprints');
-    return facade.migrate(command.project_id, command.snapshot_version, command.blueprints);
+    console.log('migrate.elasticsearch', command.project_id || 'no project_id', command.project_version || 'no snapshot version', command.blueprints ? '' : 'no blueprints');
+    return facade.migrate(command.project_id, command.project_version, command.blueprints);
   }
 });
 
 process.on('SIGTERM', function () {
+  if ( ! queue) return;
   queue.close(function () {
     console.log('Queue to elasticsearch stopping...');
     process.exit(0);
