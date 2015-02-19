@@ -36,10 +36,14 @@ Let's look at an example how to create a blueprint for storing posts on my blog.
 For this, we use the [put blueprint](#put-blueprint) command, and use "myblog" as the project, and "article" as the type.
 
 ```shell
-curl -X PUT http://localhost:2000/myblog/blueprints/article -d '
+curl -X PUT http://localhost:2000/myblog/article/_blueprint -d '
 {
-  "table": "articles",
-  "elasticsearch_type": "article",
+  "postgresql": {
+    "table": "articles"
+  },
+  "elasticsearch": {
+    "type": "article"
+  },
   "columns": {
     "title_nl": {
       "type": "string"
@@ -244,7 +248,7 @@ For LevelDB, it's quite easy. Since it's blueprintless we don't have to migrate 
 You can create a snapshot with the [create snapshot](#create-snapshot) command:
 
 ```shell
-curl -X POST http://localhost:2000/myblog/snapshots
+curl -X POST http://localhost:2000/myblog/_version
 ```
 
 When the request completes, the storage engines are ready to handle data with the new blueprint.
