@@ -11,66 +11,33 @@ app.get('queue').then(function (q) {
   return BBPromise.join(
     q.setupConsumer(),
     q.setupPublisher(),
-    app.get('blueprint.facade')
+    app.get('project.blueprint.facade')
   );
 }).spread(function (consumer, publisher, facade) {
-  consumer.consume('get-all-snapshot-versions', getAllSnapshotVersions);
-  consumer.consume('get-snapshot-version', getSnapshotVersion);
-  // consumer.consume('get-snapshot', getSnapshot);
-  consumer.consume('create-snapshot', createSnapshot);
   consumer.consume('get-blueprint', getBlueprint);
   consumer.consume('get-all-blueprints', getAllBlueprints);
   consumer.consume('get-blueprint-versions', getBlueprintVersions);
   consumer.consume('put-blueprint', putBlueprint);
+  consumer.consume('put-all-blueprints', putAllBlueprints);
 
   console.log('Queue to blueprint started');
 
-  function getAllSnapshotVersions() {
-    console.log('get-snapshot-versions');
+  function getBlueprint(command) {
+    console.log('get-blueprint', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id', command.project_version || 'no project_version');
 
-    return facade.getAllSnapshotVersions();
+    return facade.getBlueprint(command.project_id, command.blueprint_id, command.project_version);
   }
 
-  function getSnapshotVersion(command) {
-    console.log('get-snapshot-version', command.project_id || 'no project_id');
+  function getAllBlueprints(command) {
+    console.log('get-all-blueprint', command.project_id || 'no project_id', command.project_version || 'no project_version');
 
-    return facade.getSnapshotVersion(command.project_id);
+    return facade.getAllBlueprints(command.project_id, command.project_version);
   }
 
-  // function getSnapshot(command) {
-  //   console.log('get-snapshot', command.project_id || 'no project_id', command.snapshot_version || 'no snapshot_version');
+  function getBlueprintVersions(command) {
+    console.log('get-blueprint', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id');
 
-  //   return facade.getSnapshot(command.project_id, command.snapshot_version);
-  // }
-
-  function createSnapshot(command) {
-    console.log('create-snapshot', command.project_id || 'no project_id');
-
-    return app.get('blueprint.adapter')
-      .then(function (adapter) {
-        var client = adapter.getClient(command.project_id);
-        return BBPromise.join(
-          client.getSnapshot('current'),
-          client.getLatestSnapshotVersion()
-        );
-      })
-      .spread(function (blueprints, snapshotVersion) {
-        command.blueprints = blueprints;
-        command.snapshot_version = snapshotVersion + 1;
-        
-        return BBPromise.join(
-          publisher.publish('migrate.postgresql', command),
-          publisher.publish('migrate.elasticsearch', command)
-        );
-      })
-      .then(function () {
-        return facade.createSnapshot(command.project_id);
-      })
-      .then(function (snapshotVersion) {
-        return {
-          snapshot_version: snapshotVersion
-        };
-      });
+    return facade.getBlueprintVersions(command.project_id, command.blueprint_id);
   }
 
   function putBlueprint(command) {
@@ -79,26 +46,15 @@ app.get('queue').then(function (q) {
     return facade.putBlueprint(command.project_id, command.blueprint_id, command.blueprint);
   }
 
-  function getBlueprint(command) {
-    console.log('get-blueprint', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id', command.snapshot_version || 'no snapshot_version');
+  function putAllBlueprints(command) {
+    console.log('put-blueprint', command.project_id || 'no project_id', command.blueprints || 'no blueprints');
 
-    return facade.getBlueprint(command.project_id, command.blueprint_id, command.snapshot_version);
-  }
-
-  function getAllBlueprints(command) {
-    console.log('get-all-blueprint', command.project_id || 'no project_id', command.snapshot_version || 'no snapshot_version');
-
-    return facade.getAllBlueprints(command.project_id, command.snapshot_version);
-  }
-
-  function getBlueprintVersions(command) {
-    console.log('get-blueprint', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id');
-
-    return facade.getBlueprintVersions(command.project_id, command.blueprint_id);
+    return facade.putBlueprint(command.project_id, command.blueprints);
   }
 });
 
 process.on('SIGTERM', function () {
+  if ( ! queue) return;
   queue.close(function () {
     console.log('Queue to blueprint stopping...');
     process.exit(0);
