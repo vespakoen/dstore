@@ -1,7 +1,7 @@
 # Create a blueprint
 
 ```shell
-curl -XPUT http://localhost:2020/testnamespace/blueprints/kitchensink -H 'content-type: application/json' -d '{
+curl -XPUT http://localhost:2020/testnamespace/kitchensink/_blueprint -H 'content-type: application/json' -d '{
   "table": "kitchensinks",
   "elasticsearch_type": "kitchensink",
   "columns": {
@@ -95,14 +95,14 @@ curl -XPUT http://localhost:2020/testnamespace/blueprints/kitchensink -H 'conten
 
 # Create a snapshot
 ```shell
-curl -XPOST -H 'content-type: application/json' http://localhost:2020/testproject/snapshots
+curl -XPOST -H 'content-type: application/json' http://localhost:2020/testproject/_version
 ```
 
 # Create an item
 ```shell
-curl -XPUT -H 'content-type: application/json' http://localhost:2020/testproject/items/kitchensink/a4f20ace-7aa4-4077-983b-717c2ec5427d -d '{
+curl -XPUT -H 'content-type: application/json' http://localhost:2020/testproject/kitchensink/a4f20ace-7aa4-4077-983b-717c2ec5427d -d '{
   "id": "a4f20ace-7aa4-4077-983b-717c2ec5427d",
-  "snapshot_version": 1,
+  "project_version": 1,
   "integer_type": 35235,
   "uuid_type": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
   "string_type": "some string",
@@ -337,7 +337,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 CREATE TABLE kitchensinks (
     id uuid NOT NULL,
-    snapshot_version integer,
+    project_version integer,
     type_integer integer,
     type_uuid uuid,
     type_string character varying(255),
@@ -392,7 +392,7 @@ curl http://localhost:9200/testprojectv1/_mapping?pretty=1
           "links" : {
             "type" : "string"
           },
-          "snapshot_version" : {
+          "project_version" : {
             "type" : "long"
           },
           "type_boolean" : {
@@ -519,7 +519,7 @@ curl http://localhost:9200/testprojectv1/_search?pretty=1
         "_score": 1,
         "_source": {
           "id": "a4f20ace-7aa4-4077-983b-717c2ec5427d",
-          "snapshot_version": 3,
+          "project_version": 3,
           "type_integer": 35235,
           "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
           "type_string": "some string",
@@ -748,8 +748,8 @@ superlevel storage/level/testprojectv1/ createReadStream
 
 **output**
 ```json
-{"key":"!item-by-id!a4f20ace-7aa4-4077-983b-717c2ec5427d","value":"{\"id\":\"a4f20ace-7aa4-4077-983b-717c2ec5427d\",\"snapshot_version\":3,\"type_integer\":35235,\"type_uuid\":\"e5c20ace-7aa4-4077-983b-717c2ec5427d\",\"type_string\":\"some string\",\"type_text\":\"some text\",\"type_datetime\":\"2007-05-06 05:06:07\",\"type_date\":\"2007-05-06\",\"type_float\":22.22222222222222,\"type_point\":{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]},\"type_linestring\":{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]},\"type_polygon\":{\"type\":\"Polygon\",\"coordinates\":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]},\"type_boolean\":true,\"type_json\":{\"some\":{\"random\":\"json\"}},\"type_integer_array\":[1,2,3],\"type_uuid_array\":[\"0c02a6b3-babd-4399-9105-42c40189bb89\",\"0cf7a1f2-800b-43ee-a4a1-838a76533108\"],\"type_string_array\":[\"testing\",\"it\",\"out\"],\"type_text_array\":[\"testing\",\"it\",\"out\"],\"type_datetime_array\":[\"2007-05-06 05:06:07\",\"2008-06-07 06:07:08\"],\"type_date_array\":[\"2007-05-06\",\"2008-06-07\"],\"type_float_array\":[22.2222,33.3333],\"type_point_array\":{\"type\":\"MultiPoint\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78757]]},\"type_linestring_array\":{\"type\":\"MultiLineString\",\"coordinates\":[[[100,0],[101,1]],[[102,2],[103,3]]]},\"type_polygon_array\":{\"type\":\"MultiPolygon\",\"coordinates\":[[[[102,2],[103,2],[103,3],[102,3],[102,2]]],[[[100,0],[101,0],[101,1],[100,1],[100,0]],[[100.2,0.2],[100.8,0.2],[100.8,0.8],[100.2,0.8],[100.2,0.2]]]]},\"type_boolean_array\":[true,false],\"type_json_array\":[{\"some\":\"data\"},{\"more\":\"data\"}],\"links\":[\"e5c20ace-7aa4-4077-983b-717c2ec5427d\"]}"}
-{"key":"!item-by-type#kitchensink!a4f20ace-7aa4-4077-983b-717c2ec5427d","value":"{\"id\":\"a4f20ace-7aa4-4077-983b-717c2ec5427d\",\"snapshot_version\":3,\"type_integer\":35235,\"type_uuid\":\"e5c20ace-7aa4-4077-983b-717c2ec5427d\",\"type_string\":\"some string\",\"type_text\":\"some text\",\"type_datetime\":\"2007-05-06 05:06:07\",\"type_date\":\"2007-05-06\",\"type_float\":22.22222222222222,\"type_point\":{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]},\"type_linestring\":{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]},\"type_polygon\":{\"type\":\"Polygon\",\"coordinates\":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]},\"type_boolean\":true,\"type_json\":{\"some\":{\"random\":\"json\"}},\"type_integer_array\":[1,2,3],\"type_uuid_array\":[\"0c02a6b3-babd-4399-9105-42c40189bb89\",\"0cf7a1f2-800b-43ee-a4a1-838a76533108\"],\"type_string_array\":[\"testing\",\"it\",\"out\"],\"type_text_array\":[\"testing\",\"it\",\"out\"],\"type_datetime_array\":[\"2007-05-06 05:06:07\",\"2008-06-07 06:07:08\"],\"type_date_array\":[\"2007-05-06\",\"2008-06-07\"],\"type_float_array\":[22.2222,33.3333],\"type_point_array\":{\"type\":\"MultiPoint\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78757]]},\"type_linestring_array\":{\"type\":\"MultiLineString\",\"coordinates\":[[[100,0],[101,1]],[[102,2],[103,3]]]},\"type_polygon_array\":{\"type\":\"MultiPolygon\",\"coordinates\":[[[[102,2],[103,2],[103,3],[102,3],[102,2]]],[[[100,0],[101,0],[101,1],[100,1],[100,0]],[[100.2,0.2],[100.8,0.2],[100.8,0.8],[100.2,0.8],[100.2,0.2]]]]},\"type_boolean_array\":[true,false],\"type_json_array\":[{\"some\":\"data\"},{\"more\":\"data\"}],\"links\":[\"e5c20ace-7aa4-4077-983b-717c2ec5427d\"]}"}
-{"key":"!item-by-type-and-id!kitchensink,a4f20ace-7aa4-4077-983b-717c2ec5427d","value":"{\"id\":\"a4f20ace-7aa4-4077-983b-717c2ec5427d\",\"snapshot_version\":3,\"type_integer\":35235,\"type_uuid\":\"e5c20ace-7aa4-4077-983b-717c2ec5427d\",\"type_string\":\"some string\",\"type_text\":\"some text\",\"type_datetime\":\"2007-05-06 05:06:07\",\"type_date\":\"2007-05-06\",\"type_float\":22.22222222222222,\"type_point\":{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]},\"type_linestring\":{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]},\"type_polygon\":{\"type\":\"Polygon\",\"coordinates\":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]},\"type_boolean\":true,\"type_json\":{\"some\":{\"random\":\"json\"}},\"type_integer_array\":[1,2,3],\"type_uuid_array\":[\"0c02a6b3-babd-4399-9105-42c40189bb89\",\"0cf7a1f2-800b-43ee-a4a1-838a76533108\"],\"type_string_array\":[\"testing\",\"it\",\"out\"],\"type_text_array\":[\"testing\",\"it\",\"out\"],\"type_datetime_array\":[\"2007-05-06 05:06:07\",\"2008-06-07 06:07:08\"],\"type_date_array\":[\"2007-05-06\",\"2008-06-07\"],\"type_float_array\":[22.2222,33.3333],\"type_point_array\":{\"type\":\"MultiPoint\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78757]]},\"type_linestring_array\":{\"type\":\"MultiLineString\",\"coordinates\":[[[100,0],[101,1]],[[102,2],[103,3]]]},\"type_polygon_array\":{\"type\":\"MultiPolygon\",\"coordinates\":[[[[102,2],[103,2],[103,3],[102,3],[102,2]]],[[[100,0],[101,0],[101,1],[100,1],[100,0]],[[100.2,0.2],[100.8,0.2],[100.8,0.8],[100.2,0.8],[100.2,0.2]]]]},\"type_boolean_array\":[true,false],\"type_json_array\":[{\"some\":\"data\"},{\"more\":\"data\"}],\"links\":[\"e5c20ace-7aa4-4077-983b-717c2ec5427d\"]}"}
+{"key":"!item-by-id!a4f20ace-7aa4-4077-983b-717c2ec5427d","value":"{\"id\":\"a4f20ace-7aa4-4077-983b-717c2ec5427d\",\"project_version\":3,\"type_integer\":35235,\"type_uuid\":\"e5c20ace-7aa4-4077-983b-717c2ec5427d\",\"type_string\":\"some string\",\"type_text\":\"some text\",\"type_datetime\":\"2007-05-06 05:06:07\",\"type_date\":\"2007-05-06\",\"type_float\":22.22222222222222,\"type_point\":{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]},\"type_linestring\":{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]},\"type_polygon\":{\"type\":\"Polygon\",\"coordinates\":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]},\"type_boolean\":true,\"type_json\":{\"some\":{\"random\":\"json\"}},\"type_integer_array\":[1,2,3],\"type_uuid_array\":[\"0c02a6b3-babd-4399-9105-42c40189bb89\",\"0cf7a1f2-800b-43ee-a4a1-838a76533108\"],\"type_string_array\":[\"testing\",\"it\",\"out\"],\"type_text_array\":[\"testing\",\"it\",\"out\"],\"type_datetime_array\":[\"2007-05-06 05:06:07\",\"2008-06-07 06:07:08\"],\"type_date_array\":[\"2007-05-06\",\"2008-06-07\"],\"type_float_array\":[22.2222,33.3333],\"type_point_array\":{\"type\":\"MultiPoint\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78757]]},\"type_linestring_array\":{\"type\":\"MultiLineString\",\"coordinates\":[[[100,0],[101,1]],[[102,2],[103,3]]]},\"type_polygon_array\":{\"type\":\"MultiPolygon\",\"coordinates\":[[[[102,2],[103,2],[103,3],[102,3],[102,2]]],[[[100,0],[101,0],[101,1],[100,1],[100,0]],[[100.2,0.2],[100.8,0.2],[100.8,0.8],[100.2,0.8],[100.2,0.2]]]]},\"type_boolean_array\":[true,false],\"type_json_array\":[{\"some\":\"data\"},{\"more\":\"data\"}],\"links\":[\"e5c20ace-7aa4-4077-983b-717c2ec5427d\"]}"}
+{"key":"!item-by-type#kitchensink!a4f20ace-7aa4-4077-983b-717c2ec5427d","value":"{\"id\":\"a4f20ace-7aa4-4077-983b-717c2ec5427d\",\"project_version\":3,\"type_integer\":35235,\"type_uuid\":\"e5c20ace-7aa4-4077-983b-717c2ec5427d\",\"type_string\":\"some string\",\"type_text\":\"some text\",\"type_datetime\":\"2007-05-06 05:06:07\",\"type_date\":\"2007-05-06\",\"type_float\":22.22222222222222,\"type_point\":{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]},\"type_linestring\":{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]},\"type_polygon\":{\"type\":\"Polygon\",\"coordinates\":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]},\"type_boolean\":true,\"type_json\":{\"some\":{\"random\":\"json\"}},\"type_integer_array\":[1,2,3],\"type_uuid_array\":[\"0c02a6b3-babd-4399-9105-42c40189bb89\",\"0cf7a1f2-800b-43ee-a4a1-838a76533108\"],\"type_string_array\":[\"testing\",\"it\",\"out\"],\"type_text_array\":[\"testing\",\"it\",\"out\"],\"type_datetime_array\":[\"2007-05-06 05:06:07\",\"2008-06-07 06:07:08\"],\"type_date_array\":[\"2007-05-06\",\"2008-06-07\"],\"type_float_array\":[22.2222,33.3333],\"type_point_array\":{\"type\":\"MultiPoint\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78757]]},\"type_linestring_array\":{\"type\":\"MultiLineString\",\"coordinates\":[[[100,0],[101,1]],[[102,2],[103,3]]]},\"type_polygon_array\":{\"type\":\"MultiPolygon\",\"coordinates\":[[[[102,2],[103,2],[103,3],[102,3],[102,2]]],[[[100,0],[101,0],[101,1],[100,1],[100,0]],[[100.2,0.2],[100.8,0.2],[100.8,0.8],[100.2,0.8],[100.2,0.2]]]]},\"type_boolean_array\":[true,false],\"type_json_array\":[{\"some\":\"data\"},{\"more\":\"data\"}],\"links\":[\"e5c20ace-7aa4-4077-983b-717c2ec5427d\"]}"}
+{"key":"!item-by-type-and-id!kitchensink,a4f20ace-7aa4-4077-983b-717c2ec5427d","value":"{\"id\":\"a4f20ace-7aa4-4077-983b-717c2ec5427d\",\"project_version\":3,\"type_integer\":35235,\"type_uuid\":\"e5c20ace-7aa4-4077-983b-717c2ec5427d\",\"type_string\":\"some string\",\"type_text\":\"some text\",\"type_datetime\":\"2007-05-06 05:06:07\",\"type_date\":\"2007-05-06\",\"type_float\":22.22222222222222,\"type_point\":{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]},\"type_linestring\":{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]},\"type_polygon\":{\"type\":\"Polygon\",\"coordinates\":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]},\"type_boolean\":true,\"type_json\":{\"some\":{\"random\":\"json\"}},\"type_integer_array\":[1,2,3],\"type_uuid_array\":[\"0c02a6b3-babd-4399-9105-42c40189bb89\",\"0cf7a1f2-800b-43ee-a4a1-838a76533108\"],\"type_string_array\":[\"testing\",\"it\",\"out\"],\"type_text_array\":[\"testing\",\"it\",\"out\"],\"type_datetime_array\":[\"2007-05-06 05:06:07\",\"2008-06-07 06:07:08\"],\"type_date_array\":[\"2007-05-06\",\"2008-06-07\"],\"type_float_array\":[22.2222,33.3333],\"type_point_array\":{\"type\":\"MultiPoint\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78757]]},\"type_linestring_array\":{\"type\":\"MultiLineString\",\"coordinates\":[[[100,0],[101,1]],[[102,2],[103,3]]]},\"type_polygon_array\":{\"type\":\"MultiPolygon\",\"coordinates\":[[[[102,2],[103,2],[103,3],[102,3],[102,2]]],[[[100,0],[101,0],[101,1],[100,1],[100,0]],[[100.2,0.2],[100.8,0.2],[100.8,0.8],[100.2,0.8],[100.2,0.2]]]]},\"type_boolean_array\":[true,false],\"type_json_array\":[{\"some\":\"data\"},{\"more\":\"data\"}],\"links\":[\"e5c20ace-7aa4-4077-983b-717c2ec5427d\"]}"}
 {"key":"!type-by-id!a4f20ace-7aa4-4077-983b-717c2ec5427d","value":"kitchensink"}
 ```
