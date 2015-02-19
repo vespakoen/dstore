@@ -4,12 +4,12 @@
   "type": "object",
   "properties": {
     "id": { "$ref": "types#/definitions/uuid" },
-    "snapshot_version": {
+    "project_version": {
       "type": "integer"
     }
   },
   "required": [
     "id",
-    "snapshot_version"
+    "project_version"
   ]
 }

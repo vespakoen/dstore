@@ -4,22 +4,30 @@
   "description": "A blueprint as defined by node-projector",
   "type": "object",
   "properties": {
-    "key": {
+    "blueprint_id": {
       "type": "string"
     },
-    "elasticsearch_type": {
-      "type": "string"
+    "elasticsearch": {
+      "type": "object",
+      "properties": {
+        "type": "string"
+      },
+      "required": ["type"]
     },
-    "table": {
-      "type": "string"
+    "postgresql": {
+      "type": "object",
+      "properties": {
+        "table": "string"
+      },
+      "required": ["table"]
     },
     "columns": {
       "additionalProperties": { "$ref": "#/definitions/column" }
     }
   },
   "required": [
-    "elasticsearch_type",
-    "table",
+    "elasticsearch",
+    "postgresql",
     "columns"
   ],
   "definitions": {
