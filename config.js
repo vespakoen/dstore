@@ -20,7 +20,10 @@ module.exports = {
     path: process.env.LEVEL_PATH
   },
 
-  blueprint: {
-    path: process.env.BLUEPRINT_PATH
+  project: {
+    client: 'file',
+    file: {
+      path: process.env.PROJECT_FILE_PATH
+    }
   }
 };

@@ -255,7 +255,7 @@ When the request completes, the storage engines are ready to handle data with th
 Storing items is done via a simple PUT command.
 The request body is JSON and should, at the very least contain the following keys:
 
-- **snapshot_version** An existing snapshot version
+- **project_version** An existing snapshot version
 - **id** A UUID that does or does not yet exist in the database
 
 You can also include a **links** key that is an array of UUID's, pointing to other items  
@@ -266,7 +266,7 @@ Below is an example:
 curl -X PUT http://localhost:2000/myblog/article/66276124-ebcd-45e1-8013-825346daa283 -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
-  "snapshot_version": 1,
+  "project_version": 1,
   "title_nl": "De titel",
   "title_en": "Some title",
   "intro_nl": "De intro",
@@ -312,7 +312,7 @@ export POSTGRESQL_PASSWORD="..."
 export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
-export BLUEPRINT_PATH="storage/blueprint"
+export PROJECT_FILE_PATH="storage/blueprint"
 export PROJECTOR_PATH="."
 export PORT=2000
 ```
@@ -391,7 +391,7 @@ export POSTGRESQL_PASSWORD="..."
 export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
-export BLUEPRINT_PATH="storage/blueprint"
+export PROJECT_FILE_PATH="storage/blueprint"
 export PROJECTOR_PATH="."
 export PORT=2000
 
