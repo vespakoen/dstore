@@ -13,7 +13,7 @@ BBPromise.promisifyAll(pg);
 var opts = {};
 
 function removeBlueprint() {
-  return rmRF(app.config.blueprint.path + '/integrationtest');
+  return rmRF(app.config.project.file.path + '/integrationtest');
 }
 
 function removeElasticsearchIndexes() {
@@ -54,8 +54,12 @@ function putFirstBlueprint(opts) {
     project_id: 'integrationtest',
     blueprint_id: 'kitchensink',
     blueprint: {
-      table: 'kitchensinks',
-      elasticsearch_type: 'kitchensink',
+      postgresql: {
+        table: 'kitchensinks'
+      },
+      elasticsearch: {
+        type: 'kitchensink'
+      },
       columns: {
         type_integer: {
           type: 'integer'
@@ -98,8 +102,8 @@ function putFirstBlueprint(opts) {
   });
 }
 
-function createSnapshot(opts) {
-  return opts.publisher.publish('create-snapshot', {
+function tagProject(opts) {
+  return opts.publisher.publish('tag-project', {
     project_id: 'integrationtest'
   });
 }
@@ -111,7 +115,7 @@ function putFirstItem(opts) {
     id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
     item: {
       id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
-      snapshot_version: 1,
+      project_version: 1,
       type_integer: 15,
       type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
       type_string: 'string',
@@ -133,55 +137,59 @@ function putSecondBlueprint(opts) {
     project_id: 'integrationtest',
     blueprint_id: 'kitchensink',
     blueprint: {
-      table: 'kitchensinks',
-      elasticsearch_type: 'kitchensink',
+      postgresql: {
+        table: 'kitchensinks'
+      },
+      elasticsearch: {
+        type: 'kitchensink'
+      },
       columns: {
         type_integer: {
-          key: 'integer_type',
+          column_id: 'integer_type',
           type: 'integer'
         },
         type_uuid: {
-          key: 'uuid_type',
+          column_id: 'uuid_type',
           type: 'uuid'
         },
         type_string: {
-          key: 'string_type',
+          column_id: 'string_type',
           type: 'string'
         },
         type_text: {
-          key: 'text_type',
+          column_id: 'text_type',
           type: 'text'
         },
         type_datetime: {
-          key: 'datetime_type',
+          column_id: 'datetime_type',
           type: 'datetime'
         },
         type_date: {
-          key: 'date_type',
+          column_id: 'date_type',
           type: 'date'
         },
         type_float: {
-          key: 'float_type',
+          column_id: 'float_type',
           type: 'float'
         },
         type_point: {
-          key: 'point_type',
+          column_id: 'point_type',
           type: 'point'
         },
         type_linestring: {
-          key: 'linestring_type',
+          column_id: 'linestring_type',
           type: 'linestring'
         },
         type_polygon: {
-          key: 'polygon_type',
+          column_id: 'polygon_type',
           type: 'polygon'
         },
         type_boolean: {
-          key: 'boolean_type',
+          column_id: 'boolean_type',
           type: 'boolean'
         },
         type_json: {
-          key: 'json_type',
+          column_id: 'json_type',
           type: 'json'
         },
         type_integer_array: {
@@ -232,7 +240,7 @@ function putSecondItem(opts) {
     id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
     item: {
       id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
-      snapshot_version: 2,
+      project_version: 2,
       integer_type: 35235,
       uuid_type: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
       string_type: 'stringetje',
@@ -263,7 +271,7 @@ function putSecondItem(opts) {
 }
 
 function getElasticsearchClient(opts) {
-  return app.get('elasticsearch.client');
+  return app.get('storage.elasticsearch.client');
 }
 
 function testElasticsearchResult(opts, t) {
@@ -279,7 +287,7 @@ function testElasticsearchResult(opts, t) {
       var doc = result.hits.hits[0]._source;
       et.deepEqual(doc, {
         "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-        "snapshot_version": 1,
+        "project_version": 1,
         "type_integer": 15,
         "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
         "type_string": "string",
@@ -340,7 +348,7 @@ function testElasticsearchResult(opts, t) {
 }
 
 function getLevelClient(opts) {
-  return app.get('level.adapter').then(function (levelAdapter) {
+  return app.get('storage.level.adapter').then(function (levelAdapter) {
     opts.levelAdapter = levelAdapter;
     return levelAdapter.getClient('integrationtest', 1);
   });
@@ -409,14 +417,14 @@ function testLevelResult(opts, t) {
           "type_string": "string",
           "type_text": "text",
           "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-          "snapshot_version": 1
+          "project_version": 1
         }, 'documents should match');
       }));
   });
 }
 
 function getPostgresqlClient(opts) {
-  return app.get('postgresql.adapter').then(function (postgresqlAdapter) {
+  return app.get('storage.postgresql.adapter').then(function (postgresqlAdapter) {
     opts.postgresqlAdapter = postgresqlAdapter;
     return postgresqlAdapter.getClient('integrationtest', 1);
   });
@@ -439,7 +447,7 @@ function testPostgresqlResult(opts, t) {
       .then(function (result) {
         pt.deepEqual(result, {
           "id": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
-          "snapshot_version": 1,
+          "project_version": 1,
           "type_integer": 15,
           "type_uuid": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
           "type_string": "string",
@@ -469,7 +477,7 @@ test('when testing integration', function (t) {
       return removeBlueprint();
     })
     .then(function () {
-      return app.get('postgresql.adapter');
+      return app.get('storage.postgresql.adapter');
     })
     .then(function (adapter) {
       var client = adapter.getClient('projector', 1);
@@ -499,7 +507,7 @@ test('when testing integration', function (t) {
       return putFirstBlueprint(opts);
     })
     .then(function () {
-      return createSnapshot(opts);
+      return tagProject(opts);
     })
     .then(function () {
       return putFirstItem(opts);
@@ -508,7 +516,7 @@ test('when testing integration', function (t) {
       return putSecondBlueprint(opts)
     })
     .then(function () {
-      return createSnapshot(opts);
+      return tagProject(opts);
     })
     .then(function () {
       return putSecondItem(opts);
@@ -533,5 +541,8 @@ test('when testing integration', function (t) {
     })
     .catch(function (err) {
       t.ok(false, "Test failed with error " + err.message);
+    })
+    .finally(function () {
+      opts.closeManageConnection();
     });
 });

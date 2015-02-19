@@ -11,7 +11,7 @@
     "start": "cd ./bin && ./start.sh",
     "docs": "cd ./bin && ./create_docs.sh",
     "pretest": "cd ./bin && ./restart.sh",
-    "test": "tape tests/testIntegration.js tests/testBlueprintClient.js tests/testBlueprintService.js"
+    "test": "tape tests/testIntegration.js tests/testProjectClient.js tests/testBlueprintService.js"
   },
   "dependencies": {
     "bluebird": "^2.3.10",

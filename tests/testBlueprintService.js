@@ -1,42 +1,96 @@
 'use strict';
 
+var pg = require('pg');
 var test = require('trap').test;
 var BBPromise = require('bluebird');
+var exec = require('child-process-promise').exec;
 var rmRF = BBPromise.promisify(require('rimraf'));
 var app = require('../main');
+BBPromise.promisifyAll(pg);
+
 var memo = {};
 
+function removeElasticsearchIndexes() {
+  return BBPromise.join(
+    exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/blueprintservicetestv1'),
+    exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/blueprintservicetestv2')
+  );
+}
+
+function getPostgresqlManageConnection() {
+  var connectionString = 'postgresql://' + app.config.postgresql.username + (app.config.postgresql.password === "" ? '' : ':' + app.config.postgresql.password) + '@' + app.config.postgresql.host + '/postgres';
+  return pg.connectAsync(connectionString)
+    .spread(function(client, done) {
+      memo.closeManageConnection = done;
+      return client;
+    });
+}
+
+function dropTestDatabases(memo) {
+  return memo.client.queryAsync("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'blueprintservicetestv1'")
+    .then(function () {
+      return memo.client.queryAsync('DROP DATABASE blueprintservicetestv1');
+    })
+    .then(function () {
+      return memo.client.queryAsync("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'blueprintservicetestv2'");
+    })
+    .then(function () {
+      return memo.client.queryAsync('DROP DATABASE blueprintservicetestv2');
+    })
+    .catch(function (err) {
+      // the database probably doesn't exist, so we ignore this error
+      // noop
+    });
+}
+
+
 test('when testing the blueprint service', function (t) {
-  return app.get('blueprint.adapter')
-    .then(function (adapter) {
-      memo.adapter = adapter;
-      return rmRF(app.config.blueprint.path + '/servicetest');
+  var clean = {
+    file: function () {
+      return rmRF(app.config.project.file.path + '/blueprintservicetest');
+    },
+    postgresql: function () {
+      return app.get('storage.postgresql.adapter')
+        .then(function (adapter) {
+          var client = adapter.getClient('projector', 1);
+          return BBPromise.join(
+            client.table('log').where({ project_id: 'blueprintservicetest' }).del().then(function () {}),
+            client.table('snapshots').where({ project_id: 'blueprintservicetest' }).del().then(function () {}),
+            client.table('versions').where({ project_id: 'blueprintservicetest' }).del().then(function () {})
+          ).catch(function () {
+            // noop
+          });
+        })
+    }
+  };
+
+  var clientId = app.config.project.client;
+  return clean[clientId]()
+    .then(function () {
+      return removeElasticsearchIndexes();
     })
     .then(function () {
-      memo.client = memo.adapter.getClient('servicetest');
-      return app.get('blueprint.facade');
+      return getPostgresqlManageConnection();
     })
-    .then(function (facade) {
-      memo.facade = facade;
+    .then(function (client) {
+      memo.client = client;
+      return dropTestDatabases(memo);
     })
     .then(function () {
-      return app.get('postgresql.adapter');
-    })
-    .then(function (adapter) {
-      var client = adapter.getClient('projector', 1);
       return BBPromise.join(
-        client.table('log').where({ project_id: 'servicetest' }).del().then(function () {}),
-        client.table('snapshots').where({ project_id: 'servicetest' }).del().then(function () {}),
-        client.table('versions').where({ project_id: 'servicetest' }).del().then(function () {})
-      ).catch(function () {
-        // noop
-      });
+        app.get('project.blueprint.service'),
+        app.get('project.tagger')
+      );
     })
-    .then(function () {
+    .spread(function (service, tagger) {
       t.test("when creating a news blueprint", function (t1) {
         var blueprint = {
-          "elasticsearch_type": "news",
-          "table": "news",
+          "elasticsearch": {
+            "type": "news"
+          },
+          "postgresql": {
+            "table": "news"
+          },
           "columns": {
             "description_nl": {
               "type": "text"
@@ -44,11 +98,11 @@ test('when testing the blueprint service', function (t) {
           }
         };
 
-        return memo.facade.putBlueprint('servicetest', 'news', blueprint)
+        return service.putBlueprint('blueprintservicetest', 'news', blueprint)
           .then(function () {
             return BBPromise.join(
-              memo.client.getLog(),
-              memo.client.getBlueprint('current', 'news')
+              service.getLog('blueprintservicetest'),
+              service.getBlueprint('blueprintservicetest', 'news', 'current')
             );
           })
           .spread(function (changes, storedBlueprint) {
@@ -56,8 +110,12 @@ test('when testing the blueprint service', function (t) {
               "type": "blueprint.create",
               "blueprint": "news",
               "value": {
-                "elasticsearch_type": "news",
-                "table": "news",
+                "elasticsearch": {
+                  "type": "news"
+                },
+                "postgresql": {
+                  "table": "news"
+                },
                 "columns": {
                   "description_nl": {
                     "type": "text"
@@ -70,126 +128,17 @@ test('when testing the blueprint service', function (t) {
             t1.deepEqual(storedBlueprint, blueprint, "versions/news/1.json should match with " + JSON.stringify(blueprint));
           })
           .then(function () {
-            return memo.facade.createSnapshot('servicetest');
+            return tagger.tagProject('blueprintservicetest');
           })
           .then(function() {
-            return memo.client.getLog();
+            return service.getLog('blueprintservicetest');
           })
           .then(function (changes) {
             var change = {
-              "type": "snapshot.create",
+              "type": "project.tag",
               "value": 1
             };
             t1.deepEqual(changes[1], change, "log's second change should be " + JSON.stringify(change));
-          });
-      });
-
-      t.test("when renaming the news blueprint to articles, and renaming the column and changing the column's type", function (t2) {
-        var renamedBlueprint = {
-          "key": "articles",
-          "elasticsearch_type": "news",
-          "table": "news",
-          "columns": {
-            "description_nl": {
-              "key": "title_nl",
-              "type": "string"
-            }
-          }
-        };
-
-        return memo.facade.putBlueprint('servicetest', 'news', renamedBlueprint)
-          .then(function () {
-            return BBPromise.join(
-              memo.client.getLog(),
-              memo.client.getBlueprint('current', 'news'),
-              memo.client.getBlueprint('current', 'articles')
-            );
-          })
-          .spread(function (changes, news2, articles1) {
-            var change2 = {
-              "type": "column.update",
-              "blueprint": "news",
-              "column": "description_nl",
-              "key": "type",
-              "oldValue": "text",
-              "value": "string"
-            };
-            t2.deepEqual(changes[2], change2, "log's third change should be " + JSON.stringify(change2));
-
-            var change3 = {
-              "type": "column.rename",
-              "blueprint": "news",
-              "column": "description_nl",
-              "value": "title_nl"
-            };
-            t2.deepEqual(changes[3], change3, "log's fourth change should be " + JSON.stringify(change3));
-
-            var change4 = {
-              "type": "blueprint.rename",
-              "blueprint": "news",
-              "value": "articles"
-            };
-            t2.deepEqual(changes[4], change4, "log's fifth change should be " + JSON.stringify(change4));
-
-            var cleanNews1Blueprint = {
-              "elasticsearch_type": "news",
-              "table": "news",
-              "columns": {
-                "title_nl": {
-                  "type": "string"
-                }
-              }
-            };
-            t2.deepEqual(cleanNews1Blueprint, news2, "versions/news/2.json should match with " + JSON.stringify(cleanNews1Blueprint));
-
-            var cleanArticles1Blueprint = {
-              "elasticsearch_type": "news",
-              "table": "news",
-              "columns": {
-                "title_nl": {
-                  "type": "string"
-                }
-              }
-            };
-            t2.deepEqual(cleanArticles1Blueprint, articles1, "versions/articles/1.json should match with " + JSON.stringify(cleanArticles1Blueprint));
-          })
-          .then(function () {
-            return memo.facade.createSnapshot('servicetest');
-          });
-      });
-
-      t.test("when adding a column to the articles blueprint", function (t3) {
-        var blueprint = {
-          "elasticsearch_type": "news",
-          "table": "news",
-          "columns": {
-            "title_nl": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string"
-            }
-          }
-        };
-
-        return memo.facade.putBlueprint('servicetest', 'articles', blueprint)
-          .then(function () {
-            return BBPromise.join(
-              memo.client.getLog(),
-              memo.client.getBlueprint('current', 'articles')
-            );
-          })
-          .spread(function (changes, storedBlueprint) {
-            var change = {
-              "type": "column.create",
-              "blueprint": "articles",
-              "column": "image",
-              "value": {
-                "type": "string"
-              }
-            };
-            t3.deepEqual(changes[6], change, "log's seventh change should be " + JSON.stringify(change));
-            t3.deepEqual(storedBlueprint, blueprint, "versions/articles/2.json should match with " + JSON.stringify(blueprint));
           });
       });
     })
