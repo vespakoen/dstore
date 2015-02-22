@@ -3,7 +3,7 @@
 
 [![NPM](https://nodei.co/npm/dstore.png?downloads=true)](https://nodei.co/npm/dstore/)
 
-#Introduction
+# Introduction
 
 dstore is an abstraction over storage engines, more specifically, managing their "schema" and handling creating / updating & deleting data (No reads!).
 
@@ -12,12 +12,12 @@ Via a simple REST API, you can manage the blueprint of your data, and store data
 Currently, dstore supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, the perfect stack for a modern web application.  
 
 
-#Overview
+# Overview
 
 ![overview](http://trappsnl.github.io/dstore/overview.png)
 
 
-#Topics
+# Topics
 
 - [Blueprints](#blueprints)  
 - [Snapshots](#snapshots)
@@ -28,7 +28,7 @@ Currently, dstore supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, th
 - [Dive deeper](#dive-deeper)
 
 
-#Blueprints
+# Blueprints
 
 The blueprint describes your data format, so the projectors know what data they can expect and know how to serialize it.  
 A blueprint contains information like the table name, elasticsearch type, the columns and the validation options that should be used when data is stored.  
@@ -238,7 +238,7 @@ Below is a map of the available **column types**, and the type that it translate
 
 As you can see, we follow PostgreSQL's [] notation for defining *an array* of something.
 
-#Snapshots
+# Snapshots
 
 When you are done adding blueprints, it's time to create a snapshot.
 By creating a snapshot we are saving the current state of all blueprints, and assign a snapshot version number to it.
@@ -254,7 +254,7 @@ curl -X POST http://localhost:2020/myblog/_version
 When the request completes, the storage engines are ready to handle data with the new blueprint.
 
 
-#Items
+# Items
 
 Storing items is done via a simple PUT command.
 The request body is JSON and should, at the very least contain the following keys:
@@ -287,7 +287,7 @@ Deleting an item is not so difficult either:
 curl -X DELETE http://localhost:2020/myblog/article/66276124-ebcd-45e1-8013-825346daa283
 ```
 
-#API
+# API
 
 At this moment, the only way to communicate with dstore is via a JSON API.  
 **In the future we might add support for communication with dstore via RabbitMQ**
@@ -295,7 +295,7 @@ At this moment, the only way to communicate with dstore is via a JSON API.
 Please check the [API documentation](http://docs.dstore.apiary.io/) over at apiary.io.
 (**NOTE:** The API is currently being updated to reflect the examples in the apiary docs.)
 
-#Requirements
+# Requirements
 
 - [Node.js](http://nodejs.org/)
 - [RabbitMQ](https://www.rabbitmq.com)
@@ -321,7 +321,7 @@ export PROJECTOR_PATH="."
 export PORT=2020
 ```
 
-#Installation
+# Installation
 
 We build a .deb file that installs dstore on your system.
 It is made & tested on Ubuntu 14.04, but probably works in debian as well.
@@ -362,14 +362,13 @@ npm install --save dstore
 # install PM2 (node.js process manager)
 sudo npm install -g pm2
 
-# install rabbitmq
-sudo apt-get install rabbitmq-server
+# add elasticsearch repository
+wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -
+sudo add-apt-repository "deb http://packages.elasticsearch.org/elasticsearch/1.4/debian stable main"
+sudo apt-get update
 
-# install postgresql
-sudo apt-get install postgresql-9.3 postgresql-contrib
-
-# install postgis (only if you need spatial support)
-sudo apt-get install postgresql-9.3-postgis-2.1
+# install dependencies
+sudo apt-get install rabbitmq-server postgresql-9.3 postgresql-contrib postgresql-9.3-postgis-2.1 nodejs build-essential openjdk-7-jdk libpq-dev
 
 # change user to postgres
 sudo su postgres
@@ -383,9 +382,6 @@ CREATE EXTENSION "uuid-ossp";
 CREATE EXTENSION postgis;
 UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';
 EOF
-
-# install elasticsearch (follow instructions over there!)
-firefox https://gist.github.com/gourneau/66e0bd90c92ad829590b
 
 # export necessary config variables
 export POSTGRESQL_HOST="localhost"
