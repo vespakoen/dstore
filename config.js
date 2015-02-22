@@ -1,4 +1,10 @@
 module.exports = {
+  stores: [
+    'postgresql',
+    'elasticsearch',
+    'level'
+  ],
+  
   postgresql: {
     host: process.env.POSTGRESQL_HOST,
     port: process.env.POSTGRESQL_PORT,
@@ -12,12 +18,12 @@ module.exports = {
     ]
   },
 
-  queue: {
-    connectionString: process.env.QUEUE_CONNECTIONSTRING
-  },
-
   level: {
     path: process.env.LEVEL_PATH
+  },
+
+  queue: {
+    connectionString: process.env.QUEUE_CONNECTIONSTRING
   },
 
   project: {
