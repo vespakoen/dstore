@@ -20,7 +20,6 @@ sudo dpkg -i dstore-1.deb
 
 echo "==> Running apt-get -f install"
 sudo apt-get -f -y install << INPUT
-
 dstore
 dstore
 INPUT
