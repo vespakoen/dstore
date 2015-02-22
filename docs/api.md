@@ -1,7 +1,7 @@
 FORMAT: 1A
 
-# node-projector
-Welcome to the API docs for node-projector.  
+# dstore
+Welcome to the API docs for dstore.  
 
 For your (and our) convenience, our API uses some of the same conventions as elasticsearch does.  
 
@@ -255,7 +255,7 @@ This is used for:
 
 * Validation of the input when storing items (via json schema).
     * **json schema** http://spacetelescope.github.io/understanding-json-schema/
-    * **built-in schemas** https://github.com/trappsnl/node-projector/tree/master/schemas
+    * **built-in schemas** https://github.com/trappsnl/dstore/tree/master/schemas
 * Serialization of the input when sending the item to a specific projector.
 * Migration of the tables / creation of the elasticsearch mappings.
 * Transforming of items to make it compatible with blueprints of different versions.
@@ -471,7 +471,7 @@ This is used for:
 Items are like rows in a database and like a elasticsearch document.  
 When you create or update an item, it will be validated by the provided json-schema in the blueprint.  
 In case no json-schema is available for the blueprint, the system will validate the input the best it can.  
-For more information about this convention, for now, [check the source](https://github.com/trappsnl/node-projector/blob/master/lib/item/itemRepository.js#L99-L137)
+For more information about this convention, for now, [check the source](https://github.com/trappsnl/dstore/blob/master/lib/item/itemRepository.js#L99-L137)
 
 ## General [/{project_id}/{blueprint_id}/{id}]
 
