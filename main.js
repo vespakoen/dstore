@@ -37,6 +37,7 @@ app.use(require('./lib/storage/elasticsearch/elasticsearchRepository'));
 app.use(require('./lib/storage/elasticsearch/elasticsearchSerializer'));
 
 app.use(require('./lib/storage/level/levelAdapter'));
+app.use(require('./lib/storage/level/levelDropper'));
 app.use(require('./lib/storage/level/levelFacade'));
 app.use(require('./lib/storage/level/levelRepository'));
 app.use(require('./lib/storage/level/levelSerializer'));
