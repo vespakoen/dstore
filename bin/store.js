@@ -12,7 +12,7 @@ if ( ! argv.store) {
   process.exit(0);
 }
 
-var store = argv['store'];
+var store = argv.store;
 
 BBPromise.all([
   app.get('queue').then(function (q) {
