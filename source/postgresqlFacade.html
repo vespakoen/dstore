@@ -20,27 +20,31 @@
 var _ = require('underscore');
 var BBPromise = require('bluebird');
 
-<span id='postgresql-PostgresqlFacade'>/**
-</span> * @class postgresql.PostgresqlFacade
- * LevelFacade
+<span id='storage-postgresql-PostgresqlFacade'>/**
+</span> * LevelFacade
  *
- * @param {postgresql.PostgresqlRepository} repository
- * @param {postgresql.PostgresqlSerializer} serializer
+ * @class storage.postgresql.PostgresqlFacade
+ * 
+ * @param {storage.postgresql.PostgresqlRepository} repository
+ * @param {storage.postgresql.PostgresqlSerializer} serializer
+ * @param {storage.postgresql.PostgresqlMigrator}   migrator
+ * @param {storage.postgresql.PostgresqlDropper}    dropper
  */
-function PostgresqlFacade(repository, serializer, migrator) {
+function PostgresqlFacade(repository, serializer, migrator, dropper) {
   this.repository = repository;
   this.serializer = serializer;
   this.migrator = migrator;
+  this.dropper = dropper;
 }
 
-<span id='postgresql-PostgresqlFacade-property-attachKey'>/**
+<span id='storage-postgresql-PostgresqlFacade-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-PostgresqlFacade.attachKey = 'postgresql.facade';
+PostgresqlFacade.attachKey = 'storage.postgresql.facade';
 
-<span id='postgresql-PostgresqlFacade-method-attach'>/**
+<span id='storage-postgresql-PostgresqlFacade-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
@@ -48,63 +52,74 @@ PostgresqlFacade.attachKey = 'postgresql.facade';
  */
 PostgresqlFacade.attach = function(app) {
   return BBPromise.join(
-    app.get('postgresql.repository'),
-    app.get('postgresql.serializer'),
-    app.get('postgresql.migrator')
-  ).spread(function(repostory, serializer, migrator) {
-    return new PostgresqlFacade(repostory, serializer, migrator);
+    app.get('storage.postgresql.repository'),
+    app.get('storage.postgresql.serializer'),
+    app.get('storage.postgresql.migrator'),
+    app.get('storage.postgresql.dropper')
+  ).spread(function(repostory, serializer, migrator, dropper) {
+    return new PostgresqlFacade(repostory, serializer, migrator, dropper);
   });
 };
 
-<span id='postgresql-PostgresqlFacade-method-putItem'>/**
+<span id='storage-postgresql-PostgresqlFacade-method-putItem'>/**
 </span> * Insert / update item
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
+ * @param  {String} id
  * @param  {Object} item
  *
  * @return {BBPromise}
  */
-PostgresqlFacade.prototype.putItem = function(namespace, schemaKey, item) {
-  return this.repository.putItem(namespace, schemaKey, item);
+PostgresqlFacade.prototype.putItem = function(projectId, blueprintId, id, item) {
+  return this.repository.putItem(projectId, blueprintId, id, item);
 };
 
-<span id='postgresql-PostgresqlFacade-method-delItem'>/**
+<span id='storage-postgresql-PostgresqlFacade-method-delItem'>/**
 </span> * Delete item
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {String} id
  *
  * @return {BBPromise}
  */
-PostgresqlFacade.prototype.delItem = function(namespace, schemaKey, version, id) {
-  return this.repository.delItem(namespace, schemaKey, version, id);
+PostgresqlFacade.prototype.delItem = function(projectId, blueprintId, id) {
+  return this.repository.delItem(projectId, blueprintId, id);
 };
 
-<span id='postgresql-PostgresqlFacade-method-migrate'>/**
+<span id='storage-postgresql-PostgresqlFacade-method-migrate'>/**
 </span> * Create / migrate database.
  *
- * @param  {String} namespace
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
+ * @param  {Object} blueprints
  *
  * @return {BBPromise.&lt;undefined&gt;}
  */
-PostgresqlFacade.prototype.migrate = function(namespace, version) {
-  return this.migrator.migrate(namespace, version);
+PostgresqlFacade.prototype.migrate = function(projectId, projectVersion, blueprints) {
+  return this.migrator.migrate(projectId, projectVersion, blueprints);
 };
 
-<span id='postgresql-PostgresqlFacade-method-serialize'>/**
+<span id='storage-postgresql-PostgresqlFacade-method-drop'>/**
+</span> * Drop all databases of a project.
+ * 
+ * @return {BBPromise}
+ */
+PostgresqlFacade.prototype.drop = function(projectId) {
+  return this.dropper.drop(projectId);
+};
+
+<span id='storage-postgresql-PostgresqlFacade-method-serialize'>/**
 </span> * Serialize an item to make it compatible with postgresql.
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} item
  * @return {Object} The serialized item
  */
-PostgresqlFacade.prototype.serialize = function(namespace, schemaKey, item) {
-  return this.serializer.serializer(namespace, schemaKey, item);
+PostgresqlFacade.prototype.serialize = function(projectId, blueprintId, item) {
+  return this.serializer.serializer(projectId, blueprintId, item);
 };
 
 module.exports = PostgresqlFacade;

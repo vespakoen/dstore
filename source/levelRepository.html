@@ -21,33 +21,37 @@ var _ = require('underscore');
 var BBPromise = require('bluebird');
 var map = require('map-stream');
 var bytewiseCodec = require('level-sublevel/codec/bytewise');
-var ItemRepository = require('../item/itemRepository');
+var ItemRepository = require('../itemRepository');
 
-<span id='level-LevelRepository'>/**
-</span> * @class level.LevelRepository
- * LevelRepository
+<span id='storage-level-LevelRepository'>/**
+</span> * LevelRepository
  * 
- * @param {level.LevelSerializer} serializer
- * @param {level.LevelAdapter} adapter
- * @param {schema.SchemaAdapter} schemaAdapter
- * @param {item.ItemTransformer} itemTransformer
+ * @class storage.level.LevelRepository
+ * @extends {storage.ItemRepository}
+ * 
+ * @param {storage.level.LevelSerializer}       serializer
+ * @param {storage.level.LevelAdapter}          adapter
+ * @param {project.blueprint.BlueprintService}  blueprintService
+ * @param {storage.ItemTransformer}             itemTransformer
+ * @param {Validator}                           validator
  */
-function LevelRepository(serializer, adapter, schemaAdapter, itemTransformer) {
-  ItemRepository.call(this, schemaAdapter, itemTransformer);
+function LevelRepository(serializer, adapter, blueprintService, itemTransformer, validator) {
+  ItemRepository.call(this, blueprintService, itemTransformer, validator);
   this.serializer = serializer;
   this.adapter = adapter;
 }
 
 LevelRepository.prototype = Object.create(ItemRepository.prototype);
+LevelRepository.prototype.constructor = LevelRepository;
 
-<span id='level-LevelRepository-property-attachKey'>/**
+<span id='storage-level-LevelRepository-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-LevelRepository.attachKey = 'level.repository';
+LevelRepository.attachKey = 'storage.level.repository';
 
-<span id='level-LevelRepository-method-attach'>/**
+<span id='storage-level-LevelRepository-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
@@ -55,87 +59,84 @@ LevelRepository.attachKey = 'level.repository';
  */
 LevelRepository.attach = function (app) {
   return BBPromise.join(
-    app.get('level.serializer'),
-    app.get('level.adapter'),
-    app.get('schema.adapter'),
-    app.get('item.transformer')
-  ).spread(function (serializer, adapter, schemaAdapter, itemTransformer) {
-    return new LevelRepository(serializer, adapter, schemaAdapter, itemTransformer);
+    app.get('storage.level.serializer'),
+    app.get('storage.level.adapter'),
+    app.get('project.blueprint.service'),
+    app.get('storage.itemtransformer'),
+    app.get('validator')
+  ).spread(function (serializer, adapter, blueprintService, itemTransformer, validator) {
+    return new LevelRepository(serializer, adapter, blueprintService, itemTransformer, validator);
   });
 };
 
-<span id='level-LevelRepository-method-putItem'>/**
+<span id='storage-level-LevelRepository-method-putItem'>/**
 </span> * Insert / update item
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} item
  *
  * @return {BBPromise}
  */
-LevelRepository.prototype.putItem = function (namespace, schemaKey, item) {
+LevelRepository.prototype.putItem = function (projectId, blueprintId, id, item) {
   var self = this;
-
-  return this._validatePutItem(namespace, schemaKey, item)
+  
+  return this._validatePutItem(projectId, blueprintId, id, item)
     .then(function () {
        // serialize the item
-      return self.serializer.serialize(namespace, schemaKey, item);
+      return self.serializer.serialize(projectId, blueprintId, item);
     })
     .then(function(item) {
       var value = JSON.stringify(item);
 
-      var client = self.adapter.getClient(namespace, item.version);
+      var client = self.adapter.getClient(projectId, item.project_version);
       var typeByIdDb = client.sublevel('type-by-id');
       var itemByIdDb = client.sublevel('item-by-id');
       var itemByTypeDb = client.sublevel('item-by-type');
-      var table = itemByTypeDb.sublevel(schemaKey);
+      var table = itemByTypeDb.sublevel(blueprintId);
       var itemByTypeAndIdDb = client.sublevel('item-by-type-and-id', bytewiseCodec);
 
-      return BBPromise.join(
-        BBPromise.promisify(typeByIdDb.put)(item.id, schemaKey),
-        BBPromise.promisify(itemByIdDb.put)(item.id, value),
-        BBPromise.promisify(table.put)(item.id, value),
-        BBPromise.promisify(itemByTypeAndIdDb.put)([schemaKey, item.id], value)
-      )
-      .catch(function (err) {
-        console.error('leveldb error', err);
-      });
+      return BBPromise.promisify(typeByIdDb.put)(id, blueprintId)
+        .then(function () {
+          return BBPromise.promisify(itemByIdDb.put)(id, value);
+        })
+        .then(function () {
+          return BBPromise.promisify(table.put)(id, value);
+        })
+        .then(function () {
+          return BBPromise.promisify(itemByTypeAndIdDb.put)([blueprintId, id], value);
+        })
     });
 };
 
-<span id='level-LevelRepository-method-delItem'>/**
+<span id='storage-level-LevelRepository-method-delItem'>/**
 </span> * Delete item
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {String} blueprintId
+ * @param  {Number} projectVersion
  * @param  {String} id
  *
  * @return {BBPromise}
  */
-LevelRepository.prototype.delItem = function (namespace, schemaKey, version, id) {
+LevelRepository.prototype.delItem = function (projectId, blueprintId, id) {
   var self = this;
 
-  return this._validateDelItem(namespace, schemaKey, id)
+  return this._validateDelItem(projectId, blueprintId, id)
     .then(function () {
-      // delete the item
-      return self.client.delete({
-        index: namespace + 'v' + version,
-        type: schemaKey,
-        id: id
-      });
+      
     });
 };
 
-<span id='level-LevelRepository-method-getIdToTypeMap'>/**
+<span id='storage-level-LevelRepository-method-getIdToTypeMap'>/**
 </span> * Get a id =&gt; type map.
  *
- * @param  {String} namespace
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
  * @param  {Array} ids
  * @return {BBPromise}
  */
-LevelRepository.prototype.getIdToTypeMap = function(namespace, version, ids) {
+LevelRepository.prototype.getIdToTypeMap = function(projectId, projectVersion, ids) {
   var self = this;
 
   return new BBPromise(function(resolve) {
@@ -147,7 +148,7 @@ LevelRepository.prototype.getIdToTypeMap = function(namespace, version, ids) {
       idsMap[id] = true;
     });
     
-    var client = self.adapter.getClient(namespace, version);
+    var client = self.adapter.getClient(projectId, projectVersion);
     var typeByIdDb = client.sublevel('type-by-id');
     typeByIdDb.createReadStream()
       .on('data', function(data) {
@@ -160,18 +161,18 @@ LevelRepository.prototype.getIdToTypeMap = function(namespace, version, ids) {
   });
 };
 
-<span id='level-LevelRepository-method-getStream'>/**
+<span id='storage-level-LevelRepository-method-getStream'>/**
 </span> * Get a stream of all items.
  *
- * @param  {String} namespace
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
  * @return {Stream}
  */
-LevelRepository.prototype.getStream = function (namespace, version) {
+LevelRepository.prototype.getStream = function (projectId, projectVersion) {
   var self = this;
 
   return new BBPromise(function (resolve) {
-    var client = self.adapter.getClient(namespace, version);
+    var client = self.adapter.getClient(projectId, projectVersion);
     var itemByTypeAndIdDb = client.sublevel('item-by-type-and-id', bytewiseCodec);
 
     return itemByTypeAndIdDb.createReadStream()

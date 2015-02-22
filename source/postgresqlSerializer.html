@@ -21,28 +21,31 @@ var _ = require('underscore');
 var moment = require('moment');
 var knex = require('knex')({dialect: 'postgres'});
 var st = require('knex-postgis')(knex);
-var ItemSerializer = require('../item/itemSerializer');
+var ItemSerializer = require('../itemSerializer');
 
-<span id='postgresql-PostgresqlSerializer'>/**
-</span> * @class postgresql.PostgresqlSerializer
- * @extends {item.ItemSerializer}
+<span id='storage-postgresql-PostgresqlSerializer'>/**
+</span> * PostgresqlSerializer
  *
- * PostgresqlSerializer
+ * @class storage.postgresql.PostgresqlSerializer
+ * @extends {storage.ItemSerializer}
+ * 
+ * @param {project.blueprint.BlueprintService} blueprintService
  */
-function PostgresqlSerializer(schemaAdapter) {
-  ItemSerializer.call(this, schemaAdapter);
+function PostgresqlSerializer(blueprintService) {
+  ItemSerializer.call(this, blueprintService);
 }
 
 PostgresqlSerializer.prototype = Object.create(ItemSerializer.prototype);
+PostgresqlSerializer.prototype.constructor = PostgresqlSerializer;
 
-<span id='postgresql-PostgresqlSerializer-property-attachKey'>/**
+<span id='storage-postgresql-PostgresqlSerializer-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-PostgresqlSerializer.attachKey = 'postgresql.serializer';
+PostgresqlSerializer.attachKey = 'storage.postgresql.serializer';
 
-<span id='postgresql-PostgresqlSerializer-method-attach'>/**
+<span id='storage-postgresql-PostgresqlSerializer-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
@@ -50,25 +53,26 @@ PostgresqlSerializer.attachKey = 'postgresql.serializer';
  * @return {BBPromise} A PostgresqlSerializer instance with resolved dependencies.
  */
 PostgresqlSerializer.attach = function(app) {
-  return app.get('schema.adapter').then(function(schemaAdapter) {
-    return new PostgresqlSerializer(schemaAdapter);
-  });
+  return app.get('project.blueprint.service')
+    .then(function(blueprintService) {
+      return new PostgresqlSerializer(blueprintService);
+    });
 };
 
-<span id='postgresql-PostgresqlSerializer-method-serialize'>/**
+<span id='storage-postgresql-PostgresqlSerializer-method-serialize'>/**
 </span> * Serialize item for PostgreSQL
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} item
  *
  * @return {Object} The serialized item
  */
-PostgresqlSerializer.prototype.serialize = function(namespace, schemaKey, item) {
-  return this._serializeItem(namespace, schemaKey, item);
+PostgresqlSerializer.prototype.serialize = function(projectId, blueprintId, item) {
+  return this._serializeItem(projectId, blueprintId, item);
 };
 
-<span id='postgresql-PostgresqlSerializer-method-_serializePoint'>/**
+<span id='storage-postgresql-PostgresqlSerializer-method-_serializePoint'>/**
 </span> * Serialize a point.
  *
  * @protected
@@ -78,7 +82,17 @@ PostgresqlSerializer.prototype._serializePoint = function(value) {
   return this._serializeGeoJSON(value);
 };
 
-<span id='postgresql-PostgresqlSerializer-method-_serializeLinestring'>/**
+<span id='storage-postgresql-PostgresqlSerializer-method-_serializePointArray'>/**
+</span> * Serialize a point array.
+ *
+ * @protected
+ * @param  {string} value
+ */
+PostgresqlSerializer.prototype._serializePointArray = function(value) {
+  return this._serializeGeoJSON(value);
+};
+
+<span id='storage-postgresql-PostgresqlSerializer-method-_serializeLinestring'>/**
 </span> * Serialize a linestring.
  *
  * @protected
@@ -88,32 +102,51 @@ PostgresqlSerializer.prototype._serializeLinestring = function(value) {
   return this._serializeGeoJSON(value);
 };
 
-<span id='postgresql-PostgresqlSerializer-method-_serializeRectangle'>/**
-</span> * Serialize a rectangle.
+<span id='storage-postgresql-PostgresqlSerializer-method-_serializeLinestringArray'>/**
+</span> * Serialize a linestring array.
  *
  * @protected
  * @param  {string} value
  */
-PostgresqlSerializer.prototype._serializeRectangle = function(value) {
+PostgresqlSerializer.prototype._serializeLinestringArray = function(value) {
   return this._serializeGeoJSON(value);
 };
 
-<span id='postgresql-PostgresqlSerializer-method-_serializeGeoJSON'>/**
+<span id='storage-postgresql-PostgresqlSerializer-method-_serializePolygon'>/**
+</span> * Serialize a polygon.
+ *
+ * @protected
+ * @param  {string} value
+ */
+PostgresqlSerializer.prototype._serializePolygon = function(value) {
+  return this._serializeGeoJSON(value);
+};
+
+<span id='storage-postgresql-PostgresqlSerializer-method-_serializePolygonArray'>/**
+</span> * Serialize a polygon array.
+ *
+ * @protected
+ * @param  {string} value
+ */
+PostgresqlSerializer.prototype._serializePolygonArray = function(value) {
+  return this._serializeGeoJSON(value);
+};
+
+<span id='storage-postgresql-PostgresqlSerializer-method-_serializeGeoJSON'>/**
 </span> * Serialize to geojson.
  *
  * @protected
  * @param  {string} value
  */
 PostgresqlSerializer.prototype._serializeGeoJSON = function(value) {
-  if (_.isString(value)) {
-    var geoJson = JSON.parse(value);
-    geoJson.crs = {
+  if ( ! value.crs) {    
+    value.crs = {
       type: 'name',
       properties: {name: 'EPSG:4326'}
     };
-    value = st.geomFromGeoJSON(geoJson);
   }
-  return value;
+  
+  return st.geomFromGeoJSON(value);
 };
 
 module.exports = PostgresqlSerializer;

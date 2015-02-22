@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var _ = require('underscore');
+var BBPromise = require('bluebird');
+
+function ProjectService(client) {
+  this.client = client;
+}
+
+ProjectService.attachKey = 'project.service';
+
+ProjectService.attach = function(app) {
+  return app.get('project.client')
+    .then(function (client) {
+      return new ProjectService(client);
+    });
+};
+
+ProjectService.prototype.getProjectVersion = function(projectId) {
+  return this.client.getProjectVersion(projectId);
+};
+
+ProjectService.prototype.getProjectIds = function() {
+  return this.client.getAllProjectVersions()
+    .then(function (projectVersions) {
+      return Object.keys(projectVersions);
+    });
+};
+
+ProjectService.prototype.delProject = function(projectId) {
+  return this.client.delProject(projectId);
+};
+
+module.exports = ProjectService;
+</pre>
+</body>
+</html>

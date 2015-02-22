@@ -19,33 +19,37 @@
 
 var _ = require('underscore');
 var BBPromise = require('bluebird');
-var ItemRepository = require('../item/itemRepository');
+var ItemRepository = require('../itemRepository');
 
-<span id='postgresql-PostgresqlRepository'>/**
-</span> * @class postgresql.PostgresqlRepository
- * PostgresqlRepository
+<span id='storage-postgresql-PostgresqlRepository'>/**
+</span> * PostgresqlRepository 
  * 
- * @param {postgresql.PostgresqlAdapter}    adapter
- * @param {postgresql.PostgresqlSerializer} serializer
- * @param {schema.SchemaAdapter}            schemaAdapter
- * @param {item.ItemTransformer}            itemTransformer
+ * @class storage.postgresql.PostgresqlRepository
+ * @extends {storage.ItemRepository}
+ * 
+ * @param {storage.postgresql.PostgresqlAdapter}      adapter
+ * @param {storage.postgresql.PostgresqlSerializer}   serializer
+ * @param {project.blueprint.BlueprintService}        blueprintService
+ * @param {storage.ItemTransformer}                   itemTransformer
+ * @param {Validator}                                 validator
  */
-function PostgresqlRepository(adapter, serializer, schemaAdapter, itemTransformer) {
-  ItemRepository.call(this, schemaAdapter, itemTransformer);
+function PostgresqlRepository(adapter, serializer, blueprintService, itemTransformer, validator) {
+  ItemRepository.call(this, blueprintService, itemTransformer, validator);
   this.adapter = adapter;
   this.serializer = serializer;
 }
 
 PostgresqlRepository.prototype = Object.create(ItemRepository.prototype);
+PostgresqlRepository.prototype.constructor = PostgresqlRepository;
 
-<span id='postgresql-PostgresqlRepository-property-attachKey'>/**
+<span id='storage-postgresql-PostgresqlRepository-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-PostgresqlRepository.attachKey = 'postgresql.repository';
+PostgresqlRepository.attachKey = 'storage.postgresql.repository';
 
-<span id='postgresql-PostgresqlRepository-method-attach'>/**
+<span id='storage-postgresql-PostgresqlRepository-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
@@ -53,35 +57,37 @@ PostgresqlRepository.attachKey = 'postgresql.repository';
  */
 PostgresqlRepository.attach = function(app) {
   return BBPromise.join(
-    app.get('postgresql.adapter'),
-    app.get('postgresql.serializer'),
-    app.get('schema.adapter'),
-    app.get('item.transformer')
-  ).spread(function (adapter, serializer, schemaAdapter, itemTransformer) {
-    return new PostgresqlRepository(adapter, serializer, schemaAdapter, itemTransformer);
+    app.get('storage.postgresql.adapter'),
+    app.get('storage.postgresql.serializer'),
+    app.get('project.blueprint.facade'),
+    app.get('storage.itemtransformer'),
+    app.get('validator')
+  ).spread(function (adapter, serializer, blueprintService, itemTransformer, validator) {
+    return new PostgresqlRepository(adapter, serializer, blueprintService, itemTransformer, validator);
   });
 };
 
-<span id='postgresql-PostgresqlRepository-method-putItem'>/**
+<span id='storage-postgresql-PostgresqlRepository-method-putItem'>/**
 </span> * Insert / update item
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} item
  *
  * @return {BBPromise}
  */
-PostgresqlRepository.prototype.putItem = function (namespace, schemaKey, item) {
+PostgresqlRepository.prototype.putItem = function (projectId, blueprintId, id, item) {
   var self = this;
   var opts = {
+    id: id,
     item: item
   };
 
-  return this._validatePutItem(namespace, schemaKey, item)
-    .then(function (schema) {
-      opts.schema = schema;
-      opts.client = self.adapter.getClient(namespace, item.version);
-      return self.serializer.serialize(namespace, schemaKey, item);
+  return this._validatePutItem(projectId, blueprintId, id, item)
+    .then(function (blueprint) {
+      opts.blueprint = blueprint;
+      opts.client = self.adapter.getClient(projectId, item.project_version);
+      return self.serializer.serialize(projectId, blueprintId, item);
     })
     .then(function (compatibleItem) {
       opts.compatibleItem = compatibleItem;
@@ -96,91 +102,92 @@ PostgresqlRepository.prototype.putItem = function (namespace, schemaKey, item) {
     });
 };
 
-<span id='postgresql-PostgresqlRepository-method-delItem'>/**
+<span id='storage-postgresql-PostgresqlRepository-method-delItem'>/**
 </span> * Delete item
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {String} blueprintId
+ * @param  {Number} projectVersion
  * @param  {String} id
  *
  * @return {BBPromise}
  */
-PostgresqlRepository.prototype.delItem = function (namespace, schemaKey, version, id) {
-  var self = this;
+PostgresqlRepository.prototype.delItem = function (projectId, blueprintId, id) {
+  return BBPromise.resolve();
+  
+  // var self = this;
 
-  return this._validateDelItem(namespace, schemaKey, id)
-    .then(function () {
-      var schemaClient = self.schemaAdapter.getClient(namespace);
-      return schemaClient.getSnapshot(version);
-    })
-    .then(function (snapshot) {
-      var schema = snapshot[schemaKey];
-      var table = schema.table;
-      var client = self.adapter.getClient(namespace, version);
+  // return this._validateDelItem(projectId, blueprintId, id)
+  //   .then(function () {
+  //     return self.blueprintService.getAllBlueprints(projectVersion);
+  //   })
+  //   .then(function (snapshot) {
+  //     var blueprint = snapshot[blueprintId];
+  //     var table = blueprint.postgresql.table;
+  //     var client = self.adapter.getClient(projectId, projectVersion);
 
-      return client
-        .table(table)
-        .where({
-          id: id
-        })
-        .del()
-        // triggers knex.js's promise strategy
-        .then(function () {});
-    });
+  //     return client
+  //       .table(table)
+  //       .where({
+  //         id: id
+  //       })
+  //       .del()
+  //       // triggers knex.js's promise strategy
+  //       .then(function () {});
+  //   });
 };
 
-<span id='postgresql-PostgresqlRepository-method-_itemExists'>/**
+<span id='storage-postgresql-PostgresqlRepository-method-_itemExists'>/**
 </span> * Checks if an item already exists in the database.
  * 
- * @param  {Object} opts        Options
- * @param  {Object} opts.schema Schema options
- * @param  {Object} opts.item   The item
+ * @param  {Object} opts            Options
+ * @param  {Object} opts.blueprint  Blueprint options
+ * @param  {Object} opts.item       The item
  * 
  * @return {BBPromise}   Promise resolving true or false (exists or doesn't exist).
  */
 PostgresqlRepository.prototype._itemExists = function (opts) {
-  return opts.client.table(opts.schema.table)
+  return opts.client.table(opts.blueprint.postgresql.table)
     .first()
     .where({
-      id: opts.item.id
+      id: opts.id
     })
     .then(function(row) {
       return !!row;
     });
 };
 
-<span id='postgresql-PostgresqlRepository-method-_updateItem'>/**
+<span id='storage-postgresql-PostgresqlRepository-method-_updateItem'>/**
 </span> * Updates an item in the database.
  * 
  * @param  {Object} opts                 Options
- * @param  {Object} opts.schema          Schema options
+ * @param  {Object} opts.blueprint       Blueprint options
  * @param  {Object} opts.item            The item
  * @param  {Object} opts.compatibleItem  The serialized item
  * 
  * @return {BBPromise}
  */
 PostgresqlRepository.prototype._updateItem = function (opts) {
-  return opts.client.table(opts.schema.table)
+  return opts.client.table(opts.blueprint.postgresql.table)
     .where({
-      id: opts.item.id
+      id: opts.id
     })
     .update(opts.compatibleItem)
     // triggers knex.js's promise strategy
     .then(function () {});
 };
 
-<span id='postgresql-PostgresqlRepository-method-_updateItem'>/**
+<span id='storage-postgresql-PostgresqlRepository-method-_insertItem'>/**
 </span> * Inserts a new item into the database.
  * 
  * @param  {Object} opts                 Options
- * @param  {Object} opts.schema          Schema options
+ * @param  {Object} opts.blueprint       Blueprint options
  * @param  {Object} opts.compatibleItem  The serialized item
  * 
  * @return {BBPromise}
  */
-PostgresqlRepository.prototype._updateItem = function (opts) {
-  return opts.client.table(opts.schema.table)
+PostgresqlRepository.prototype._insertItem = function (opts) {
+  return opts.client.table(opts.blueprint.postgresql.table)
     .insert(opts.compatibleItem)
     // triggers knex.js's promise strategy
     .then(function () {});

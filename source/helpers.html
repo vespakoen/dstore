@@ -35,6 +35,13 @@ module.exports = {
     return string.charAt(0).toUpperCase() + string.slice(1);
   },
 
+<span id='Helpers-method-serializeError'>  /**
+</span>   * Serializes an error.
+   * 
+   * @param  {Error} err
+   * 
+   * @return {Object} The serialized error
+   */
   serializeError: function (err) {
     var serialized = {};
     var storeKey = function (key) {
@@ -45,6 +52,13 @@ module.exports = {
     return serialized;
   },
 
+<span id='Helpers-method-unserializeError'>  /**
+</span>   * Unserializes an error.
+   * 
+   * @param  {Object} obj The serialized error
+   * 
+   * @return {Error} The unserialized error
+   */
   unserializeError: function (obj) {
     var err = new Error(obj.message);
 

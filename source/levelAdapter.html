@@ -19,10 +19,13 @@
 
 var level = require('level-party');
 var sublevel = require('level-sublevel');
+var BBPromise = require('bluebird');
+var mkdirp = BBPromise.promisify(require('mkdirp'));
 
-<span id='level-LevelAdapter'>/**
-</span> * @class level.LevelAdapter
- * LevelAdapter
+<span id='storage-level-LevelAdapter'>/**
+</span> * LevelAdapter
+ * 
+ * @class storage.level.LevelAdapter
  *
  * @param {String} path
  */
@@ -31,41 +34,49 @@ function LevelAdapter(path) {
   this.connections = {};
 }
 
-<span id='level-LevelAdapter-property-attachKey'>/**
+<span id='storage-level-LevelAdapter-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-LevelAdapter.attachKey = 'level.adapter';
+LevelAdapter.attachKey = 'storage.level.adapter';
 
-<span id='level-LevelAdapter-method-attach'>/**
+<span id='storage-level-LevelAdapter-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
  *
- * @return {BBPromise|Object} The object with resolved dependencies
+ * @return {storage.level.LevelAdapter} A LevelAdapter instance with resolved dependencies
  */
 LevelAdapter.attach = function(app) {
-  return new LevelAdapter(app.config.level.path);
+  return mkdirp(app.config.level.path)
+    .then(function () {
+      return new LevelAdapter(app.config.level.path);
+    });
 };
 
-<span id='level-LevelAdapter-method-getClient'>/**
+<span id='storage-level-LevelAdapter-method-getClient'>/**
 </span> * Get the level client.
  *
- * @param  {String} namespace
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
  *
- * @return {elasticsearch.ElasticsearchClient}
+ * @return {storage.elasticsearch.ElasticsearchClient}
  */
-LevelAdapter.prototype.getClient = function(namespace, version) {
-  if (!this.connections[namespace + version]) {
-    var options = {};
-    if (process.env.ENV === 'testing') {
-      options = { db: require('memdown') };
-    }
-    this.connections[namespace + version] = sublevel(level(this.path + '/' + namespace + 'v' + version, options));
+LevelAdapter.prototype.getClient = function(projectId, projectVersion) {
+  if (!this.connections[projectId + projectVersion]) {
+    this.connections[projectId + projectVersion] = sublevel(level(this.path + '/' + projectId + 'v' + projectVersion));
   }
-  return this.connections[namespace + version];
+  return this.connections[projectId + projectVersion];
+};
+
+<span id='storage-level-LevelAdapter-method-closeConnections'>/**
+</span> * Closes all connections
+ */
+LevelAdapter.prototype.closeConnections = function() {
+  Object.keys(this.connections).forEach(function (connectionKey) {
+    this.connections[connectionKey].close();
+  }, this);
 };
 
 module.exports = LevelAdapter;

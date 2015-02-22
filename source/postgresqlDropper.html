@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">'use strict';
+
+var _ = require('underscore');
+var pg = require('pg');
+var help = require('../../helpers');
+var BBPromise = require('bluebird');
+BBPromise.promisifyAll(pg);
+
+<span id='storage-postgresql-PostgresqlDropper'>/**
+</span> * PostgresqlDropper
+ * 
+ * @class storage.postgresql.PostgresqlDropper
+ * 
+ * @param {Object} config
+ * @param {project.service} projectService
+ */
+function PostgresqlDropper(config, projectService) {
+  this.config = config;
+  this.projectService = projectService;
+}
+
+<span id='storage-postgresql-PostgresqlDropper-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
+PostgresqlDropper.attachKey = 'storage.postgresql.dropper';
+
+<span id='storage-postgresql-PostgresqlDropper-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ * @return {BBPromise} A PostgresqlDropper instance with resolved dependencies
+ */
+PostgresqlDropper.attach = function(app) {
+  var config = app.config.postgresql;
+  return app.get('project.service')
+    .then(function (projectService) {
+      return new PostgresqlDropper(config, projectService);
+    });
+};
+
+<span id='storage-postgresql-PostgresqlDropper-method-drop'>/**
+</span> * Create / migrate database.
+ *
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
+ *
+ * @return {BBPromise.&lt;undefined&gt;}
+ */
+PostgresqlDropper.prototype.drop = function(projectId) {
+  var self = this;
+  var opts = {
+    projectId: projectId,
+    connectionString: 'postgresql://' + this.config.username + ':' + this.config.password + '@' + this.config.host + '/postgres'
+  };
+
+  return self._getConnection(opts)
+    .then(function (client) {
+      opts.client = client;
+      return self.projectService.getProjectVersion(projectId);
+    })
+    .then(function (projectVersion) {
+      if (_.isNumber(projectVersion)) {
+        var versions = _.range(1, projectVersion + 1);
+
+        return BBPromise.all(_.map(versions, function (version) {
+          return opts.client.queryAsync(&quot;SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '&quot; + projectId + &quot;v&quot; + version + &quot;'&quot;)
+            .then(function () {
+              return opts.client.queryAsync('DROP DATABASE ' + projectId + 'v' + version);
+            })
+            .catch(function (err) {
+              console.log('Error while dropping db', err);
+              // db doesn't exist
+              // noop
+            });
+        }));
+      }
+    });
+};
+
+PostgresqlDropper.prototype._getConnection = function (opts) {
+  var self = this;
+  return pg.connectAsync(opts.connectionString)
+    .spread(function(client, done) {
+      self.connectionCloser = done;
+      return client;
+    });
+};
+
+PostgresqlDropper.prototype.closeConnection = function () {
+  if (this.connectionCloser) {
+    this.connectionCloser();
+  }
+};
+
+module.exports = PostgresqlDropper;
+
+
+</pre>
+</body>
+</html>

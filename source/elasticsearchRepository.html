@@ -19,33 +19,37 @@
 
 var _ = require('underscore');
 var BBPromise = require('bluebird');
-var ItemRepository = require('../item/itemRepository');
+var ItemRepository = require('../itemRepository');
 
-<span id='elasticsearch-ElasticsearchReposirory'>/**
-</span> * @class elasticsearch.ElasticsearchReposirory
- * ElasticsearchRepository
+<span id='storage-elasticsearch-ElasticsearchReposirory'>/**
+</span> * ElasticsearchRepository
  * 
- * @param {elasticsearch.ElasticsearchSerializer} serializer
- * @param {elasticsearch.ElasticsearchClient}     client
- * @param {schema.SchemaAdapter}                  schemaAdapter
- * @param {item.ItemTransformer}                  itemTransformer
+ * @class storage.elasticsearch.ElasticsearchReposirory
+ * @extends {storage.ItemRepository}
+ * 
+ * @param {storage.elasticsearch.ElasticsearchSerializer} serializer
+ * @param {storage.elasticsearch.ElasticsearchClient}     client
+ * @param {project.blueprint.BlueprintService}            blueprintService
+ * @param {storage.ItemTransformer}                       itemTransformer
+ * @param {Validator}                                     validator
  */
-function ElasticsearchRepository(serializer, client, schemaAdapter, itemTransformer) {
-  ItemRepository.call(this, schemaAdapter, itemTransformer);
+function ElasticsearchRepository(serializer, client, blueprintService, itemTransformer, validator) {
+  ItemRepository.call(this, blueprintService, itemTransformer, validator);
   this.serializer = serializer;
   this.client = client;
 }
 
 ElasticsearchRepository.prototype = Object.create(ItemRepository.prototype);
+ElasticsearchRepository.prototype.constructor = ElasticsearchRepository;
 
-<span id='elasticsearch-ElasticsearchReposirory-property-attachKey'>/**
+<span id='storage-elasticsearch-ElasticsearchReposirory-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-ElasticsearchRepository.attachKey = 'elasticsearch.repository';
+ElasticsearchRepository.attachKey = 'storage.elasticsearch.repository';
 
-<span id='elasticsearch-ElasticsearchReposirory-method-attach'>/**
+<span id='storage-elasticsearch-ElasticsearchReposirory-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
@@ -54,63 +58,65 @@ ElasticsearchRepository.attachKey = 'elasticsearch.repository';
  */
 ElasticsearchRepository.attach = function (app) {
   return BBPromise.join(
-    app.get('elasticsearch.serializer'),
-    app.get('elasticsearch.client'),
-    app.get('schema.adapter'),
-    app.get('item.transformer')
-  ).spread(function (serializer, client, schemaAdapter, itemTransformer) {
-    return new ElasticsearchRepository(serializer, client, schemaAdapter, itemTransformer);
+    app.get('storage.elasticsearch.serializer'),
+    app.get('storage.elasticsearch.client'),
+    app.get('project.blueprint.service'),
+    app.get('storage.itemtransformer'),
+    app.get('validator')
+  ).spread(function (serializer, client, blueprintService, itemTransformer, validator) {
+    return new ElasticsearchRepository(serializer, client, blueprintService, itemTransformer, validator);
   });
 };
 
-<span id='elasticsearch-ElasticsearchReposirory-method-putItem'>/**
+<span id='storage-elasticsearch-ElasticsearchReposirory-method-putItem'>/**
 </span> * Insert / update item.
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} item
  *
  * @return {BBPromise}
  */
-ElasticsearchRepository.prototype.putItem = function (namespace, schemaKey, item) {
+ElasticsearchRepository.prototype.putItem = function (projectId, blueprintId, id, item) {
   var self = this;
   var memo = {};
 
-  return this._validatePutItem(namespace, schemaKey, item)
-    .then(function (schema) {
-      memo.schema = schema;
+  return this._validatePutItem(projectId, blueprintId, id, item)
+    .then(function (blueprint) {
+      memo.blueprint = blueprint;
        // serialize the item
-      return self.serializer.serialize(namespace, schemaKey, item);
+      return self.serializer.serialize(projectId, blueprintId, item);
     })
     .then(function(compatibleItem) {
       // index the item
       return self.client.index({
-        index: namespace + 'v' + item.version,
-        type: memo.schema.es_type,
-        id: compatibleItem.id,
+        index: projectId + 'v' + item.project_version,
+        type: memo.blueprint.elasticsearch.type,
+        id: id,
         body: compatibleItem
       });
     });
 };
 
-<span id='elasticsearch-ElasticsearchReposirory-method-delItem'>/**
+<span id='storage-elasticsearch-ElasticsearchReposirory-method-delItem'>/**
 </span> * Delete item.
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
+ * @param  {Number} projectVersion
  * @param  {Object} id
  *
  * @return {BBPromise}
  */
-ElasticsearchRepository.prototype.delItem = function (namespace, schemaKey, version, id) {
+ElasticsearchRepository.prototype.delItem = function (projectId, blueprintId, id) {
   var self = this;
 
-  return this._validateDelItem(namespace, schemaKey, id)
+  return this._validateDelItem(projectId, blueprintId, id)
     .then(function () {
       // delete the item
       return self.client.delete({
-        index: namespace + 'v' + version,
-        type: schemaKey,
+        index: projectId + 'v' + projectVersion,
+        type: blueprintId,
         id: id
       });
     });

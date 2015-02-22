@@ -19,51 +19,57 @@
 
 var _ = require('underscore');
 var BBPromise = require('bluebird');
-var ItemSerializer = require('../item/itemSerializer');
+var ItemSerializer = require('../itemSerializer');
 
-<span id='level-LevelSerializer'>/**
-</span> * @class level.LevelSerializer
- * @extends {Serializer}
+<span id='storage-level-LevelSerializer'>/**
+</span> * LevelSerializer
  *
- * LevelSerializer
+ * @class storage.level.LevelSerializer
+ * @extends {storage.ItemSerializer}
+ * 
+ * @param {project.blueprint.BlueprintService} blueprintService
  */
-function LevelSerializer() {}
+function LevelSerializer(blueprintService) {
+  ItemSerializer.call(this, blueprintService);
+}
 
-<span id='level-LevelSerializer-property-attachKey'>/**
+LevelSerializer.prototype = Object.create(ItemSerializer.prototype);
+LevelSerializer.prototype.constructor = LevelSerializer;
+
+<span id='storage-level-LevelSerializer-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-LevelSerializer.attachKey = 'level.serializer';
+LevelSerializer.attachKey = 'storage.level.serializer';
 
-<span id='level-LevelSerializer-method-attach'>/**
+<span id='storage-level-LevelSerializer-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
  * @return {BBPromise|Object} A LevelSerializer instance with resolved dependencies.
  */
 LevelSerializer.attach = function(app) {
-  return new LevelSerializer();
+  return app.get('project.blueprint.service')
+    .then(function(blueprintService) {
+      return new LevelSerializer(blueprintService);
+    });
 };
 
 LevelSerializer.prototype = Object.create(ItemSerializer.prototype);
+LevelSerializer.prototype.constructor = LevelSerializer;
 
-<span id='level-LevelSerializer-method-serialize'>/**
+<span id='storage-level-LevelSerializer-method-serialize'>/**
 </span> * Serialize item for leveldb
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} item
  *
  * @return {Object} The serialized item
  */
-LevelSerializer.prototype.serialize = function(namespace, schemaKey, item) {
-  var self = this;
-
-  return new BBPromise(function(resolve) {
-    item.links = _.uniq(item.links || []);
-    resolve(self._sortKeys(item));
-  });
+LevelSerializer.prototype.serialize = function(projectId, blueprintId, item) {
+  return this._serializeItem(projectId, blueprintId, item);
 };
 
 module.exports = LevelSerializer;

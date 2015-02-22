@@ -19,24 +19,25 @@
 
 var _ = require('underscore');
 
-<span id='item-ItemTransformer'>/**
-</span> * @class item.ItemTransformer
- * ItemTransformer
+<span id='storage-ItemTransformer'>/**
+</span> * ItemTransformer
  * 
- * @param {schema.SchemaAdapter} schemaAdapter
+ * @class storage.ItemTransformer
+ * 
+ * @param {project.blueprint.BlueprintService} blueprintService
  */
-function ItemTransformer(schemaAdapter) {
-  this.schemaAdapter = schemaAdapter;
+function ItemTransformer(blueprintService) {
+  this.blueprintService = blueprintService;
 }
 
-<span id='item-ItemTransformer-property-attachKey'>/**
+<span id='storage-ItemTransformer-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-ItemTransformer.attachKey = 'item.transformer';
+ItemTransformer.attachKey = 'storage.itemtransformer';
 
-<span id='item-ItemTransformer-method-attach'>/**
+<span id='storage-ItemTransformer-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
@@ -44,33 +45,33 @@ ItemTransformer.attachKey = 'item.transformer';
  * @return {BBPromise} An ItemTransformer instance with resolved dependencies.
  */
 ItemTransformer.attach = function (app) {
-  return app.get('schema.adapter')
-    .then(function (schemaAdapter) {
-      return new ItemTransformer(schemaAdapter);
+  return app.get('project.blueprint.service')
+    .then(function (blueprintService) {
+      return new ItemTransformer(blueprintService);
     });
 };
 
-ItemTransformer.prototype.transform = function(namespace, schemaKey, item, version) {
+ItemTransformer.prototype.transform = function(projectId, blueprintId, item, projectVersion) {
   var self = this;
   item = _.clone(item);
-  var schemaClient = this.schemaAdapter.getClient(namespace);
-  return schemaClient.getChangesBetween(item.version, version).then(function(changes) {
-    return self._applyChanges(changes, schemaKey, item);
-  });
+  return this.blueprintService.getChangesBetween(projectId, item.project_version, projectVersion)
+    .then(function(changes) {
+      return self._applyChanges(changes, blueprintId, item);
+    });
 };
 
-ItemTransformer.prototype._applyChanges = function(changes, schemaKey, item) {
+ItemTransformer.prototype._applyChanges = function(changes, blueprintId, item) {
   _.each(changes, function(change) {
-    if (change.schema !== schemaKey) {
+    if (change.blueprint !== blueprintId) {
       return;
     }
 
     switch (change.type) {
       case 'snapshot.create':
-        item.version = change.value;
+        item.project_version = change.value;
         break;
-      case 'schema.rename':
-        schemaKey = change.value;
+      case 'blueprint.rename':
+        blueprintId = change.value;
         break;
       case 'column.create':
         item[change.column] = undefined;
@@ -91,25 +92,30 @@ ItemTransformer.prototype._applyChanges = function(changes, schemaKey, item) {
   }, this);
 
   return {
-    schemaKey: schemaKey,
+    blueprintId: blueprintId,
     item: item
   };
 };
 
 ItemTransformer.prototype._transformTypeOfItem = function(value, fromType, toType) {
+  // stringify if possible
   if (toType === 'string') {
-    if (value === undefined) {
-      return undefined;
+    if (value === null) {
+      return null;
     }
+
     if (_.isDate(value)) {
       return value.toString();
     }
+
     if (_.isObject(value) || _.isArray(value)) {
       return JSON.stringify(value);
     }
+
     return &quot;&quot; + value;
   }
-  return value;
+
+  return null;
 };
 
 module.exports = ItemTransformer;

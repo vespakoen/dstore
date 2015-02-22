@@ -19,10 +19,11 @@
 
 var knex = require('knex');
 
-<span id='postgresql-PostgresqlAdapter'>/**
-</span> * @class postgresql.PostgresqlAdapter
+<span id='storage-postgresql-PostgresqlAdapter'>/**
+</span> * PostgresqlAdapter
  * 
- * PostgresqlAdapter
+ * @class storage.postgresql.PostgresqlAdapter
+ * 
  * @param {Object} config The postgresql connection configuration
  */
 function PostgresqlAdapter(config) {
@@ -30,14 +31,14 @@ function PostgresqlAdapter(config) {
   this.connections = {};
 }
 
-<span id='postgresql-PostgresqlAdapter-property-attachKey'>/**
+<span id='storage-postgresql-PostgresqlAdapter-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-exports.attachKey = 'postgresql.adapter';
+exports.attachKey = 'storage.postgresql.adapter';
 
-<span id='postgresql-PostgresqlAdapter-method-attach'>/**
+<span id='storage-postgresql-PostgresqlAdapter-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
@@ -47,28 +48,37 @@ exports.attach = function(app) {
   return new PostgresqlAdapter(app.config.postgresql);
 };
 
-<span id='postgresql-PostgresqlAdapter-method-getClient'>/**
+<span id='storage-postgresql-PostgresqlAdapter-method-getClient'>/**
 </span> * Get the postgresql client.
  *
- * @param  {String} namespace
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
  *
- * @return {postgresql.PostgresqlClient}
+ * @return {storage.postgresql.PostgresqlClient}
  */
-PostgresqlAdapter.prototype.getClient = function(namespace, version) {
-  if (!this.connections[namespace + version]) {
+PostgresqlAdapter.prototype.getClient = function(projectId, projectVersion) {
+  if (!this.connections[projectId + projectVersion]) {
     var options = {
       client: 'postgresql',
       connection: {
         host: this.config.host,
         user: this.config.username,
         password: this.config.password,
-        database: namespace + (version ? 'v' + version : '')
+        database: projectId + (projectVersion ? 'v' + projectVersion : '')
       }
     };
-    this.connections[namespace + version] = knex(options);
+    this.connections[projectId + projectVersion] = knex(options);
   }
-  return this.connections[namespace + version];
+  return this.connections[projectId + projectVersion];
+};
+
+<span id='storage-postgresql-PostgresqlAdapter-method-closeConnections'>/**
+</span> * Closes all connections
+ */
+PostgresqlAdapter.prototype.closeConnections = function() {
+  Object.keys(this.connections).forEach(function (connectionKey) {
+    this.connections[connectionKey].destroy();
+  }, this);
 };
 </pre>
 </body>

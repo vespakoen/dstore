@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">var _ = require('underscore');
+
+var production = process.env.PRODUCTION ? true : false;
+
+module.exports = {
+  log: function (theme, args) {
+    if (production !== true) console.log.apply(console.log, ['[' + theme.toUpperCase() + '] -'].concat(args));
+  },
+  info: function () {
+    var args = Array.prototype.slice.call(arguments);
+    this.log('info', args);
+  },
+  warn: function () {
+    var args = Array.prototype.slice.call(arguments);
+    this.log('warn', args);
+  },
+  error: function () {
+    var args = Array.prototype.slice.call(arguments);
+    this.log('error', args);
+  },
+  debug: function () {
+    var args = Array.prototype.slice.call(arguments);
+    this.log('debug', args);
+  }
+};
+</pre>
+</body>
+</html>

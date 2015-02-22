@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">var tv4 = require('tv4');
+var _ = require('underscore');
+
+function Validator(schemas) {
+  this.schemas = [];
+  _.each(schemas, this.addSchema, this);
+}
+
+Validator.prototype.addSchema = function (schema) {
+  this.schemas.push(schema);
+  tv4.addSchema(schema.id, schema);
+};
+
+Validator.prototype.validate = function (data, schemaId) {
+  var schema = _.first(_.where(this.schemas, {id: schemaId}));
+  if ( ! schema) {
+    throw new Error('Schema &quot;' + schemaId + '&quot; not found!');
+  }
+  
+  var result = tv4.validateMultiple(data, schema);
+  
+  if ( ! result.valid) {
+    var err = new Error('Error while validating ' + schemaId);
+    err.errors = _.map(result.errors, function (err) {
+      return err.message + ' at path ' + err.dataPath;
+    });
+    
+    return {
+      valid: false,
+      err: err
+    };
+  }
+
+  return { valid: true };
+};
+
+Validator.attachKey = 'validator';
+
+Validator.attach = function (app) {
+  return new Validator(app.schemas);
+};
+
+module.exports = Validator;
+</pre>
+</body>
+</html>

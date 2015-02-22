@@ -19,28 +19,27 @@
 
 var _ = require('underscore');
 var BBPromise = require('bluebird');
-var help = require('../helpers');
+var help = require('../../helpers');
 
-<span id='elasticsearch-ElasticsearchMigrator'>/**
-</span> * @class elasticsearch.ElasticsearchMigrator
- * ElasticsearchMigrator
+<span id='storage-elasticsearch-ElasticsearchMigrator'>/**
+</span> * ElasticsearchMigrator
+ * 
+ * @class storage.elasticsearch.ElasticsearchMigrator
  *
- * @param {elasticsearch.ElasticsearchClient} client
- * @param {schema.SchemaAdapter} schemaAdapter
+ * @param {storage.elasticsearch.ElasticsearchClient} client
  */
-function ElasticsearchMigrator(client, schemaAdapter) {
+function ElasticsearchMigrator(client) {
   this.client = client;
-  this.schemaAdapter = schemaAdapter;
 }
 
-<span id='elasticsearch-ElasticsearchMigrator-property-attachKey'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-property-attachKey'>/**
 </span> * IOC attachKey
  *
  * @type {String}
  */
-ElasticsearchMigrator.attachKey = 'elasticsearch.migrator';
+ElasticsearchMigrator.attachKey = 'storage.elasticsearch.migrator';
 
-<span id='elasticsearch-ElasticsearchMigrator-method-attach'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-attach'>/**
 </span> * IOC attach
  *
  * @param {App} app
@@ -48,40 +47,38 @@ ElasticsearchMigrator.attachKey = 'elasticsearch.migrator';
  * @return {BBPromise|Object} The object with resolved dependencies
  */
 ElasticsearchMigrator.attach = function(app) {
-  return BBPromise.join(
-    app.get('elasticsearch.client'),
-    app.get('schema.adapter')
-  ).spread(function(client, schemaAdapter) {
-    return new ElasticsearchMigrator(client, schemaAdapter);
-  });
-};
-
-<span id='elasticsearch-ElasticsearchMigrator-method-migrate'>/**
-</span> * Create a new elasticsearch index version and put the mapping.
- *
- * @param  {String} namespace
- * @param  {Number} version
- *
- * @return {BBPromise.&lt;undefined&gt;}
- */
-ElasticsearchMigrator.prototype.migrate = function(namespace, version) {
-  var self = this;
-  var opts = {
-    index: namespace + 'v' + version
-  };
-
-  var schemaClient = this.schemaAdapter.getClient(namespace);
-  return schemaClient.getSnapshot(version)
-    .then(function (schemas) {
-      opts.schemas = schemas;
-      return self._createIndex(opts);
-    })
-    .then(function () {
-      return self._putMapping(opts);
+  return app.get('storage.elasticsearch.client')
+    .then(function(client) {
+      return new ElasticsearchMigrator(client);
     });
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_createIndex'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-migrate'>/**
+</span> * Create a new elasticsearch index and put the mapping.
+ *
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
+ *
+ * @return {BBPromise}
+ */
+ElasticsearchMigrator.prototype.migrate = function(projectId, projectVersion, blueprints) {
+  var self = this;
+  var opts = {
+    index: projectId + 'v' + projectVersion,
+    projectId: projectId,
+    blueprints: blueprints
+  };
+
+  return self._createIndex(opts)
+    .then(function () {
+      return self._putMapping(opts);
+    })
+    .then(function () {
+      return self._updateAlias(opts);
+    });
+};
+
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_createIndex'>/**
 </span> * Create a new elasticsearch index.
  *
  * @protected
@@ -105,12 +102,12 @@ ElasticsearchMigrator.prototype._createIndex = function(opts) {
   });
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_putMapping'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_putMapping'>/**
 </span> * Create and put a mapping.
  *
  * @protected
  * @param opts
- * @param opts.schemas  The schemas to turn into a mapping
+ * @param opts.blueprints  The blueprints to turn into a mapping
  * @param opts.index    The index to put the mapping to
  *
  * @return {BBPromise.&lt;undefined&gt;}
@@ -118,26 +115,26 @@ ElasticsearchMigrator.prototype._createIndex = function(opts) {
 ElasticsearchMigrator.prototype._putMapping = function (opts) {
   var self = this;
 
-  var promises = _.map(opts.schemas, function(schema, schemaKey) {
+  var promises = _.map(opts.blueprints, function(blueprint, blueprintId) {
     var mapping = {};
 
-    mapping[schemaKey] = {
+    mapping[blueprintId] = {
       _id: {path: 'id'},
       properties: {}
     };
 
-    _.each(schema.columns, function(column, columnKey) {
-      self['_define' + help.capitalizeFirstLetter(column.type)](mapping, schemaKey, column, columnKey);
+    _.each(blueprint.columns, function(column, columnKey) {
+      mapping[blueprintId].properties[columnKey] = self['_define' + help.capitalizeFirstLetter(column.type).replace('[]', '')](column);
 
-      // if extra options are given for elasticsearch, mix them in
+      // if extra options are given for elasticsearch, use those instead
       if (column.elasticsearch) {
-        _.extend(mapping[schemaKey].properties[columnKey], column.elasticsearch);
+        mapping[blueprintId].properties[columnKey] = column.elasticsearch;
       }
     });
 
     return this.client.indices.putMapping({
       index: opts.index,
-      type: schemaKey,
+      type: blueprintId,
       body: mapping
     });
   }, this);
@@ -145,193 +142,151 @@ ElasticsearchMigrator.prototype._putMapping = function (opts) {
   return BBPromise.all(promises);
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineUuid'>/**
+ElasticsearchMigrator.prototype._updateAlias = function (opts) {
+  return this.client.indices.putAlias({
+    index: opts.index,
+    name: opts.projectId
+  });
+};
+
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineUuid'>/**
 </span> * Define a uuid mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._defineUuid = function (mapping, schemaKey, column, columnKey) {
-  return this._defineString(mapping, schemaKey, column, columnKey);
+ElasticsearchMigrator.prototype._defineUuid = function () {
+  return this._defineString();
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineText'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineText'>/**
 </span> * Define a text mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._defineText = function (mapping, schemaKey, column, columnKey) {
-  return this._defineString(mapping, schemaKey, column, columnKey);
+ElasticsearchMigrator.prototype._defineText = function () {
+  return this._defineString();
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineString'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineString'>/**
 </span> * Define a string mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._defineString = function (mapping, schemaKey, column, columnKey) {
-  mapping[schemaKey].properties[columnKey] = {
+ElasticsearchMigrator.prototype._defineString = function () {
+  return {
     type: 'string',
     index: 'not_analyzed'
   };
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_definePoint'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_definePoint'>/**
 </span> * Define a point mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._definePoint = function (mapping, schemaKey, column, columnKey) {
-  mapping[schemaKey].properties[columnKey] = {
+ElasticsearchMigrator.prototype._definePoint = function () {
+  return {
     type: 'geo_point'
   };
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineLinestring'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineLinestring'>/**
 </span> * Define a linestring mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._defineLinestring = function (mapping, schemaKey, column, columnKey) {
-  return this._defineShape(mapping, schemaKey, column, columnKey);
+ElasticsearchMigrator.prototype._defineLinestring = function () {
+  return this._defineShape();
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineRectangle'>/**
-</span> * Define a rectangle mapping.
- *
- * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
- */
-ElasticsearchMigrator.prototype._defineRectangle = function (mapping, schemaKey, column, columnKey) {
-  return this._defineShape(mapping, schemaKey, column, columnKey);
-};
-
-<span id='elasticsearch-ElasticsearchMigrator-method-_definePolygon'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_definePolygon'>/**
 </span> * Define a polygon mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._definePolygon = function (mapping, schemaKey, column, columnKey) {
-  return this._defineShape(mapping, schemaKey, column, columnKey);
+ElasticsearchMigrator.prototype._definePolygon = function () {
+  return this._defineShape();
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineShape'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineShape'>/**
 </span> * Define a shape mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._defineShape = function (mapping, schemaKey, column, columnKey) {
-  mapping[schemaKey].properties[columnKey] = {
+ElasticsearchMigrator.prototype._defineShape = function () {
+  return {
     type: 'geo_shape',
     tree: 'quadtree',
     precision: '10m'
   };
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineDate'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineDate'>/**
 </span> * Define a date mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._defineDate = function (mapping, schemaKey, column, columnKey) {
-  mapping[schemaKey].properties[columnKey] = {
+ElasticsearchMigrator.prototype._defineDate = function () {
+  return {
     type: 'date',
     format: 'yyyy-MM-dd'
   };
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineDatetime'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineDatetime'>/**
 </span> * Define a datetime mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._defineDatetime = function (mapping, schemaKey, column, columnKey) {
-  mapping[schemaKey].properties[columnKey] = {
+ElasticsearchMigrator.prototype._defineDatetime = function () {
+  return {
     type: 'date',
     format: 'yyyy-MM-dd HH:mm:ss'
   };
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineFloat'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineFloat'>/**
 </span> * Define a float mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._defineFloat = function (mapping, schemaKey, column, columnKey) {
-  mapping[schemaKey].properties[columnKey] = {
+ElasticsearchMigrator.prototype._defineFloat = function () {
+  return {
     type: 'float'
   };
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineInteger'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineInteger'>/**
 </span> * Define a integer mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._defineInteger = function (mapping, schemaKey, column, columnKey) {
-  mapping[schemaKey].properties[columnKey] = {
+ElasticsearchMigrator.prototype._defineInteger = function () {
+  return {
     type: 'integer'
   };
 };
 
-<span id='elasticsearch-ElasticsearchMigrator-method-_defineBoolean'>/**
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineBoolean'>/**
 </span> * Define a boolean mapping.
  *
  * @protected
- * @param  {Object} mapping
- * @param  {String} schemaKey
- * @param  {Object} column
- * @param  {String} columnKey
  */
-ElasticsearchMigrator.prototype._defineBoolean = function (mapping, schemaKey, column, columnKey) {
-  mapping[schemaKey].properties[columnKey] = {
+ElasticsearchMigrator.prototype._defineBoolean = function () {
+  return {
     type: 'boolean'
+  };
+};
+
+<span id='storage-elasticsearch-ElasticsearchMigrator-method-_defineJson'>/**
+</span> * Define a json mapping.
+ *
+ * @protected
+ */
+ElasticsearchMigrator.prototype._defineJson = function () {
+  return {
+    type: 'object',
+    enabled: false
   };
 };
 

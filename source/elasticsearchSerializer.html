@@ -19,28 +19,31 @@
 
 var _ = require('underscore');
 var moment = require('moment');
-var ItemSerializer = require('../item/itemSerializer');
+var ItemSerializer = require('../itemSerializer');
 
-<span id='elasticsearch-ElasticsearchSerializer'>/**
-</span> * @class elasticsearch.ElasticsearchSerializer
- * @extends {item.ItemSerializer}
+<span id='storage-elasticsearch-ElasticsearchSerializer'>/**
+</span> * ElasticsearchSerializer
  * 
- * ElasticsearchSerializer
+ * @class storage.elasticsearch.ElasticsearchSerializer
+ * @extends {storage.ItemSerializer}
+ * 
+ * @param {storage.blueprint.BlueprintService} blueprintService
  */
-function ElasticsearchSerializer(schemaAdapter) {
-  ItemSerializer.call(this, schemaAdapter);
+function ElasticsearchSerializer(blueprintService) {
+  ItemSerializer.call(this, blueprintService);
 }
 
 ElasticsearchSerializer.prototype = Object.create(ItemSerializer.prototype);
+ElasticsearchSerializer.prototype.constructor = ElasticsearchSerializer;
 
-<span id='elasticsearch-ElasticsearchSerializer-property-attachKey'>/**
+<span id='storage-elasticsearch-ElasticsearchSerializer-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-ElasticsearchSerializer.attachKey = 'elasticsearch.serializer';
+ElasticsearchSerializer.attachKey = 'storage.elasticsearch.serializer';
 
-<span id='elasticsearch-ElasticsearchSerializer-method-attach'>/**
+<span id='storage-elasticsearch-ElasticsearchSerializer-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
@@ -48,64 +51,46 @@ ElasticsearchSerializer.attachKey = 'elasticsearch.serializer';
  * @return {BBPromise} An ElasticsearchSerializer instance with resolved dependencies.
  */
 ElasticsearchSerializer.attach = function(app) {
-  return app.get('schema.adapter').then(function(schemaAdapter) {
-    return new ElasticsearchSerializer(schemaAdapter);
-  });
+  return app.get('project.blueprint.service')
+    .then(function(blueprintService) {
+      return new ElasticsearchSerializer(blueprintService);
+    });
 };
 
 
-<span id='elasticsearch-ElasticsearchSerializer-method-serialize'>/**
+<span id='storage-elasticsearch-ElasticsearchSerializer-method-serialize'>/**
 </span> * Serialize item for elasticsearch.
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} item
  * @return {Object} The serialized item
  */
-ElasticsearchSerializer.prototype.serialize = function(namespace, schemaKey, item) {
-  return this._serializeItem(namespace, schemaKey, item);
+ElasticsearchSerializer.prototype.serialize = function(projectId, blueprintId, item) {
+  return this._serializeItem(projectId, blueprintId, item);
 };
 
-<span id='elasticsearch-ElasticsearchSerializer-method-_serializePoint'>/**
+<span id='storage-elasticsearch-ElasticsearchSerializer-method-_serializePoint'>/**
 </span> * Serialize a point.
  *
  * @protected
  * @param  {string} value
  */
 ElasticsearchSerializer.prototype._serializePoint = function(value) {
-  if (_.isString(value)) {
-    value = JSON.parse(value);
-  }
   if (!value || !value.coordinates) {
-    return undefined;
+    return null;
   }
   return value.coordinates;
 };
 
-<span id='elasticsearch-ElasticsearchSerializer-method-_serializeLinestring'>/**
-</span> * Serialize a linestring.
+<span id='storage-elasticsearch-ElasticsearchSerializer-method-_serializePointArray'>/**
+</span> * Serialize a point.
  *
  * @protected
  * @param  {string} value
  */
-ElasticsearchSerializer.prototype._serializeLinestring = function(value) {
-  if (_.isString(value)) {
-    value = JSON.parse(value);
-  }
-  return value;
-};
-
-<span id='elasticsearch-ElasticsearchSerializer-method-_serializeRectangle'>/**
-</span> * Serialize a rectangle.
- *
- * @protected
- * @param  {string} value
- */
-ElasticsearchSerializer.prototype._serializeRectangle = function(value) {
-  if (_.isString(value)) {
-    value = JSON.parse(value);
-  }
-  return value;
+ElasticsearchSerializer.prototype._serializePointArray = function(value) {
+  return this._serializePoint(value);
 };
 
 module.exports = ElasticsearchSerializer;

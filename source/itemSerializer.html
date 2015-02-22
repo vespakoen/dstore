@@ -22,49 +22,51 @@ var _ = require('underscore');
 var moment = require('moment');
 var help = require('../helpers');
 
-<span id='item-ItemSerializer'>/**
-</span> * @class item.ItemSerializer
- * Base class for other serializers
+<span id='storage-ItemSerializer'>/**
+</span> * Base class for other serializers
+ * 
+ * @class storage.ItemSerializer
  *
- * @param {schema.SchemaAdapter} schemaAdapter
+ * @param {project.blueprint.BlueprintService} blueprintService
  */
-function ItemSerializer(schemaAdapter) {
-  this.schemaAdapter = schemaAdapter;
+function ItemSerializer(blueprintService) {
+  this.blueprintService = blueprintService;
 }
 
-<span id='item-ItemSerializer-method-_serializeItem'>/**
+<span id='storage-ItemSerializer-method-_serializeItem'>/**
 </span> * Serialize an item.
  *
  * @protected
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} item
  * @return {Object} The serialized item
  */
-ItemSerializer.prototype._serializeItem = function (namespace, schemaKey, item) {
+ItemSerializer.prototype._serializeItem = function (projectId, blueprintId, item) {
   var self = this;
 
-  var schemaClient = this.schemaAdapter.getClient(namespace);
-  return schemaClient.getSnapshot(item.version).then(function(schemas) {
-    var column;
-    var schema = schemas[schemaKey];
-    var columns = schema.columns;
-    
-    Object.keys(item).forEach(function (key) {
-      if (columns[key]) {
-        column = columns[key];
-        var method = '_serialize' + help.capitalizeFirstLetter(column.type).replace('[]', 'Array');
-        if (self[method]) {
-          item[key] = self[method](item[key]);
+  return this.blueprintService.getBlueprint(projectId, blueprintId, item.project_version)
+    .then(function(blueprint) {
+      var column;
+      var columns = blueprint.columns;
+      
+      Object.keys(item).forEach(function (key) {
+        if (columns[key]) {
+          column = columns[key];
+          var method = '_serialize' + help.capitalizeFirstLetter(column.type).replace('[]', 'Array');
+          if (self[method]) {
+            item[key] = self[method](item[key]);
+          }
         }
-      }
-    });
+      });
 
-    return item;
-  });
+      item.links = _.uniq(item.links || []);
+
+      return item;
+    });
 };
 
-<span id='item-ItemSerializer-method-_serializeString'>/**
+<span id='storage-ItemSerializer-method-_serializeString'>/**
 </span> * Serialize a string.
  *
  * @protected
@@ -72,12 +74,108 @@ ItemSerializer.prototype._serializeItem = function (namespace, schemaKey, item) 
  */
 ItemSerializer.prototype._serializeString = function(value) {
   if (value === &quot;&quot;) {
-    return undefined;
+    return null;
   }
   return value;
 };
 
-<span id='item-ItemSerializer-method-_dateStringToMoment'>/**
+<span id='storage-ItemSerializer-method-_serializeStringArray'>/**
+</span> * Serialize a string array.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeStringArray = function(value) {
+  return _.map(value, this._serializeString);
+};
+
+<span id='storage-ItemSerializer-method-_serializeText'>/**
+</span> * Serialize a text.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeText = function(value) {
+  if (value === &quot;&quot;) {
+    return null;
+  }
+  return value;
+};
+
+<span id='storage-ItemSerializer-method-_serializeTextArray'>/**
+</span> * Serialize a text array.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeTextArray = function(value) {
+  return _.map(value, this._serializeText);
+};
+
+<span id='storage-ItemSerializer-method-_serializeUuid'>/**
+</span> * Serialize a string.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeUuid = function(value) {
+  if (value === &quot;&quot;) {
+    return null;
+  }
+  return value;
+};
+
+<span id='storage-ItemSerializer-method-_serializeUuidArray'>/**
+</span> * Serialize a string.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeUuidArray = function(value) {
+  return _.map(value, this._serializeUuid);
+};
+
+<span id='storage-ItemSerializer-method-_serializeInteger'>/**
+</span> * Serialize an integer.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeInteger = function(value) {
+  return value;
+};
+
+<span id='storage-ItemSerializer-method-_serializeIntegerArray'>/**
+</span> * Serialize an integer array.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeIntegerArray = function(value) {
+  return _.map(value, this._serializeInteger, this);
+};
+
+<span id='storage-ItemSerializer-method-_serializeFloat'>/**
+</span> * Serialize a float.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeFloat = function(value) {
+  return value;
+};
+
+<span id='storage-ItemSerializer-method-_serializeFloatArray'>/**
+</span> * Serialize an float array.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeFloatArray = function(value) {
+  return _.map(value, this._serializeFloat, this);
+};
+
+<span id='storage-ItemSerializer-method-_dateStringToMoment'>/**
 </span> * Convert a date string to a date object.
  *
  * @protected
@@ -87,8 +185,8 @@ ItemSerializer.prototype._dateStringToMoment = function(value) {
   return moment(new Date(value));
 };
 
-<span id='item-ItemSerializer-method-_serializeDatetime'>/**
-</span> * Serialize a date string to a datetime.
+<span id='storage-ItemSerializer-method-_serializeDatetime'>/**
+</span> * Serialize a datetime string to a datetime.
  *
  * @protected
  * @param  {string} value
@@ -98,7 +196,17 @@ ItemSerializer.prototype._serializeDatetime = function(value) {
     .format('YYYY-MM-DD HH:mm:ss');
 };
 
-<span id='item-ItemSerializer-method-_serializeDate'>/**
+<span id='storage-ItemSerializer-method-_serializeDatetimeArray'>/**
+</span> * Serialize a datetime array string to a datetime.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeDatetimeArray = function(value) {
+  return _.map(value, this._serializeDatetime, this);
+};
+
+<span id='storage-ItemSerializer-method-_serializeDate'>/**
 </span> * Serialize a date string to a date.
  *
  * @protected
@@ -109,7 +217,17 @@ ItemSerializer.prototype._serializeDate = function(value) {
     .format('YYYY-MM-DD');
 };
 
-<span id='item-ItemSerializer-method-_serializeBoolean'>/**
+<span id='storage-ItemSerializer-method-_serializeDateArray'>/**
+</span> * Serialize a date array string to a array of dates.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeDateArray = function(value) {
+  return _.map(value, this._serializeDate, this);
+};
+
+<span id='storage-ItemSerializer-method-_serializeBoolean'>/**
 </span> * Serialize to boolean.
  *
  * @protected
@@ -119,7 +237,97 @@ ItemSerializer.prototype._serializeBoolean = function(value) {
   return !!value;
 };
 
-<span id='item-ItemSerializer-method-_sortKeys'>/**
+<span id='storage-ItemSerializer-method-_serializeBooleanArray'>/**
+</span> * Serialize to boolean array.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeBooleanArray = function(value) {
+  return _.map(value, this._serializeBoolean, this);
+};
+
+<span id='storage-ItemSerializer-method-_serializeJson'>/**
+</span> * Serialize to json.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeJson = function(value) {
+  return value;
+};
+
+<span id='storage-ItemSerializer-method-_serializeJsonArray'>/**
+</span> * Serialize to array of json.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeJsonArray = function(value) {
+  return _.map(value, this._serializeJson, this);
+};
+
+<span id='storage-ItemSerializer-method-_serializePoint'>/**
+</span> * Serialize a point.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializePoint = function(value) {
+  return this._serializeJson(value);
+};
+
+<span id='storage-ItemSerializer-method-_serializePointArray'>/**
+</span> * Serialize a point array.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializePointArray = function(value) {
+  return this._serializeJson(value);
+};
+
+<span id='storage-ItemSerializer-method-_serializeLinestring'>/**
+</span> * Serialize a linestring.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeLinestring = function(value) {
+  return this._serializeJson(value);
+};
+
+<span id='storage-ItemSerializer-method-_serializeLinestringArray'>/**
+</span> * Serialize a linestring array.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializeLinestringArray = function(value) {
+  return this._serializeJson(value);
+};
+
+<span id='storage-ItemSerializer-method-_serializePolygon'>/**
+</span> * Serialize a polygon.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializePolygon = function(value) {
+  return this._serializeJson(value);
+};
+
+<span id='storage-ItemSerializer-method-_serializePolygonArray'>/**
+</span> * Serialize a polygon array.
+ *
+ * @protected
+ * @param  {string} value
+ */
+ItemSerializer.prototype._serializePolygonArray = function(value) {
+  return this._serializeJson(value);
+};
+
+<span id='storage-ItemSerializer-method-_sortKeys'>/**
 </span> * Sort keys of an object.
  *
  * @protected

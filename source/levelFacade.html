@@ -21,26 +21,27 @@ var BBPromise = require('bluebird');
 var map = require('map-stream');
 var bytewiseCodec = require('level-sublevel/codec/bytewise');
 
-<span id='level-LevelFacade'>/**
-</span> * @class level.LevelFacade
- * LevelFacade
+<span id='storage-level-LevelFacade'>/**
+</span> * LevelFacade
+ * 
+ * @class storage.level.LevelFacade
  *
- * @param {level.LevelRepository} repository
- * @param {level.LevelSerializer} serializer
+ * @param {storage.level.LevelRepository} repository
+ * @param {storage.level.LevelSerializer} serializer
  */
 function LevelFacade(repository, serializer) {
   this.repository = repository;
   this.serializer = serializer;
 }
 
-<span id='level-LevelFacade-property-attachKey'>/**
+<span id='storage-level-LevelFacade-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-LevelFacade.attachKey = 'level.facade';
+LevelFacade.attachKey = 'storage.level.facade';
 
-<span id='level-LevelFacade-method-attach'>/**
+<span id='storage-level-LevelFacade-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
@@ -48,73 +49,97 @@ LevelFacade.attachKey = 'level.facade';
  */
 LevelFacade.attach = function(app) {
   return BBPromise.join(
-    app.get('level.repository'),
-    app.get('level.serializer')
+    app.get('storage.level.repository'),
+    app.get('storage.level.serializer')
   ).spread(function(repository, serializer) {
     return new LevelFacade(repository, serializer);
   });
 };
 
-<span id='level-LevelFacade-method-putItem'>/**
+<span id='storage-level-LevelFacade-method-putItem'>/**
 </span> * Insert / update item
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
+ * @param  {String} id
  * @param  {Object} item
  *
  * @return {BBPromise}
  */
-LevelFacade.prototype.putItem = function(namespace, schemaKey, item) {
-  return this.repository.putItem(namespace, schemaKey, item);
+LevelFacade.prototype.putItem = function(projectId, blueprintId, id, item) {
+  return this.repository.putItem(projectId, blueprintId, id, item);
 };
 
-<span id='level-LevelFacade-method-delItem'>/**
+<span id='storage-level-LevelFacade-method-delItem'>/**
 </span> * Delete item
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {String} id
  *
  * @return {BBPromise}
  */
-LevelFacade.prototype.delItem = function(namespace, schemaKey, version, id) {
-  return this.repository.delItem(namespace, schemaKey, version, id);
+LevelFacade.prototype.delItem = function(projectId, blueprintId, id) {
+  return this.repository.delItem(projectId, blueprintId, id);
 };
 
-<span id='level-LevelFacade-method-serialize'>/**
+<span id='storage-level-LevelFacade-method-migrate'>/**
+</span> * Migrate
+ *
+ *  Here we simply return a truthy promise
+ *  Since leveldb is schemaless and no migrations
+ *  have to be done.
+ * 
+ * @return {BBPromise}
+ */
+LevelFacade.prototype.migrate = function() {
+  return BBPromise.resolve(true);
+};
+
+<span id='storage-level-LevelFacade-method-drop'>/**
+</span> * Drop
+ *
+ *  @TODO implement
+ * 
+ * @return {BBPromise}
+ */
+LevelFacade.prototype.drop = function(projectId) {
+  return BBPromise.resolve(true);
+};
+
+<span id='storage-level-LevelFacade-method-serialize'>/**
 </span> * Serialize an item to make it compatible with leveldb.
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} item
  * @return {Object} The serialized item
  */
-LevelFacade.prototype.serialize = function(namespace, schemaKey, item) {
-  return this.serializer.serializer(namespace, schemaKey, item);
+LevelFacade.prototype.serialize = function(projectId, blueprintId, item) {
+  return this.serializer.serializer(projectId, blueprintId, item);
 };
 
-<span id='level-LevelFacade-method-getIdToTypeMap'>/**
+<span id='storage-level-LevelFacade-method-getIdToTypeMap'>/**
 </span> * Get a id =&gt; type map.
  *
- * @param  {String} namespace
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
  * @param  {Array} ids
  * @return {BBPromise}
  */
-LevelFacade.prototype.getIdToTypeMap = function(namespace, version, ids) {
-  return this.repository.getIdToTypeMap(namespace, version, ids);
+LevelFacade.prototype.getIdToTypeMap = function(projectId, projectVersion, ids) {
+  return this.repository.getIdToTypeMap(projectId, projectVersion, ids);
 };
 
-<span id='level-LevelFacade-method-getStream'>/**
+<span id='storage-level-LevelFacade-method-getStream'>/**
 </span> * Get a stream of all items.
  *
- * @param  {String} namespace
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
  * @return {Stream}
  */
-LevelFacade.prototype.getStream = function (namespace, version) {
-  return this.repository.getStream(namespace, version);
+LevelFacade.prototype.getStream = function (projectId, projectVersion) {
+  return this.repository.getStream(projectId, projectVersion);
 };
 
 module.exports = LevelFacade;

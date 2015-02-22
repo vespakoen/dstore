@@ -18,10 +18,10 @@
   <pre class="prettyprint lang-js">'use strict';
 
 var _ = require('underscore');
-var request = require('request');
 var rabbit = require('rabbit.js');
 var BBPromise = require('bluebird');
 var help = require('./helpers');
+var es = require('event-stream')
 
 <span id='Queue'>/**
 </span> * A RabbitMQ queue driver wrapped in promises.
@@ -54,6 +54,10 @@ Queue.attach = function(app) {
     context.on('ready', function() {
       resolve(new Queue(context));
     });
+    context.on('error', function (err) {
+      console.error('Could not connect to RabbitMQ');
+      throw err;
+    })
   });
 };
 
@@ -85,6 +89,7 @@ Queue.prototype.setupConsumer = function() {
  */
 Queue.prototype.publish = function(key, body) {
   var self = this;
+
   return new BBPromise(function(resolve, reject) {
     var request = self.context.socket('REQ');
     request.connect(key, function () {
@@ -112,13 +117,19 @@ Queue.prototype.publish = function(key, body) {
  *
  * @return {BBPromise.&lt;undefined&gt;}
  */
-Queue.prototype.consume = function(key, cb) {
+Queue.prototype.consume = function(key, cb, serial) {
   var self = this;
   return new BBPromise(function(resolve, reject) {
     var reply = self.context.socket('REP');
     reply.connect(key, function () {
-      reply.on('data', function (buffer) {
-        var data = JSON.parse(buffer.toString());
+      reply.pipe(es.through(function (data) {
+        var self = this;
+        var data = JSON.parse(data.toString());
+
+        // if we consume this serially, pause the stream
+        if (serial) {
+          this.pause();
+        }
         if (data.type === key || key === '#') {
           cb(data.body)
             .then(function (result) {
@@ -131,12 +142,25 @@ Queue.prototype.consume = function(key, cb) {
                 status: 'error',
                 err: help.serializeError(err)
               }), 'utf8');
+            })
+            .finally(function () {
+              // if we consume this serially, resume the stream
+              if (serial) {
+                self.resume();
+              }
             });
         }
-      });
+      }));
       resolve();
     });
   });
+};
+
+<span id='Queue-method-close'>/**
+</span> * Closes the queue connection
+ */
+Queue.prototype.close = function(cb) {
+  this.context.close(cb);
 };
 
 module.exports = Queue;

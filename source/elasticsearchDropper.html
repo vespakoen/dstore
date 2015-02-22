@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">//   return BBPromise.join(
+//     exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/blueprintservicetestv1'),
+//     exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/blueprintservicetestv2')
+//   );'use strict';
+
+var _ = require('underscore');
+var pg = require('pg');
+var BBPromise = require('bluebird');
+BBPromise.promisifyAll(pg);
+
+<span id='storage-elasticsearch-ElasticsearchDropper'>/**
+</span> * ElasticsearchDropper
+ * 
+ * @class storage.elasticsearch.ElasticsearchDropper
+ * 
+ * @param {project.ProjectService} projectService
+ * @param {storage.elasticsearch.ElasticsearchClient} client
+ */
+function ElasticsearchDropper(projectService, client) {
+  this.projectService = projectService;
+  this.client = client;
+}
+
+<span id='storage-elasticsearch-ElasticsearchDropper-property-attachKey'>/**
+</span> * IOC attachKey.
+ *
+ * @type {String}
+ */
+ElasticsearchDropper.attachKey = 'storage.elasticsearch.dropper';
+
+<span id='storage-elasticsearch-ElasticsearchDropper-method-attach'>/**
+</span> * IOC attach.
+ *
+ * @param {App} app
+ * @return {BBPromise} A ElasticsearchDropper instance with resolved dependencies
+ */
+ElasticsearchDropper.attach = function(app) {
+  return BBPromise.join(
+    app.get('project.service'),
+    app.get('storage.elasticsearch.client')
+  )
+  .spread(function (projectService, client) {
+    return new ElasticsearchDropper(projectService, client);
+  });
+};
+
+<span id='storage-elasticsearch-ElasticsearchDropper-method-drop'>/**
+</span> * Create / migrate database.
+ *
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
+ *
+ * @return {BBPromise.&lt;undefined&gt;}
+ */
+ElasticsearchDropper.prototype.drop = function(projectId) {
+  var self = this;
+  var opts = {
+    projectId: projectId,
+  };
+
+  return this.projectService.getProjectVersion(projectId)
+    .then(function (projectVersion) {
+      if (_.isNumber(projectVersion)) {
+        var versions = _.range(1, projectVersion + 1);
+
+        return BBPromise.all(_.map(versions, function (version) {
+          opts.index = projectId + 'v' + version;
+          return self._dropIndex(opts);
+        }));
+      }
+    });
+};
+
+<span id='storage-elasticsearch-ElasticsearchDropper-method-_dropIndex'>/**
+</span> * Create a new elasticsearch index.
+ *
+ * @protected
+ * @param opts
+ * @param opts.index The name of the index to create
+ *
+ * @return {BBPromise.&lt;undefined&gt;}
+ */
+ElasticsearchDropper.prototype._dropIndex = function(opts) {
+  var self = this;
+
+  return self.client.indices.exists({
+    index: opts.index
+  })
+  .then(function (exists) {
+    return self.client.indices.delete({
+      index: opts.index
+    });
+  })
+  .catch(function () {
+    // noop, indices.exists throws when the index doesn't exist
+  });
+};
+
+
+module.exports = ElasticsearchDropper;
+
+
+</pre>
+</body>
+</html>

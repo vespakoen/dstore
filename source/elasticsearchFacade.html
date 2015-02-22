@@ -20,26 +20,29 @@
 var _ = require('underscore'),
     BBPromise = require('bluebird');
 
-<span id='elasticsearch-ElasticsearchFacade'>/**
-</span> * @class elasticsearch.ElasticsearchFacade
- * ElasticsearchFacade
+<span id='storage-elasticsearch-ElasticsearchFacade'>/**
+</span> * ElasticsearchFacade
+ * 
+ * @class storage.elasticsearch.ElasticsearchFacade
  *
- * @param {elasticsearch.ElasticsearchRepository} repository
- * @param {elasticsearch.ElasticsearchMigrator} migrator
+ * @param {storage.elasticsearch.ElasticsearchRepository} repository
+ * @param {storage.elasticsearch.ElasticsearchMigrator}   migrator
+ * @param {storage.elasticsearch.ElasticsearchDropper}    dropper
  */
-function ElasticsearchFacade(repository, migrator) {
+function ElasticsearchFacade(repository, migrator, dropper) {
   this.repository = repository;
   this.migrator = migrator;
+  this.dropper = dropper;
 }
 
-<span id='elasticsearch-ElasticsearchFacade-property-attachKey'>/**
+<span id='storage-elasticsearch-ElasticsearchFacade-property-attachKey'>/**
 </span> * IOC attachKey.
  *
  * @type {String}
  */
-ElasticsearchFacade.attachKey = 'elasticsearch.facade';
+ElasticsearchFacade.attachKey = 'storage.elasticsearch.facade';
 
-<span id='elasticsearch-ElasticsearchFacade-method-attach'>/**
+<span id='storage-elasticsearch-ElasticsearchFacade-method-attach'>/**
 </span> * IOC attach.
  *
  * @param {App} app
@@ -48,61 +51,75 @@ ElasticsearchFacade.attachKey = 'elasticsearch.facade';
  */
 ElasticsearchFacade.attach = function(app) {
   return BBPromise.join(
-    app.get('elasticsearch.repository'),
-    app.get('elasticsearch.migrator')
-  ).spread(function(repository, migrator) {
-    return new ElasticsearchFacade(repository, migrator);
+    app.get('storage.elasticsearch.repository'),
+    app.get('storage.elasticsearch.migrator'),
+    app.get('storage.elasticsearch.dropper')
+  ).spread(function(repository, migrator, dropper) {
+    return new ElasticsearchFacade(repository, migrator, dropper);
   });
 };
 
-<span id='elasticsearch-ElasticsearchFacade-method-putItem'>/**
+<span id='storage-elasticsearch-ElasticsearchFacade-method-putItem'>/**
 </span> * Insert / update item.
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
+ * @param  {String} id
  * @param  {Object} item
  *
  * @return {BBPromise.&lt;undefined&gt;}
  */
-ElasticsearchFacade.prototype.putItem = function(namespace, schemaKey, item) {
-  return this.repository.putItem(namespace, schemaKey, item);
+ElasticsearchFacade.prototype.putItem = function(projectId, blueprintId, id, item) {
+  return this.repository.putItem(projectId, blueprintId, id, item);
 };
 
-<span id='elasticsearch-ElasticsearchFacade-method-delItem'>/**
+<span id='storage-elasticsearch-ElasticsearchFacade-method-delItem'>/**
 </span> * Delete item.
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} id
  *
  * @return {BBPromise.&lt;undefined&gt;}
  */
-ElasticsearchFacade.prototype.delItem = function(namespace, schemaKey, id) {
-  return this.repository.delItem(namespace, schemaKey, id);
+ElasticsearchFacade.prototype.delItem = function(projectId, blueprintId, id) {
+  return this.repository.delItem(projectId, blueprintId, id);
 };
 
-<span id='elasticsearch-ElasticsearchFacade-method-migrate'>/**
-</span> * Create a new elasticsearch index version and put the mapping.
+<span id='storage-elasticsearch-ElasticsearchFacade-method-migrate'>/**
+</span> * Create a new elasticsearch index and put the mapping.
  *
- * @param  {String} namespace
- * @param  {Number} version
+ * @param  {String} projectId
+ * @param  {Number} projectVersion
+ * @param  {Object} blueprints
  *
  * @return {BBPromise.&lt;undefined&gt;}
  */
-ElasticsearchFacade.prototype.migrate = function(namespace, version) {
-  return this.migrator.migrate(namespace, version);
+ElasticsearchFacade.prototype.migrate = function(projectId, projectVersion, blueprints) {
+  return this.migrator.migrate(projectId, projectVersion, blueprints);
 };
 
-<span id='elasticsearch-ElasticsearchFacade-method-serialize'>/**
+<span id='storage-elasticsearch-ElasticsearchFacade-method-drop'>/**
+</span> * Drop
+ *
+ *  @TODO implement
+ * 
+ * @return {BBPromise}
+ */
+ElasticsearchFacade.prototype.drop = function(projectId) {
+  return this.dropper.drop(projectId);
+};
+
+<span id='storage-elasticsearch-ElasticsearchFacade-method-serialize'>/**
 </span> * Serialize an item to make it compatible with elasticsearch.
  *
- * @param  {String} namespace
- * @param  {String} schemaKey
+ * @param  {String} projectId
+ * @param  {String} blueprintId
  * @param  {Object} item
  * @return {Object} The serialized item
  */
-ElasticsearchFacade.prototype.serialize = function(namespace, schemaKey, item) {
-  return this.serializer.serializer(namespace, schemaKey, item);
+ElasticsearchFacade.prototype.serialize = function(projectId, blueprintId, item) {
+  return this.serializer.serializer(projectId, blueprintId, item);
 };
 
 module.exports = ElasticsearchFacade;
