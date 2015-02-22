@@ -13,52 +13,55 @@ BBPromise.promisifyAll(pg);
 var opts = {};
 
 function putFirstBlueprint(opts) {
-  return opts.publisher.publish('put-blueprint', {
-    project_id: 'integrationtest',
-    blueprint_id: 'kitchensink',
-    blueprint: {
-      postgresql: {
-        table: 'kitchensinks'
-      },
-      elasticsearch: {
-        type: 'kitchensink'
-      },
-      columns: {
-        type_integer: {
-          type: 'integer'
+  return opts.publisher.publish('queue', {
+    key: 'put-blueprint',
+    command: {
+      project_id: 'integrationtest',
+      blueprint_id: 'kitchensink',
+      blueprint: {
+        postgresql: {
+          table: 'kitchensinks'
         },
-        type_uuid: {
-          type: 'uuid'
+        elasticsearch: {
+          type: 'kitchensink'
         },
-        type_string: {
-          type: 'string'
-        },
-        type_text: {
-          type: 'text'
-        },
-        type_datetime: {
-          type: 'datetime'
-        },
-        type_date: {
-          type: 'date'
-        },
-        type_float: {
-          type: 'float'
-        },
-        type_point: {
-          type: 'point'
-        },
-        type_linestring: {
-          type: 'linestring'
-        },
-        type_polygon: {
-          type: 'polygon'
-        },
-        type_boolean: {
-          type: 'boolean'
-        },
-        type_json: {
-          type: 'json'
+        columns: {
+          type_integer: {
+            type: 'integer'
+          },
+          type_uuid: {
+            type: 'uuid'
+          },
+          type_string: {
+            type: 'string'
+          },
+          type_text: {
+            type: 'text'
+          },
+          type_datetime: {
+            type: 'datetime'
+          },
+          type_date: {
+            type: 'date'
+          },
+          type_float: {
+            type: 'float'
+          },
+          type_point: {
+            type: 'point'
+          },
+          type_linestring: {
+            type: 'linestring'
+          },
+          type_polygon: {
+            type: 'polygon'
+          },
+          type_boolean: {
+            type: 'boolean'
+          },
+          type_json: {
+            type: 'json'
+          }
         }
       }
     }
@@ -66,130 +69,143 @@ function putFirstBlueprint(opts) {
 }
 
 function tagProject(opts) {
-  return opts.publisher.publish('tag-project', {
-    project_id: 'integrationtest'
-  });
-}
-
-function putFirstItem(opts) {
-  return opts.publisher.publish('put-item', {
-    project_id: 'integrationtest',
-    blueprint_id: 'kitchensink',
-    id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
-    item: {
-      id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
-      project_version: 1,
-      type_integer: 15,
-      type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
-      type_string: 'string',
-      type_text: 'text',
-      type_datetime: '2012-11-10 09:08:07',
-      type_date: '2012-11-10',
-      type_float: 11.11111,
-      type_point: {"type": "Point", "coordinates": [5.9127083, 50.78757]},
-      type_linestring: {"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]},
-      type_polygon: {"type": "Polygon", "coordinates": [[[5.9127083, 50.78757], [5.4127083, 50.88757], [5.9327083, 50.78757], [5.9127083, 50.78753]]]},
-      type_boolean: true,
-      type_json: {"some": {"random": "json"}}
+  return opts.publisher.publish('queue', {
+    key: 'tag-project',
+    command: {
+      project_id: 'integrationtest'
     }
   });
 }
 
+function putFirstItem(opts) {
+  return opts.publisher.publish('queue', {
+    key: 'put-item',
+    command: {
+      project_id: 'integrationtest',
+      blueprint_id: 'kitchensink',
+      id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
+      item: {
+        id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
+        project_version: 1,
+        type_integer: 15,
+        type_uuid: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
+        type_string: 'string',
+        type_text: 'text',
+        type_datetime: '2012-11-10 09:08:07',
+        type_date: '2012-11-10',
+        type_float: 11.11111,
+        type_point: {"type": "Point", "coordinates": [5.9127083, 50.78757]},
+        type_linestring: {"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]},
+        type_polygon: {"type":"Polygon","coordinates": [[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0],[100.0,0.0]]]},
+        type_boolean: true,
+        type_json: {"some": {"random": "json"}}
+      }
+    }
+  })
+  .catch(function (err) {
+    console.log('ERROR WHILE PUTTING FIRST ITEM', err);
+    throw err;
+  });
+}
+
 function putSecondBlueprint(opts) {
-  return opts.publisher.publish('put-blueprint', {
-    project_id: 'integrationtest',
-    blueprint_id: 'kitchensink',
-    blueprint: {
-      postgresql: {
-        table: 'kitchensinks'
-      },
-      elasticsearch: {
-        type: 'kitchensink'
-      },
-      columns: {
-        type_integer: {
-          column_id: 'integer_type',
-          type: 'integer'
+  return opts.publisher.publish('queue', {
+    key: 'put-blueprint',
+    command: {
+      project_id: 'integrationtest',
+      blueprint_id: 'kitchensink',
+      blueprint: {
+        postgresql: {
+          table: 'kitchensinks'
         },
-        type_uuid: {
-          column_id: 'uuid_type',
-          type: 'uuid'
+        elasticsearch: {
+          type: 'kitchensink'
         },
-        type_string: {
-          column_id: 'string_type',
-          type: 'string'
-        },
-        type_text: {
-          column_id: 'text_type',
-          type: 'text'
-        },
-        type_datetime: {
-          column_id: 'datetime_type',
-          type: 'datetime'
-        },
-        type_date: {
-          column_id: 'date_type',
-          type: 'date'
-        },
-        type_float: {
-          column_id: 'float_type',
-          type: 'float'
-        },
-        type_point: {
-          column_id: 'point_type',
-          type: 'point'
-        },
-        type_linestring: {
-          column_id: 'linestring_type',
-          type: 'linestring'
-        },
-        type_polygon: {
-          column_id: 'polygon_type',
-          type: 'polygon'
-        },
-        type_boolean: {
-          column_id: 'boolean_type',
-          type: 'boolean'
-        },
-        type_json: {
-          column_id: 'json_type',
-          type: 'json'
-        },
-        type_integer_array: {
-          type: 'integer[]'
-        },
-        type_uuid_array: {
-          type: 'uuid[]'
-        },
-        type_string_array: {
-          type: 'string[]'
-        },
-        type_text_array: {
-          type: 'text[]'
-        },
-        type_datetime_array: {
-          type: 'datetime[]'
-        },
-        type_date_array: {
-          type: 'date[]'
-        },
-        type_float_array: {
-          type: 'float[]'
-        },
-        type_point_array: {
-          type: 'point[]'
-        },
-        type_linestring_array: {
-          type: 'linestring[]'
-        },
-        type_polygon_array: {
-          type: 'polygon[]'
-        },
-        type_boolean_array: {
-          type: 'boolean[]'
-        },
-        type_json_array: {
-          type: 'json[]'
+        columns: {
+          type_integer: {
+            column_id: 'integer_type',
+            type: 'integer'
+          },
+          type_uuid: {
+            column_id: 'uuid_type',
+            type: 'uuid'
+          },
+          type_string: {
+            column_id: 'string_type',
+            type: 'string'
+          },
+          type_text: {
+            column_id: 'text_type',
+            type: 'text'
+          },
+          type_datetime: {
+            column_id: 'datetime_type',
+            type: 'datetime'
+          },
+          type_date: {
+            column_id: 'date_type',
+            type: 'date'
+          },
+          type_float: {
+            column_id: 'float_type',
+            type: 'float'
+          },
+          type_point: {
+            column_id: 'point_type',
+            type: 'point'
+          },
+          type_linestring: {
+            column_id: 'linestring_type',
+            type: 'linestring'
+          },
+          type_polygon: {
+            column_id: 'polygon_type',
+            type: 'polygon'
+          },
+          type_boolean: {
+            column_id: 'boolean_type',
+            type: 'boolean'
+          },
+          type_json: {
+            column_id: 'json_type',
+            type: 'json'
+          },
+          type_integer_array: {
+            type: 'integer[]'
+          },
+          type_uuid_array: {
+            type: 'uuid[]'
+          },
+          type_string_array: {
+            type: 'string[]'
+          },
+          type_text_array: {
+            type: 'text[]'
+          },
+          type_datetime_array: {
+            type: 'datetime[]'
+          },
+          type_date_array: {
+            type: 'date[]'
+          },
+          type_float_array: {
+            type: 'float[]'
+          },
+          type_point_array: {
+            type: 'point[]'
+          },
+          type_linestring_array: {
+            type: 'linestring[]'
+          },
+          type_polygon_array: {
+            type: 'polygon[]'
+          },
+          type_boolean_array: {
+            type: 'boolean[]'
+          },
+          type_json_array: {
+            type: 'json[]'
+          }
         }
       }
     }
@@ -197,38 +213,41 @@ function putSecondBlueprint(opts) {
 }
 
 function putSecondItem(opts) {
-  return opts.publisher.publish('put-item', {
-    project_id: 'integrationtest',
-    blueprint_id: 'kitchensink',
-    id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
-    item: {
+  return opts.publisher.publish('queue', {
+    key: 'put-item',
+    command: {
+      project_id: 'integrationtest',
+      blueprint_id: 'kitchensink',
       id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
-      project_version: 2,
-      integer_type: 35235,
-      uuid_type: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
-      string_type: 'stringetje',
-      text_type: 'textje',
-      datetime_type: '05-06-2007 05:06:07',
-      date_type: '05-06-2007',
-      float_type: 22.222222222222222,
-      point_type: {"type": "Point", "coordinates": [5.9127083, 50.78757]},
-      linestring_type: {"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]},
-      polygon_type: {"type":"Polygon","coordinates":[[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0],[100.0,0.0]]]},
-      boolean_type: true,
-      json_type: {"some": {"random": "json"}},
-      type_integer_array: [1,2,3],
-      type_uuid_array: ["0c02a6b3-babd-4399-9105-42c40189bb89", "0cf7a1f2-800b-43ee-a4a1-838a76533108"],
-      type_string_array: ["testing", "it", "out"],
-      type_text_array: ["testing", "it", "out"],
-      type_datetime_array: ["05-06-2007 05:06:07", "06-07-2008 06:07:08"],
-      type_date_array: ["05-06-2007", "06-07-2008"],
-      type_float_array: [22.2222, 33.3333],
-      type_point_array: {"type": "MultiPoint", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78757]]},
-      type_linestring_array: {"type":"MultiLineString","coordinates":[[[100.0,0.0],[101.0,1.0]],[[102.0,2.0],[103.0,3.0]]]},
-      type_polygon_array: {"type":"MultiPolygon","coordinates":[[[[102.0,2.0],[103.0,2.0],[103.0,3.0],[102.0,3.0],[102.0,2.0]]],[[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0],[100.0,0.0]],[[100.2,0.2],[100.8,0.2],[100.8,0.8],[100.2,0.8],[100.2,0.2]]]]},
-      type_boolean_array: [true,false],
-      type_json_array: [{"some": "data"},{"more": "data"}],
-      links: ['e5c20ace-7aa4-4077-983b-717c2ec5427d']
+      item: {
+        id: 'a4f20ace-7aa4-4077-983b-717c2ec5427d',
+        project_version: 2,
+        integer_type: 35235,
+        uuid_type: 'e5c20ace-7aa4-4077-983b-717c2ec5427d',
+        string_type: 'stringetje',
+        text_type: 'textje',
+        datetime_type: '05-06-2007 05:06:07',
+        date_type: '05-06-2007',
+        float_type: 22.222222222222222,
+        point_type: {"type": "Point", "coordinates": [5.9127083, 50.78757]},
+        linestring_type: {"type": "LineString", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78754]]},
+        polygon_type: {"type":"Polygon","coordinates":[[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0],[100.0,0.0]]]},
+        boolean_type: true,
+        json_type: {"some": {"random": "json"}},
+        type_integer_array: [1,2,3],
+        type_uuid_array: ["0c02a6b3-babd-4399-9105-42c40189bb89", "0cf7a1f2-800b-43ee-a4a1-838a76533108"],
+        type_string_array: ["testing", "it", "out"],
+        type_text_array: ["testing", "it", "out"],
+        type_datetime_array: ["05-06-2007 05:06:07", "06-07-2008 06:07:08"],
+        type_date_array: ["05-06-2007", "06-07-2008"],
+        type_float_array: [22.2222, 33.3333],
+        type_point_array: {"type": "MultiPoint", "coordinates": [[5.9127083, 50.78757], [5.9127083, 50.78757]]},
+        type_linestring_array: {"type":"MultiLineString","coordinates":[[[100.0,0.0],[101.0,1.0]],[[102.0,2.0],[103.0,3.0]]]},
+        type_polygon_array: {"type":"MultiPolygon","coordinates":[[[[102.0,2.0],[103.0,2.0],[103.0,3.0],[102.0,3.0],[102.0,2.0]]],[[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0],[100.0,0.0]],[[100.2,0.2],[100.8,0.2],[100.8,0.8],[100.2,0.8],[100.2,0.2]]]]},
+        type_boolean_array: [true,false],
+        type_json_array: [{"some": "data"},{"more": "data"}],
+        links: ['e5c20ace-7aa4-4077-983b-717c2ec5427d']
+      }
     }
   });
 }
@@ -277,26 +296,7 @@ function testElasticsearchResult(opts, t) {
         },
         "type_polygon": {
           "type": "Polygon",
-          "coordinates": [
-            [
-              [
-                5.9127083,
-                50.78757
-              ],
-              [
-                5.4127083,
-                50.88757
-              ],
-              [
-                5.9327083,
-                50.78757
-              ],
-              [
-                5.9127083,
-                50.78753
-              ]
-            ]
-          ]
+          "coordinates": [[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0],[100.0,0.0]]]
         },
         "type_boolean": true,
         "type_json": {
@@ -356,26 +356,7 @@ function testLevelResult(opts, t) {
           },
           "type_polygon": {
             "type": "Polygon",
-            "coordinates": [
-              [
-                [
-                  5.9127083,
-                  50.78757
-                ],
-                [
-                  5.4127083,
-                  50.88757
-                ],
-                [
-                  5.9327083,
-                  50.78757
-                ],
-                [
-                  5.9127083,
-                  50.78753
-                ]
-              ]
-            ]
+            "coordinates": [[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0],[100.0,0.0]]]
           },
           "type_string": "string",
           "type_text": "text",
@@ -420,7 +401,7 @@ function testPostgresqlResult(opts, t) {
           "type_float": 11.1111,
           "type_point": "{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]}",
           "type_linestring": "{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]}",
-          "type_polygon": "{\"type\":\"Polygon\",\"coordinates\":[[[5.9127083,50.78757],[5.4127083,50.88757],[5.9327083,50.78757],[5.9127083,50.78753]]]}",
+          "type_polygon": "{\"type\":\"Polygon\",\"coordinates\":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]}",
           "type_boolean": true,
           "type_json": {
             "some": {
@@ -445,8 +426,11 @@ test('when testing integration', function (t) {
       opts.publisher = publisher;
     })
     .then(function (projectFacade) {
-      return opts.publisher.publish('del-project', {
-        project_id: 'integrationtest'
+      return opts.publisher.publish('queue', {
+        key: 'del-project',
+        command: {
+          project_id: 'integrationtest'
+        }
       });
     })
     .then(function () {
