@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # generate docs to temp folder
-jsduck --title=node-projector lib/* -o /tmp/projector-docs
+jsduck --title=dstore lib/* -o /tmp/projector-docs
 
 git stash
 git checkout gh-pages
