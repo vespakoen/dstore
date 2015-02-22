@@ -10,76 +10,13 @@ BBPromise.promisifyAll(pg);
 
 var memo = {};
 
-function removeElasticsearchIndexes() {
-  return BBPromise.join(
-    exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/blueprintservicetestv1'),
-    exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/blueprintservicetestv2')
-  );
-}
-
-function getPostgresqlManageConnection() {
-  var connectionString = 'postgresql://' + app.config.postgresql.username + (app.config.postgresql.password === "" ? '' : ':' + app.config.postgresql.password) + '@' + app.config.postgresql.host + '/postgres';
-  return pg.connectAsync(connectionString)
-    .spread(function(client, done) {
-      memo.closeManageConnection = done;
-      return client;
-    });
-}
-
-function dropTestDatabases(memo) {
-  return memo.client.queryAsync("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'blueprintservicetestv1'")
-    .then(function () {
-      return memo.client.queryAsync('DROP DATABASE blueprintservicetestv1');
-    })
-    .then(function () {
-      return memo.client.queryAsync("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'blueprintservicetestv2'");
-    })
-    .then(function () {
-      return memo.client.queryAsync('DROP DATABASE blueprintservicetestv2');
-    })
-    .catch(function (err) {
-      // the database probably doesn't exist, so we ignore this error
-      // noop
-    });
-}
-
-
 test('when testing the blueprint service', function (t) {
-  var clean = {
-    file: function () {
-      return rmRF(app.config.project.file.path + '/blueprintservicetest');
-    },
-    postgresql: function () {
-      return app.get('storage.postgresql.adapter')
-        .then(function (adapter) {
-          var client = adapter.getClient('projector', 1);
-          return BBPromise.join(
-            client.table('log').where({ project_id: 'blueprintservicetest' }).del().then(function () {}),
-            client.table('snapshots').where({ project_id: 'blueprintservicetest' }).del().then(function () {}),
-            client.table('versions').where({ project_id: 'blueprintservicetest' }).del().then(function () {})
-          ).catch(function () {
-            // noop
-          });
-        })
-    }
-  };
-
-  var clientId = app.config.project.client;
-  return clean[clientId]()
-    .then(function () {
-      return removeElasticsearchIndexes();
-    })
-    .then(function () {
-      return getPostgresqlManageConnection();
-    })
-    .then(function (client) {
-      memo.client = client;
-      return dropTestDatabases(memo);
-    })
-    .then(function () {
+  return app.get('project.facade')
+    .then(function (projectFacade) {
       return BBPromise.join(
         app.get('project.blueprint.service'),
-        app.get('project.tagger')
+        app.get('project.tagger'),
+        projectFacade.delProject('blueprintservicetest')
       );
     })
     .spread(function (service, tagger) {

@@ -12,43 +12,6 @@ BBPromise.promisifyAll(pg);
 
 var opts = {};
 
-function removeBlueprint() {
-  return rmRF(app.config.project.file.path + '/integrationtest');
-}
-
-function removeElasticsearchIndexes() {
-  return BBPromise.join(
-    exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtestv1'),
-    exec('curl -XDELETE ' + app.config.elasticsearch.hosts[0] + '/integrationtestv2')
-  );
-}
-
-function getPostgresqlManageConnection() {
-  var connectionString = 'postgresql://' + app.config.postgresql.username + (app.config.postgresql.password === "" ? '' : ':' + app.config.postgresql.password) + '@' + app.config.postgresql.host + '/postgres';
-  return pg.connectAsync(connectionString)
-    .spread(function(client, done) {
-      opts.closeManageConnection = done;
-      return client;
-    });
-}
-
-function dropTestDatabases(opts) {
-  return opts.client.queryAsync("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'integrationtestv1'")
-    .then(function () {
-      return opts.client.queryAsync('DROP DATABASE integrationtestv1');
-    })
-    .then(function () {
-      return opts.client.queryAsync("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'integrationtestv2'");
-    })
-    .then(function () {
-      return opts.client.queryAsync('DROP DATABASE integrationtestv2');
-    })
-    .catch(function (err) {
-      // the database probably doesn't exist, so we ignore this error
-      // noop
-    });
-}
-
 function putFirstBlueprint(opts) {
   return opts.publisher.publish('put-blueprint', {
     project_id: 'integrationtest',
@@ -474,36 +437,19 @@ test('when testing integration', function (t) {
   return app.get('queue')
     .then(function (queue) {
       opts.queue = queue;
-      return removeBlueprint();
-    })
-    .then(function () {
-      return app.get('storage.postgresql.adapter');
-    })
-    .then(function (adapter) {
-      var client = adapter.getClient('projector', 1);
-      return BBPromise.join(
-        client.table('log').where({ project_id: 'testintegration' }).del().then(function () {}),
-        client.table('snapshots').where({ project_id: 'testintegration' }).del().then(function () {}),
-        client.table('versions').where({ project_id: 'testintegration' }).del().then(function () {})
-      ).catch(function () {
-        // noop
-      });
-    })
-    .then(function () {
-      return removeElasticsearchIndexes();
-    })
-    .then(function () {
-      return getPostgresqlManageConnection();
-    })
-    .then(function (client) {
-      opts.client = client;
-      return dropTestDatabases(opts);
     })
     .then(function () {
       return opts.queue.setupPublisher();
     })
     .then(function (publisher) {
       opts.publisher = publisher;
+    })
+    .then(function (projectFacade) {
+      return opts.publisher.publish('del-project', {
+        project_id: 'integrationtest'
+      });
+    })
+    .then(function () {
       return putFirstBlueprint(opts);
     })
     .then(function () {
@@ -541,8 +487,6 @@ test('when testing integration', function (t) {
     })
     .catch(function (err) {
       t.ok(false, "Test failed with error " + err.message);
-    })
-    .finally(function () {
-      opts.closeManageConnection();
+      throw err;
     });
 });
