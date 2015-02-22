@@ -9,9 +9,9 @@ var project = require('./lib/project');
 var router = require('./lib/router');
 
 api()
-  .then(router)
   .then(blueprint)
   .then(project)
+  .then(router)
   .then(function () {
     console.log('Projector started');
   });

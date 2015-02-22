@@ -12,15 +12,24 @@ module.exports = function () {
       );
     })
     .spread(function (consumer, facade) {
-      consumer.consume('get-project', getProject);
-      consumer.consume('get-project-version', getProjectVersion);
-      consumer.consume('get-all-projects', getAllProjects);
-      consumer.consume('put-project', putProject);
-      consumer.consume('put-all-projects', putAllProjects);
-      consumer.consume('del-project', delProject);
-      consumer.consume('del-all-projects', delAllProjects);
-      consumer.consume('tag-project', tagProject);
-      consumer.consume('tag-all-projects', tagAllProjects);
+      function wrap(handler) {
+        return function (command) {
+          return handler(command)
+            .catch(function (err) {
+              console.error('Error in project', err);
+            })
+        }
+      }
+
+      consumer.consume('get-project', wrap(getProject));
+      consumer.consume('get-project-version', wrap(getProjectVersion));
+      consumer.consume('get-all-projects', wrap(getAllProjects));
+      consumer.consume('put-project', wrap(putProject));
+      consumer.consume('put-all-projects', wrap(putAllProjects));
+      consumer.consume('del-project', wrap(delProject));
+      consumer.consume('del-all-projects', wrap(delAllProjects));
+      consumer.consume('tag-project', wrap(tagProject));
+      consumer.consume('tag-all-projects', wrap(tagAllProjects));
       
       console.log('Queue to project started');
 

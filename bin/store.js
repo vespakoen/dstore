@@ -21,10 +21,19 @@ BBPromise.all([
   }),
   app.get('storage.' + store + '.facade')
 ]).spread(function (consumer, facade) {
-  consumer.consume('put-item.' + store, putItem);
-  consumer.consume('del-item.' + store, delItem);
-  consumer.consume('migrate.' + store, migrate);
-  consumer.consume('drop.' + store, drop);
+  function wrap(handler) {
+    return function (command) {
+      return handler(command)
+        .catch(function (err) {
+          console.error('Error in store ' + store, err);
+        })
+    }
+  }
+
+  consumer.consume('put-item.' + store, wrap(putItem));
+  consumer.consume('del-item.' + store, wrap(delItem));
+  consumer.consume('migrate.' + store, wrap(migrate));
+  consumer.consume('drop.' + store, wrap(drop));
 
   console.log('Queue to ' + store + ' started');
 

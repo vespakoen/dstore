@@ -12,11 +12,20 @@ module.exports = function () {
     app.get('project.blueprint.facade')
   )
   .spread(function (consumer, facade) {
-    consumer.consume('get-blueprint', getBlueprint);
-    consumer.consume('get-all-blueprints', getAllBlueprints);
-    consumer.consume('get-blueprint-versions', getBlueprintVersions);
-    consumer.consume('put-blueprint', putBlueprint);
-    consumer.consume('put-all-blueprints', putAllBlueprints);
+    function wrap(handler) {
+      return function (command) {
+        return handler(command)
+          .catch(function (err) {
+            console.error('Error in blueprint', err);
+          })
+      }
+    }
+
+    consumer.consume('get-blueprint', wrap(getBlueprint));
+    consumer.consume('get-all-blueprints', wrap(getAllBlueprints));
+    consumer.consume('get-blueprint-versions', wrap(getBlueprintVersions));
+    consumer.consume('put-blueprint', wrap(putBlueprint));
+    consumer.consume('put-all-blueprints', wrap(putAllBlueprints));
 
     function getBlueprint(command) {
       console.log('get-blueprint', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id', command.project_version || 'no project_version');

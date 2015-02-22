@@ -13,14 +13,23 @@ module.exports = function () {
       );
     })
     .spread(function (consumer, publisher) {
+      function wrap(handler) {
+        return function (command) {
+          return handler(command)
+            .catch(function (err) {
+              console.error('Error in router', err);
+            })
+        }
+      }
+
       var stores = app.config.stores;
       
       // ordered / serial queue
-      consumer.consume('queue', queueToQueue, true);
-      consumer.consume('put-item', putItem);
-      consumer.consume('del-item', delItem);
-      consumer.consume('migrate', migrate);
-      consumer.consume('drop', drop);
+      consumer.consume('queue', wrap(queueToQueue), true);
+      consumer.consume('put-item', wrap(putItem));
+      consumer.consume('del-item', wrap(delItem));
+      consumer.consume('migrate', wrap(migrate));
+      consumer.consume('drop', wrap(drop));
       
       console.log('Router started...');
 
