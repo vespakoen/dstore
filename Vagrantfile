@@ -12,11 +12,11 @@ echo "==> Installing dependencies"
 curl -sL https://deb.nodesource.com/setup | sudo bash -
 sudo apt-get install -y nodejs build-essential openjdk-7-jdk htop
 
-echo "==> Grab node-projector .deb"
-wget https://github.com/trappsnl/node-projector/raw/master/build/debinstall/node-projector-1.deb
+echo "==> Grab dstore .deb"
+wget https://github.com/trappsnl/dstore/raw/master/build/debinstall/dstore-1.deb
 
 cho "Installing deb"
-sudo dpkg -i node-projector-1.deb
+sudo dpkg -i dstore-1.deb
 
 echo "==> Running apt-get -f install"
 sudo apt-get -f -y install << INPUT
@@ -29,27 +29,27 @@ echo "==> Starting elasticsearch on startup"
 sudo service elasticsearch start
 sudo update-rc.d elasticsearch defaults 95 10
 
-echo "==> Updating node-projector config"
-sed -i "s/PROJECTOR_PATH=\\/opt\\/node-projector/PROJECTOR_PATH=\\/vagrant/g" /etc/node-projector/node-projector.conf
+echo "==> Updating dstore config"
+sed -i "s/PROJECTOR_PATH=\\/opt\\/dstore/PROJECTOR_PATH=\\/vagrant/g" /etc/dstore/dstore.conf
 
-echo "==> Start node-projector"
-sudo service node-projector start
+echo "==> Start dstore"
+sudo service dstore start
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.define 'node-projector' do |machine|
+  config.vm.define 'dstore' do |machine|
     machine.vm.box = "ubuntu/trusty64"
-    machine.vm.hostname = "node-projector"
+    machine.vm.hostname = "dstore"
     machine.vm.box_url = 'https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box'
 
     machine.vm.network "private_network", ip: "192.168.33.123"
 
     machine.vm.provision :shell, inline: $script
 
-    machine.vm.synced_folder "../node-projector/", "/vagrant", type: "nfs"
+    machine.vm.synced_folder "../dstore/", "/vagrant", type: "nfs"
 
     machine.vm.provider "virtualbox" do |vb|
-      vb.name = "node-projector"
+      vb.name = "dstore"
       vb.customize ["modifyvm", :id, "--memory", "2048"]
     end
   end

@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "blueprint",
-  "description": "A blueprint as defined by node-projector",
+  "description": "A blueprint as defined by dstore",
   "type": "object",
   "properties": {
     "blueprint_id": {

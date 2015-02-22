@@ -1,20 +1,20 @@
-[![build status](https://travis-ci.org/trappsnl/node-projector.svg)](https://travis-ci.org/trappsnl/node-projector)
-[![Code Climate](https://codeclimate.com/github/trappsnl/node-projector/badges/gpa.svg)](https://codeclimate.com/github/trappsnl/node-projector)
+[![build status](https://travis-ci.org/trappsnl/dstore.svg)](https://travis-ci.org/trappsnl/dstore)
+[![Code Climate](https://codeclimate.com/github/trappsnl/dstore/badges/gpa.svg)](https://codeclimate.com/github/trappsnl/dstore)
 
-[![NPM](https://nodei.co/npm/node-projector.png?downloads=true)](https://nodei.co/npm/node-projector/)
+[![NPM](https://nodei.co/npm/dstore.png?downloads=true)](https://nodei.co/npm/dstore/)
 
 #Introduction
 
-node-projector can be seen as a interface to all your storage engines.
+dstore is an abstraction over storage engines, more specifically, managing their "schema" and handling creating / updating & deleting data (No reads!).
 
 Via a simple REST API, you can manage the blueprint of your data, and store data with a single request and in a simple format.
 
-Currently, node-projector supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, the perfect stack for a modern web application.  
+Currently, dstore supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, the perfect stack for a modern web application.  
 
 
 #Overview
 
-![overview](http://trappsnl.github.io/node-projector/overview.png)
+![overview](http://trappsnl.github.io/dstore/overview.png)
 
 
 #Topics
@@ -36,7 +36,7 @@ Let's look at an example how to create a blueprint for storing posts on my blog.
 For this, we use the [put blueprint](#put-blueprint) command, and use "myblog" as the project, and "article" as the type.
 
 ```shell
-curl -X PUT http://localhost:2000/myblog/article/_blueprint -d '
+curl -X PUT http://localhost:2020/myblog/article/_blueprint -d '
 {
   "postgresql": {
     "table": "articles"
@@ -64,13 +64,13 @@ curl -X PUT http://localhost:2000/myblog/article/_blueprint -d '
       "type": "text"
     },
     "date_created": {
-      "type": "datetime"
+      "type": "datetime",
       "validation": {
         "required": true
       }
     },
     "date_changed": {
-      "type": "datetime"
+      "type": "datetime",
       "validation": {
         "required": true
       }
@@ -248,7 +248,7 @@ For LevelDB, it's quite easy. Since it's blueprintless we don't have to migrate 
 You can create a snapshot with the [create snapshot](#create-snapshot) command:
 
 ```shell
-curl -X POST http://localhost:2000/myblog/_version
+curl -X POST http://localhost:2020/myblog/_version
 ```
 
 When the request completes, the storage engines are ready to handle data with the new blueprint.
@@ -267,7 +267,7 @@ You can also include a **links** key that is an array of UUID's, pointing to oth
 
 Below is an example:
 ```shell
-curl -X PUT http://localhost:2000/myblog/article/66276124-ebcd-45e1-8013-825346daa283 -d '
+curl -X PUT http://localhost:2020/myblog/article/66276124-ebcd-45e1-8013-825346daa283 -d '
 {
   "id": "66276124-ebcd-45e1-8013-825346daa283",
   "project_version": 1,
@@ -278,21 +278,21 @@ curl -X PUT http://localhost:2000/myblog/article/66276124-ebcd-45e1-8013-825346d
   "content_nl": "De inhoud",
   "content_en": "The content",
   "date_created": "2014-01-17 03:50:12",
-  "date_updated": "2014-01-17 03:50:12"
+  "date_changed": "2014-01-17 03:50:12"
 }'
 ```
 
 Deleting an item is not so difficult either:
 ```shell
-curl -X DELETE http://localhost:2000/myblog/article/66276124-ebcd-45e1-8013-825346daa283
+curl -X DELETE http://localhost:2020/myblog/article/66276124-ebcd-45e1-8013-825346daa283
 ```
 
 #API
 
-At this moment, the only way to communicate with node-projector is via a JSON API.  
-**In the future we might add support for communication with node-projector via RabbitMQ**
+At this moment, the only way to communicate with dstore is via a JSON API.  
+**In the future we might add support for communication with dstore via RabbitMQ**
 
-Please check the [API documentation](http://docs.nodeprojector.apiary.io/) over at apiary.io.
+Please check the [API documentation](http://docs.dstore.apiary.io/) over at apiary.io.
 (**NOTE:** The API is currently being updated to reflect the examples in the apiary docs.)
 
 #Requirements
@@ -318,27 +318,27 @@ export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
 export PROJECT_FILE_PATH="storage/blueprint"
 export PROJECTOR_PATH="."
-export PORT=2000
+export PORT=2020
 ```
 
 #Installation
 
-We build a .deb file that installs node-projector on your system.
+We build a .deb file that installs dstore on your system.
 It is made & tested on Ubuntu 14.04, but probably works in debian as well.
 It will go through all the instructions as seen in [DIY](#diy).
 
 ## Vagrant
 ```shell
-git clone https://github.com/trappsnl/node-projector.git
-cd node-projector
+git clone https://github.com/trappsnl/dstore.git
+cd dstore
 vagrant up
 ```
 
 ## APT
 
 ```shell
-wget https://github.com/trappsnl/node-projector/raw/master/build/debinstall/node-projector-1.deb
-sudo dpkg -i node-projector-1.deb
+wget https://github.com/trappsnl/dstore/raw/master/build/debinstall/dstore-1.deb
+sudo dpkg -i dstore-1.deb
 
 # missing dependencies ?
 # if you don't already have elasticsearch installed, add the repository as described below
@@ -350,14 +350,14 @@ sudo apt-get update
 sudo apt-get -f install
 
 # now try again
-sudo dpkg -i node-projector-1.deb
+sudo dpkg -i dstore-1.deb
 ```
 
 ## DIY
 
 ```shell
-# install node-projector
-npm install --save node-projector
+# install dstore
+npm install --save dstore
 
 # install PM2 (node.js process manager)
 sudo npm install -g pm2
@@ -397,11 +397,11 @@ export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
 export LEVEL_PATH="storage/level"
 export PROJECT_FILE_PATH="storage/blueprint"
 export PROJECTOR_PATH="."
-export PORT=2000
+export PORT=2020
 
-# start node-projector
-cd path/to/node-projector/bin && ./start.sh
+# start dstore
+cd path/to/dstore/bin && ./start.sh
 ```
 
 #Dive deeper
-Head over to the [Api docs](http://trappsnl.github.io/node-projector) to learn more about the internals.
+Head over to the [Api docs](http://trappsnl.github.io/dstore) to learn more about the internals.

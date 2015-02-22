@@ -1,10 +1,10 @@
 {
-  "name": "node-projector",
+  "name": "dstore",
   "version": "0.1.24",
   "description": "Store data to PostgreSQL, Elasticsearch and LevelDB (more can be added) via a simple API",
   "repository": {
     "type": "git",
-    "url": "git://github.com/trappsnl/node-projector.git"
+    "url": "git://github.com/trappsnl/dstore.git"
   },
   "main": "main.js",
   "scripts": {
@@ -17,6 +17,7 @@
     "bluebird": "^2.3.10",
     "deep-diff": "^0.3.0",
     "elasticsearch": "^2.4.3",
+    "event-stream": "^3.2.2",
     "geojson-coords": "0.0.0",
     "knex": "^0.7.3",
     "knex-postgis": "^0.1.2",
@@ -24,6 +25,7 @@
     "level-party": "^1.0.1",
     "level-sublevel": "^6.3.16",
     "map-stream": "0.0.5",
+    "minimist": "^1.1.0",
     "mkdirp": "^0.5.0",
     "moment": "^2.8.3",
     "node-uuid": "^1.4.1",
@@ -32,7 +34,6 @@
     "request": "^2.49.0",
     "restify": "^2.8.4",
     "tv4": "^1.1.9",
-    "event-stream": "^3.2.2",
     "underscore": "^1.7.0"
   },
   "devDependencies": {
