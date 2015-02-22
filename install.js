@@ -4,7 +4,7 @@ app.get('postgresql.migrator')
   .then(migrate);
 
 function migrate (migrator) {
-  migrator.migrate('projector', 1, {
+  migrator.migrate('dstore', 1, {
     log: {
       table: 'log',
       columns: {

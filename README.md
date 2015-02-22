@@ -30,7 +30,7 @@ Currently, dstore supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, th
 
 # Blueprints
 
-The blueprint describes your data format, so the projectors know what data they can expect and know how to serialize it.  
+The blueprint describes your data format, so the stores know what data they can expect and know how to serialize it.  
 A blueprint contains information like the table name, elasticsearch type, the columns and the validation options that should be used when data is stored.  
 Let's look at an example how to create a blueprint for storing posts on my blog.
 For this, we use the [put blueprint](#put-blueprint) command, and use "myblog" as the project, and "article" as the type.
@@ -242,7 +242,7 @@ As you can see, we follow PostgreSQL's [] notation for defining *an array* of so
 
 When you are done adding blueprints, it's time to create a snapshot.
 By creating a snapshot we are saving the current state of all blueprints, and assign a snapshot version number to it.
-After the snapshot is stored, the migrators for every projector will kick into action to create new databases / elasticsearch indexes, tables and type mappings.
+After the snapshot is stored, the migrators for every store will kick into action to create new databases / elasticsearch indexes, tables and type mappings.
 For LevelDB, it's quite easy. Since it's blueprintless we don't have to migrate anything.
 
 You can create a snapshot with the [create snapshot](#create-snapshot) command:
@@ -315,9 +315,9 @@ export POSTGRESQL_USER="..."
 export POSTGRESQL_PASSWORD="..."
 export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
-export LEVEL_PATH="storage/level"
-export PROJECT_FILE_PATH="storage/blueprint"
-export PROJECTOR_PATH="."
+export PROJECTOR_PATH=`pwd`
+export LEVEL_PATH="$PROJECTOR_PATH/storage/level"
+export PROJECT_FILE_PATH="$PROJECTOR_PATH/storage/blueprint"
 export PORT=2020
 ```
 
@@ -390,9 +390,9 @@ export POSTGRESQL_USER="..."
 export POSTGRESQL_PASSWORD="..."
 export ELASTICSEARCH_HOST="http://localhost:9200"
 export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
-export LEVEL_PATH="storage/level"
-export PROJECT_FILE_PATH="storage/blueprint"
-export PROJECTOR_PATH="."
+export PROJECTOR_PATH=`pwd`
+export LEVEL_PATH="$PROJECTOR_PATH/storage/level"
+export PROJECT_FILE_PATH="$PROJECTOR_PATH/storage/blueprint"
 export PORT=2020
 
 # start dstore

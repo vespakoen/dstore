@@ -15,14 +15,14 @@ sudo apt-get install -y nodejs build-essential openjdk-7-jdk htop
 echo "==> Grab dstore .deb"
 wget https://github.com/trappsnl/dstore/raw/master/build/debinstall/dstore-1.deb
 
-cho "Installing deb"
+echo "Installing deb"
 sudo dpkg -i dstore-1.deb
 
 echo "==> Running apt-get -f install"
 sudo apt-get -f -y install << INPUT
 
-projector
-projector
+dstore
+dstore
 INPUT
 
 echo "==> Starting elasticsearch on startup"

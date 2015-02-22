@@ -157,7 +157,7 @@ module.exports = function () {
       //////////////////////////// ITEM ACTIONS //////////////////////////
       ////////////////////////////////////////////////////////////////////
 
-      // projector.putItem(project_id, blueprint_id, id, item)
+      // storage.putItem(project_id, blueprint_id, id, item)
       server.put('/:project_id/:blueprint_id/:id', createHandler('put-item', function (req) {
         return {
           project_id: req.params.project_id,
@@ -167,7 +167,7 @@ module.exports = function () {
         };
       }));
 
-      // projector.delItem(project_id, blueprint_id, id)
+      // storage.delItem(project_id, blueprint_id, id)
       server.del('/:project_id/:blueprint_id/:id', createHandler('del-item', function (req) {
         return {
           project_id: req.params.project_id,

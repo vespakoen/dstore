@@ -13,10 +13,10 @@ echo "Creating PostgreSQL user"
 echo "Enter username for PostgreSQL user: "
 read pu
 read -s -p "Enter password for user $pu: " pp
-sed -i "s/POSTGRESQL_USER=projector/POSTGRESQL_USER=$pu/g" /etc/dstore/dstore.conf
-sed -i "s/POSTGRESQL_PASSWORD=projector/POSTGRESQL_PASSWORD=$pp/g" /etc/dstore/dstore.conf
+sed -i "s/POSTGRESQL_USER=dstore/POSTGRESQL_USER=$pu/g" /etc/dstore/dstore.conf
+sed -i "s/POSTGRESQL_PASSWORD=dstore/POSTGRESQL_PASSWORD=$pp/g" /etc/dstore/dstore.conf
 su postgres -c psql > /dev/null <<EOF
-  CREATE USER projector WITH PASSWORD '$pp';
+  CREATE USER dstore WITH PASSWORD '$pp';
 EOF
 
 # Create postgis template

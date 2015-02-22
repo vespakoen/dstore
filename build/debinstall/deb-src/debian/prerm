@@ -4,6 +4,6 @@
 service dstore stop || true
 
 # Removing files
-rm -rf /opt/dstore
-rm -rf /etc/dstore
-rm /etc/init.d/dstore
+rm -rf /opt/dstore || true
+rm -rf /etc/dstore || true
+rm /etc/init.d/dstore || true

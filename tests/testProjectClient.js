@@ -17,7 +17,7 @@ test('when testing the project client', function (t) {
     postgresql: function () {
       return app.get('storage.postgresql.adapter')
         .then(function (adapter) {
-          var client = adapter.getClient('projector', 1);
+          var client = adapter.getClient('dstore', 1);
           return BBPromise.join(
             client.table('log').where({ project_id: 'clienttest' }).del().then(function () {}),
             client.table('snapshots').where({ project_id: 'clienttest' }).del().then(function () {}),

@@ -249,14 +249,14 @@ A project can be created in 2 different ways:
 
 # Group Blueprints
 
-Blueprints tell the projector what your data looks like.
+Blueprints tell dstore what your data looks like.
 
 This is used for:
 
 * Validation of the input when storing items (via json schema).
     * **json schema** http://spacetelescope.github.io/understanding-json-schema/
     * **built-in schemas** https://github.com/trappsnl/dstore/tree/master/schemas
-* Serialization of the input when sending the item to a specific projector.
+* Serialization of the input when sending the item to a specific store.
 * Migration of the tables / creation of the elasticsearch mappings.
 * Transforming of items to make it compatible with blueprints of different versions.
 

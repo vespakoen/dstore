@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # generate docs to temp folder
-jsduck --title=dstore lib/* -o /tmp/projector-docs
+jsduck --title=dstore lib/* -o /tmp/dstore-docs
 
 git stash
 git checkout gh-pages
 
 # copy files to gh-pages branch
-rsync -av /tmp/projector-docs/ .
+rsync -av /tmp/dstore-docs/ .
 
 # commit & push
 git add .
