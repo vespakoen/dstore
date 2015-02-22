@@ -459,7 +459,7 @@ test('when testing integration', function (t) {
       return putFirstItem(opts);
     })
     .then(function () {
-      return putSecondBlueprint(opts)
+      return putSecondBlueprint(opts);
     })
     .then(function () {
       return tagProject(opts);

@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('underscore');
 var BBPromise = require('bluebird');
 var app = require('../../main');

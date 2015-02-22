@@ -129,7 +129,7 @@ module.exports = function () {
         return {
           project_id: req.params.project_id,
           blueprint_id: req.params.blueprint_id
-        }
+        };
       }));
 
       // blueprintFacade.getAllBlueprints(project_id, projectVersion)

@@ -6,7 +6,7 @@ var app = require('../main');
 
 var queue;
 
-if ( ! argv['store']) {
+if ( ! argv.store) {
   console.error('Usage: node store.js --store=nameofthestore');
   console.error('PM2 Usage: pm2 start store.js -- --store=nameofthestore');
   process.exit(0);

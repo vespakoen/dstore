@@ -1,3 +1,5 @@
+'use strict';
+
 var app = require('./main');
 
 app.get('postgresql.migrator')

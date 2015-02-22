@@ -25,7 +25,7 @@ test('when testing the project client', function (t) {
           ).catch(function () {
             // noop
           });
-        })
+        });
     }
   };
 
