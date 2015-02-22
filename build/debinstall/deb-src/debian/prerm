@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Stopping the service
-service node-projector stop || true
+service dstore stop || true
 
 # Removing files
-rm -rf /opt/node-projector
-rm -rf /etc/node-projector
-rm /etc/init.d/node-projector
+rm -rf /opt/dstore
+rm -rf /etc/dstore
+rm /etc/init.d/dstore

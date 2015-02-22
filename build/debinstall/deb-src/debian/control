@@ -1,4 +1,4 @@
-Package: node-projector
+Package: dstore
 Version: 1.0-1
 Section: base
 Priority: optional
@@ -6,4 +6,4 @@ Architecture: all
 Installed-Size: SIZE
 Depends: elasticsearch, rabbitmq-server, postgresql, postgresql-contrib, postgresql-9.3-postgis-2.1, libpq-dev, nodejs
 Maintainer: Koen Schmeets <koen@trapps.nl>
-Description: node-projector
+Description: dstore

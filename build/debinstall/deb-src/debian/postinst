@@ -6,15 +6,15 @@ npm install -g --production pm2 > /dev/null
 
 # Install dependencies
 echo "Installing node dependencies via npm"
-cd /opt/node-projector && npm install --production > /dev/null
+cd /opt/dstore && npm install --production > /dev/null
 
 # Create user
 echo "Creating PostgreSQL user"
 echo "Enter username for PostgreSQL user: "
 read pu
 read -s -p "Enter password for user $pu: " pp
-sed -i "s/POSTGRESQL_USER=projector/POSTGRESQL_USER=$pu/g" /etc/node-projector/node-projector.conf
-sed -i "s/POSTGRESQL_PASSWORD=projector/POSTGRESQL_PASSWORD=$pp/g" /etc/node-projector/node-projector.conf
+sed -i "s/POSTGRESQL_USER=projector/POSTGRESQL_USER=$pu/g" /etc/dstore/dstore.conf
+sed -i "s/POSTGRESQL_PASSWORD=projector/POSTGRESQL_PASSWORD=$pp/g" /etc/dstore/dstore.conf
 su postgres -c psql > /dev/null <<EOF
   CREATE USER projector WITH PASSWORD '$pp';
 EOF

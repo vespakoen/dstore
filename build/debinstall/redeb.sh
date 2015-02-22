@@ -5,8 +5,8 @@
 set -u
 set -e
 
-SRC=/tmp/node-projector-deb-src
-DIST=/tmp/node-projector-deb-dist
+SRC=/tmp/dstore-deb-src
+DIST=/tmp/dstore-deb-dist
 SYSROOT=${SRC}/sysroot
 DEBIAN=${SRC}/debian
 
@@ -17,7 +17,7 @@ rm -rf ${SRC}
 rsync -a deb-src/ ${SRC}/
 mkdir -p ${SYSROOT}/opt/
 
-rsync -a ../../ --exclude=node_modules --exclude='build/' --exclude='tests/' --exclude='.git' ${SYSROOT}/opt/node-projector/ --delete
+rsync -a ../../ --exclude=node_modules --exclude='build/' --exclude='tests/' --exclude='.git' ${SYSROOT}/opt/dstore/ --delete
 
 find ${SRC}/ -type d -exec chmod 0755 {} \;
 find ${SRC}/ -type f -exec chmod go-w {} \;
@@ -38,6 +38,6 @@ echo 2.0 > ./debian-binary
 find ${DIST}/ -type d -exec chmod 0755 {} \;
 find ${DIST}/ -type f -exec chmod go-w {} \;
 chown -R root:root ${DIST}/
-ar r ${DIST}/node-projector-1.deb debian-binary control.tar.gz data.tar.gz
+ar r ${DIST}/dstore-1.deb debian-binary control.tar.gz data.tar.gz
 popd
-rsync -a ${DIST}/node-projector-1.deb ./
+rsync -a ${DIST}/dstore-1.deb ./
