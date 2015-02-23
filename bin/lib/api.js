@@ -79,7 +79,7 @@ module.exports = function () {
       server.put('/:project_id/_project', createHandler('put-project', function (req) {
         return {
           project_id: req.params.project_id,
-          blueprints: JSON.parse(req.body)
+          blueprints: req.body
         };
       }));
 
@@ -138,7 +138,7 @@ module.exports = function () {
         return {
           project_id: req.params.project_id,
           blueprint_id: req.params.blueprint_id,
-          blueprint: JSON.parse(req.body)
+          blueprint: req.body
         };
       }));
 
@@ -189,7 +189,7 @@ module.exports = function () {
           project_id: req.params.project_id,
           blueprint_id: req.params.blueprint_id,
           id: req.params.id,
-          item: JSON.parse(req.body)
+          item: req.body
         };
       }));
 
