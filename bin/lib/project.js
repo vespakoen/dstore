@@ -91,6 +91,7 @@ module.exports = function () {
 
       function tagAllProjects(command) {
         console.log('tag-all-projects');
+        
         return facade.tagAllProjects();
       }
     });
