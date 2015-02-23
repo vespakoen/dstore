@@ -17,7 +17,8 @@ module.exports = function () {
         return handler(command)
           .catch(function (err) {
             console.error('Error in blueprint', err);
-          })
+            throw err;
+          });
       }
     }
 

@@ -17,11 +17,13 @@ module.exports = function () {
           return handler(command)
             .catch(function (err) {
               console.error('Error in project', err);
-            })
+              throw err;
+            });
         }
       }
 
       consumer.consume('get-project', wrap(getProject));
+      consumer.consume('get-all-project-versions', wrap(getAllProjectVersions));
       consumer.consume('get-project-version', wrap(getProjectVersion));
       consumer.consume('get-all-projects', wrap(getAllProjects));
       consumer.consume('put-project', wrap(putProject));
@@ -37,6 +39,12 @@ module.exports = function () {
         console.log('get-project', command.project_id || 'no project_id');
 
         return facade.getProject(command.project_id);
+      }
+
+      function getAllProjectVersions(command) {
+        console.log('get-project-version');
+
+        return facade.getAllProjectVersions();
       }
 
       function getProjectVersion(command) {

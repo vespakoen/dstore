@@ -18,7 +18,8 @@ module.exports = function () {
           return handler(command)
             .catch(function (err) {
               console.error('Error in router', err);
-            })
+              throw err;
+            });
         }
       }
 

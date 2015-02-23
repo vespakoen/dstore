@@ -26,7 +26,8 @@ BBPromise.all([
       return handler(command)
         .catch(function (err) {
           console.error('Error in store ' + store, err);
-        })
+          throw err;
+        });
     }
   }
 
