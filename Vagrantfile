@@ -52,7 +52,7 @@ Vagrant.configure("2") do |config|
 
     machine.vm.provider "virtualbox" do |vb|
       vb.name = "dstore"
-      vb.customize ["modifyvm", :id, "--memory", "1024"]
+      vb.customize ["modifyvm", :id, "--memory", "1500"]
     end
   end
 end
