@@ -29,7 +29,10 @@ sudo service elasticsearch start
 sudo update-rc.d elasticsearch defaults 95 10
 
 echo "==> Updating dstore config"
+mkdir /home/vagrant/{blueprint,level}
 sed -i "s/PROJECTOR_PATH=\\/opt\\/dstore/PROJECTOR_PATH=\\/vagrant/g" /etc/dstore/dstore.conf
+sed -i "s/LEVEL_PATH=\"$PROJECTOR_PATH\/storage\/level\"/LEVEL_PATH=\"\/home\/vagrant\/level\"/g" /etc/dstore/dstore.conf
+sed -i "s/PROJECTOR_PATH=\"$PROJECTOR_PATH\/storage\/blueprint\"/PROJECTOR_PATH=\"\/home\/vagrant\/blueprint\"/g" /etc/dstore/dstore.conf
 
 echo "==> Start dstore"
 sudo service dstore start
