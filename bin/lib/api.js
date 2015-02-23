@@ -91,6 +91,13 @@ module.exports = function () {
       }));
 
       // projectFacade.getProjectVersion(project_id)
+      server.get('/:project_id/_version', createHandler('get-project-version', function (req) {
+        return {
+          project_id: req.params.project_id
+        };
+      }));
+
+      // projectFacade.getProjectVersion(project_id)
       server.del('/:project_id/_version', createHandler('get-project-version', function (req) {
         return {
           project_id: req.params.project_id
@@ -143,7 +150,7 @@ module.exports = function () {
         };
       }));
 
-      // blueprintFacade.getBlueprintVersions(project_id)
+      // blueprintFacade.getBlueprintVersions(project_id, blueprint_id)
       server.get('/:project_id/:blueprint_id/_version', createHandler('get-blueprint-versions', function (req) {
         return {
           project_id: req.params.project_id,
