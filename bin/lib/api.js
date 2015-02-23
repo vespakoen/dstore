@@ -56,6 +56,25 @@ module.exports = function () {
       ////////////////////////// PROJECT ACTIONS /////////////////////////
       ////////////////////////////////////////////////////////////////////
 
+      // projectFacade.getAllProjects()
+      server.get('/_project', createHandler('get-all-projects'));
+
+      // projectFacade.getAllProjects()
+      server.del('/_project', createHandler('del-all-projects'));
+
+      // projectFacade.getAllProjectVersions()
+      server.get('/_version', createHandler('get-all-project-versions'));
+      
+      // projectFacade.tagAllProjects()
+      server.post('/_version', createHandler('tag-all-projects'));
+
+      // projectFacade.getProject(project_id)
+      server.get('/:project_id/_project', createHandler('get-project', function (req) {
+        return {
+          project_id: req.params.project_id
+        };
+      }));
+
       // projectFacade.putProject(project_id, blueprints)
       server.put('/:project_id/_project', createHandler('put-project', function (req) {
         return {
