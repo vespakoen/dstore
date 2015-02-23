@@ -1,6 +1,6 @@
 {
   "name": "dstore",
-  "version": "0.2.25",
+  "version": "0.3.0",
   "description": "Store data to PostgreSQL, Elasticsearch and LevelDB (more can be added) via a simple API",
   "repository": {
     "type": "git",
