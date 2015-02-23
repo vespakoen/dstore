@@ -35,7 +35,7 @@ echo "==> Updating dstore config"
 mkdir /home/vagrant/{blueprint,level}
 sudo sed -i 's|PROJECTOR_PATH=/opt/dstore|PROJECTOR_PATH=/vagrant|g' /etc/dstore/dstore.conf
 sudo sed -i 's|LEVEL_PATH="$PROJECTOR_PATH/storage/level"|LEVEL_PATH="/home/vagrant/level"|g' /etc/dstore/dstore.conf
-sudo sed -i 's|PROJECT_FILE_PATH="$PROJECTOR_PATH/storage/blueprint"|PROJECTOR_PATH="/home/vagrant/blueprint"|g' /etc/dstore/dstore.conf
+sudo sed -i 's|PROJECT_FILE_PATH="$PROJECTOR_PATH/storage/blueprint"|PROJECT_FILE_PATH="/home/vagrant/blueprint"|g' /etc/dstore/dstore.conf
 
 echo "==> Start dstore"
 sudo service dstore start
