@@ -46,7 +46,7 @@ Currently, dstore supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, a 
 # Projects
 
 Projects are similar to a "database" or an "elasticsearch index", 
-In case of dnode, a project is nothing more than an identifier under which we store blueprints and version information.
+In case of dstore, a project is nothing more than an identifier under which we store blueprints and version information.
 A good identifier for your project is a [reverse-DNS](http://en.wikipedia.org/wiki/Reverse_domain_name_notation)  
 or a simple string like "blog" or "website"
 
