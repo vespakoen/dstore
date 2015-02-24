@@ -313,9 +313,9 @@ curl -X DELETE http://localhost:2020/myblog/article/66276124-ebcd-45e1-8013-8253
 # API
 
 At this moment, the only way to communicate with dstore is via a JSON API.  
+We are looking to add more ways of communicating with dstore in the future.
 
-Please check the [API documentation](http://docs.dstore.apiary.io/) over at apiary.io.
-(**NOTE:** The API is currently being updated to reflect the examples in the apiary docs.)
+Check the [API documentation](http://docs.dstore.apiary.io/) over at apiary.io for a full overview of possibilities to manage and retrieve information about projects, blueprints and version.
 
 # Requirements
 
