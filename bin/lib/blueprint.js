@@ -26,7 +26,7 @@ module.exports = function () {
     consumer.consume('get-all-blueprints', wrap(getAllBlueprints));
     consumer.consume('get-blueprint-versions', wrap(getBlueprintVersions));
     consumer.consume('put-blueprint', wrap(putBlueprint));
-    consumer.consume('put-all-blueprints', wrap(putAllBlueprints));
+    consumer.consume('put-many-blueprints', wrap(putManyBlueprints));
 
     function getBlueprint(command) {
       console.log('get-blueprint', command.project_id || 'no project_id', command.blueprint_id || 'no blueprint_id', command.project_version || 'no project_version');
@@ -52,10 +52,10 @@ module.exports = function () {
       return facade.putBlueprint(command.project_id, command.blueprint_id, command.blueprint);
     }
 
-    function putAllBlueprints(command) {
-      console.log('put-blueprint', command.project_id || 'no project_id', command.blueprints || 'no blueprints');
+    function putManyBlueprints(command) {
+      console.log('put-many-blueprints', command.project_id || 'no project_id', command.blueprints || 'no blueprints');
 
-      return facade.putBlueprint(command.project_id, command.blueprints);
+      return facade.putManyBlueprints(command.project_id, command.blueprints);
     }
   });
 };

@@ -56,18 +56,6 @@ module.exports = function () {
       ////////////////////////// PROJECT ACTIONS /////////////////////////
       ////////////////////////////////////////////////////////////////////
 
-      // projectFacade.getAllProjects()
-      server.get('/_project', createHandler('get-all-projects'));
-
-      // projectFacade.getAllProjects()
-      server.del('/_project', createHandler('del-all-projects'));
-
-      // projectFacade.getAllProjectVersions()
-      server.get('/_version', createHandler('get-all-project-versions'));
-      
-      // projectFacade.tagAllProjects()
-      server.post('/_version', createHandler('tag-all-projects'));
-
       // projectFacade.getProject(project_id)
       server.get('/:project_id/_project', createHandler('get-project', function (req) {
         return {
@@ -90,26 +78,18 @@ module.exports = function () {
         };
       }));
 
-      // projectFacade.getProjectVersion(project_id)
-      server.get('/:project_id/_version', createHandler('get-project-version', function (req) {
+      // projectFacade.getAllProjects()
+      server.get('/_project', createHandler('get-all-projects'));
+
+      // projectFacade.putAllProjects(projects)
+      server.put('/_project', createHandler('put-all-projects', function (req) {
         return {
-          project_id: req.params.project_id
+          projects: req.body
         };
       }));
 
-      // projectFacade.getProjectVersion(project_id)
-      server.del('/:project_id/_version', createHandler('get-project-version', function (req) {
-        return {
-          project_id: req.params.project_id
-        };
-      }));
-
-      // projectFacade.tagProject(project_id)
-      server.post('/:project_id/_version', createHandler('tag-project', function (req) {
-        return {
-          project_id: req.params.project_id
-        };
-      }));
+      // projectFacade.delAllProjects()
+      server.del('/_project', createHandler('del-all-projects'));
 
       ////////////////////////////////////////////////////////////////////
       ///////////////////////// BLUEPRINT ACTIONS ////////////////////////
@@ -142,21 +122,14 @@ module.exports = function () {
         };
       }));
 
+      // @todo del-blueprint
       // blueprintFacade.delBlueprint(project_id, blueprint_id)
-      server.del('/:project_id/:blueprint_id/_blueprint', createHandler('del-blueprint', function (req) {
-        return {
-          project_id: req.params.project_id,
-          blueprint_id: req.params.blueprint_id
-        };
-      }));
-
-      // blueprintFacade.getBlueprintVersions(project_id, blueprint_id)
-      server.get('/:project_id/:blueprint_id/_version', createHandler('get-blueprint-versions', function (req) {
-        return {
-          project_id: req.params.project_id,
-          blueprint_id: req.params.blueprint_id
-        };
-      }));
+      // server.del('/:project_id/:blueprint_id/_blueprint', createHandler('del-blueprint', function (req) {
+      //   return {
+      //     project_id: req.params.project_id,
+      //     blueprint_id: req.params.blueprint_id
+      //   };
+      // }));
 
       // blueprintFacade.getAllBlueprints(project_id, projectVersion)
       server.get('/:project_id/_blueprint/:project_version', createHandler('get-all-blueprints', function (req) {
@@ -166,7 +139,6 @@ module.exports = function () {
         };
       }));
 
-
       // blueprintFacade.getAllBlueprints(project_id, 'current')
       server.get('/:project_id/_blueprint', createHandler('get-all-blueprints', function (req) {
         return {
@@ -175,9 +147,39 @@ module.exports = function () {
         };
       }));
 
-      // @todo put-many-blueprints
+      // blueprintFacade.putManyBlueprints(project_id, blueprints)
+      server.put('/:project_id/:blueprint_id/_blueprint', createHandler('put-many-blueprints', function (req) {
+        return {
+          project_id: req.params.project_id,
+          blueprints: req.body
+        };
+      }));
 
       // @todo del-many-blueprints
+      
+      ////////////////////////////////////////////////////////////////////
+      ////////////////////////// VERSION ACTIONS /////////////////////////
+      ////////////////////////////////////////////////////////////////////
+
+      // projectFacade.getProjectVersion(project_id)
+      server.del('/:project_id/_version', createHandler('get-project-version', function (req) {
+        return {
+          project_id: req.params.project_id
+        };
+      }));
+
+      // projectFacade.tagProject(project_id)
+      server.post('/:project_id/_version', createHandler('tag-project', function (req) {
+        return {
+          project_id: req.params.project_id
+        };
+      }));
+
+      // projectFacade.getAllProjectVersions()
+      server.get('/_version', createHandler('get-all-project-versions'));
+
+      // projectFacade.tagAllProjects()
+      server.post('/_version', createHandler('tag-all-projects'));
 
       ////////////////////////////////////////////////////////////////////
       //////////////////////////// ITEM ACTIONS //////////////////////////
@@ -193,6 +195,8 @@ module.exports = function () {
         };
       }));
 
+      // @todo put-many-items
+
       // storage.delItem(project_id, blueprint_id, id)
       server.del('/:project_id/:blueprint_id/:id', createHandler('del-item', function (req) {
         return {
@@ -201,6 +205,8 @@ module.exports = function () {
           id: req.params.id
         };
       }));
+
+      // @todo del-many-items
 
       ////////////////////////////////////////////////////////////////////
       //////////////////////////// SERVER SETUP //////////////////////////
