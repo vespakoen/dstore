@@ -5,11 +5,27 @@
 
 # Introduction
 
-dstore is an abstraction over storage engines, more specifically, managing their "schema" and handling creating / updating & deleting data (No reads!).
+dstore is an interface for different storage formats and databases (let's call them **datastores** from now on).  
+It takes 1 kind of input, and translates this into the correct format for every storage engine.  
 
-Via a simple REST API, you can manage the blueprint of your data, and store data with a single request and in a simple format.
+Besides abstracting away the input format, dstore also provides a single notation for your data's schema (called **blueprints**).  
 
-Currently, dstore supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, the perfect stack for a modern web application.  
+Blueprints tell dstore what your data looks like.
+
+This is used for:
+
+* Validation of the input when storing items (via json schema).
+    * **json schema** http://spacetelescope.github.io/understanding-json-schema/
+    * **built-in schemas** https://github.com/trappsnl/dstore/tree/master/schemas
+* Serialization of the input when sending the item to a specific store.
+* Creation of the PostgreSQL tables / creation of the Elasticsearch mappings.
+* Transforming of items to make it compatible with blueprints of different versions.
+
+dstore also tracks the changes you make to your blueprints.  
+By knowing what has changed, it is able to make the data compatible with older and never versions of your project.  
+This means old clients will still receive the latest data, and data that gets inserted by older clients is still available to new clients (although maybe lacking some "columns" in the data, in case new columns were added).  
+
+Currently, dstore supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, a great stack for a modern web application.  
 
 
 # Overview
@@ -19,21 +35,27 @@ Currently, dstore supports **PostgreSQL**, **Elasticsearch** and **LevelDB**, th
 
 # Topics
 
-- [Blueprints](#blueprints)  
-- [Snapshots](#snapshots)
+- [Projects](#projects)
+- [Blueprints](#blueprints)
 - [Items](#items)
 - [API](#api)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Dive deeper](#dive-deeper)
 
+# Projects
+
+Projects are similar to a "database" or an "elasticsearch index", 
+In case of dnode, a project is nothing more than an identifier under which we store blueprints and version information.
+A good identifier for your project is a [reverse-DNS](http://en.wikipedia.org/wiki/Reverse_domain_name_notation)  
+or a simple string like "blog" or "website"
 
 # Blueprints
 
 The blueprint describes your data format, so the stores know what data they can expect and know how to serialize it.  
 A blueprint contains information like the table name, elasticsearch type, the columns and the validation options that should be used when data is stored.  
-Let's look at an example how to create a blueprint for storing posts on my blog.
-For this, we use the [put blueprint](#put-blueprint) command, and use "myblog" as the project, and "article" as the type.
+Let's look at an example how to create a blueprint for storing posts for a blog.
+For this, we use **Put blueprint** command, and use "myblog" as the project identifier, and "article" as the blueprint identifier.
 
 ```shell
 curl -X PUT http://localhost:2020/myblog/article/_blueprint -d '
@@ -79,9 +101,9 @@ curl -X PUT http://localhost:2020/myblog/article/_blueprint -d '
 }'
 ```
 
-I hope the format explains itself.
-
-Below is a map of the available **column types**, and the type that it translates to in the storage engine.
+This command created a "myblog" project, containing a "article" blueprint.
+All we have to do next is tag the "myblog" project to make it ready for accepting data.
+But first, take a look at the **column types** that dstore supports and what they translate to for the different datastores.
 
 <table>
   <tr>
@@ -238,14 +260,15 @@ Below is a map of the available **column types**, and the type that it translate
 
 As you can see, we follow PostgreSQL's [] notation for defining *an array* of something.
 
-# Snapshots
+# Versions
 
-When you are done adding blueprints, it's time to create a snapshot.
-By creating a snapshot we are saving the current state of all blueprints, and assign a snapshot version number to it.
-After the snapshot is stored, the migrators for every store will kick into action to create new databases / elasticsearch indexes, tables and type mappings.
-For LevelDB, it's quite easy. Since it's blueprintless we don't have to migrate anything.
+When you are done adding blueprints to a project, it's time to create a project tag.
+By creating a tag we are saving the current state of all blueprints, and assign a tag version number to it.
+The migrators for every store will kick into action to prepare themselves for accepting data in this new format.  
+In practice, this means that a new database and elasticsearch index is created with it's name being a combination of your project's identifier, a "v" and the tagged version. (e.g. myblogv1, myblogv2 etc...).  
+For LevelDB, it's quite easy. Since it's schemaless we don't have to migrate anything.
 
-You can create a snapshot with the [create snapshot](#create-snapshot) command:
+You can create a tag with the **Tag project** command:
 
 ```shell
 curl -X POST http://localhost:2020/myblog/_version
@@ -259,7 +282,7 @@ When the request completes, the storage engines are ready to handle data with th
 Storing items is done via a simple PUT command.
 The request body is JSON and should, at the very least contain the following keys:
 
-- **project_version** An existing snapshot version
+- **project_version** An existing project tag
 - **id** A UUID that does or does not yet exist in the database
 
 You can also include a **links** key that is an array of UUID's, pointing to other items  
@@ -290,7 +313,6 @@ curl -X DELETE http://localhost:2020/myblog/article/66276124-ebcd-45e1-8013-8253
 # API
 
 At this moment, the only way to communicate with dstore is via a JSON API.  
-**In the future we might add support for communication with dstore via RabbitMQ**
 
 Please check the [API documentation](http://docs.dstore.apiary.io/) over at apiary.io.
 (**NOTE:** The API is currently being updated to reflect the examples in the apiary docs.)
