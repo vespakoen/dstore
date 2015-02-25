@@ -162,7 +162,7 @@ module.exports = function () {
       ////////////////////////////////////////////////////////////////////
 
       // projectFacade.getProjectVersion(project_id)
-      server.del('/:project_id/_version', createHandler('get-project-version', function (req) {
+      server.get('/:project_id/_version', createHandler('get-project-version', function (req) {
         return {
           project_id: req.params.project_id
         };
