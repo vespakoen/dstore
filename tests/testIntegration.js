@@ -458,9 +458,9 @@ test('when testing integration', function (t) {
     .then(function () {
       return putSecondItem(opts);
     })
-    .then(function () {
-      return delFirstItem(opts);
-    })
+    // .then(function () {
+    //   return delFirstItem(opts);
+    // })
     .then(function () {
       return BBPromise.join(
         getElasticsearchClient(opts),

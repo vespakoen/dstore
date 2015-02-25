@@ -9,10 +9,11 @@ module.exports = function () {
     .then(function (queue) {
       return BBPromise.join(
         queue.setupConsumer(),
-        queue.setupPublisher()
+        queue.setupPublisher(),
+        app.get('poormanssync')
       );
     })
-    .spread(function (consumer, publisher) {
+    .spread(function (consumer, publisher, poorMansSync) {
       function wrap(handler) {
         return function (command) {
           return handler(command)
@@ -70,6 +71,11 @@ module.exports = function () {
         return BBPromise.all(_.map(stores, function (store) {
           return publisher.publish('migrate.' + store, command);
         }))
+        .then(function () {
+          if (command.project_version > 1) {
+            return poorMansSync.sync(command.project_id, command.project_version, command.blueprints);
+          }
+        })
         .then(function () {
           return {
             success: true

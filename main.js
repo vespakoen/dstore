@@ -63,5 +63,6 @@ app.use(require('./lib/project/projectTagger'));
 
 app.use(require('./lib/queue'));
 app.use(require('./lib/validator'));
+app.use(require('./lib/poorMansSync'));
 
 module.exports = app;
