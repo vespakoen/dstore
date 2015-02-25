@@ -101,10 +101,17 @@ function putFirstItem(opts) {
         type_json: {"some": {"random": "json"}}
       }
     }
-  })
-  .catch(function (err) {
-    console.log('ERROR WHILE PUTTING FIRST ITEM', err);
-    throw err;
+  });
+}
+
+function delFirstItem(opts) {
+  return opts.publisher.publish('queue', {
+    key: 'del-item',
+    command: {
+      project_id: 'integrationtest',
+      blueprint_id: 'kitchensink',
+      id: 'e5c20ace-7aa4-4077-983b-717c2ec5427d'
+    }
   });
 }
 
@@ -450,6 +457,9 @@ test('when testing integration', function (t) {
     })
     .then(function () {
       return putSecondItem(opts);
+    })
+    .then(function () {
+      return delFirstItem(opts);
     })
     .then(function () {
       return BBPromise.join(
