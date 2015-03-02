@@ -8,7 +8,6 @@ addons:
 
 services:
   - elasticsearch
-  - rabbitmq
 
 before_script:
   - psql -c 'create database template_postgis;' -U postgres
@@ -22,8 +21,9 @@ before_script:
   - export POSTGRESQL_USER=postgres
   - export POSTGRESQL_PASSWORD=""
   - export ELASTICSEARCH_HOST=http://localhost:9200
-  - export QUEUE_CONNECTIONSTRING=amqp://guest:guest@localhost:5672
+  - export QUEUE_CLIENT="kue"
   - export PROJECTOR_PATH="$TRAVIS_BUILD_DIR"
   - export LEVEL_PATH="$PROJECTOR_PATH/tests/out/level"
   - export PROJECT_FILE_PATH="$PROJECTOR_PATH/tests/out/blueprint"
+  - export STORES=postgresql,elasticsearch,level
   - export PORT=2000
