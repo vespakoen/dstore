@@ -21,6 +21,7 @@
     "geojson-coords": "0.0.0",
     "knex": "^0.7.3",
     "knex-postgis": "^0.1.2",
+    "kue": "^0.8.11",
     "level": "^0.18.0",
     "level-party": "^1.0.1",
     "level-sublevel": "^6.3.16",
