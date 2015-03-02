@@ -336,10 +336,11 @@ export POSTGRESQL_PORT="5432"
 export POSTGRESQL_USER="..."
 export POSTGRESQL_PASSWORD="..."
 export ELASTICSEARCH_HOST="http://localhost:9200"
-export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
+export QUEUE_CLIENT="kue"
 export PROJECTOR_PATH=`pwd`
 export LEVEL_PATH="$PROJECTOR_PATH/storage/level"
 export PROJECT_FILE_PATH="$PROJECTOR_PATH/storage/blueprint"
+export STORES=postgresql,elasticsearch,level
 export PORT=2020
 ```
 
@@ -411,10 +412,11 @@ export POSTGRESQL_PORT="5432"
 export POSTGRESQL_USER="..."
 export POSTGRESQL_PASSWORD="..."
 export ELASTICSEARCH_HOST="http://localhost:9200"
-export QUEUE_CONNECTIONSTRING="amqp://guest:guest@localhost:5672"
+export QUEUE_CLIENT="kue"
 export PROJECTOR_PATH=`pwd`
 export LEVEL_PATH="$PROJECTOR_PATH/storage/level"
 export PROJECT_FILE_PATH="$PROJECTOR_PATH/storage/blueprint"
+export STORES=postgresql,elasticsearch,level
 export PORT=2020
 
 # start dstore

@@ -1,5 +1,5 @@
 sudo su postgres -c "psql -t -A <<EOF
-SELECT datname FROM pg_database WHERE datistemplate = false AND datname != 'postgres';
+SELECT datname FROM pg_database WHERE datistemplate = false AND datname != 'postgres' AND datname != 'trapps';
 EOF" | while read db
 do
 echo "Dropping database $db"

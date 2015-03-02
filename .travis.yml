@@ -8,6 +8,7 @@ addons:
 
 services:
   - elasticsearch
+  - redis-server
 
 before_script:
   - psql -c 'create database template_postgis;' -U postgres
