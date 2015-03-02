@@ -1,14 +1,8 @@
 'use strict';
 
-var pg = require('pg');
 var test = require('trap').test;
 var BBPromise = require('bluebird');
-var exec = require('child-process-promise').exec;
-var rmRF = BBPromise.promisify(require('rimraf'));
-var app = require('../main');
-BBPromise.promisifyAll(pg);
-
-var memo = {};
+var app = require('../main')(require('../config'));
 
 test('when testing the blueprint service', function (t) {
   return app.get('project.facade')
@@ -16,7 +10,7 @@ test('when testing the blueprint service', function (t) {
       return BBPromise.join(
         app.get('project.blueprint.service'),
         app.get('project.tagger'),
-        projectFacade.delProject('blueprintservicetest')
+        app.project.del('blueprintservicetest')
       );
     })
     .spread(function (service, tagger) {
@@ -62,7 +56,7 @@ test('when testing the blueprint service', function (t) {
             };
 
             t1.deepEqual(changes[0], change, "log's first change should be " + JSON.stringify(change));
-            t1.deepEqual(storedBlueprint, blueprint, "versions/news/1.json should match with " + JSON.stringify(blueprint));
+            t1.deepEqual(storedBlueprint, blueprint, "blueprint should match with " + JSON.stringify(blueprint));
           })
           .then(function () {
             return tagger.tagProject('blueprintservicetest');
@@ -81,5 +75,6 @@ test('when testing the blueprint service', function (t) {
     })
     .catch(function (err) {
       console.log('Errors while running test', err);
+      throw err;
     });
 });

@@ -2,38 +2,19 @@
 
 var test = require('trap').test;
 var BBPromise = require('bluebird');
-var rmRF = BBPromise.promisify(require('rimraf'));
-var app = require('../main');
-var pg = require('pg');
-BBPromise.promisifyAll(pg);
 
-var memo = {};
+var app = require('../main')({
+  stores: ['mock'],
+  queue: {
+    client: 'mock'
+  },
+  project: {
+    client: 'mock'
+  }
+});
 
 test('when testing the project client', function (t) {
-  var clean = {
-    file: function () {
-      return rmRF(app.config.project.file.path + '/clienttest');
-    },
-    postgresql: function () {
-      return app.get('storage.postgresql.adapter')
-        .then(function (adapter) {
-          var client = adapter.getClient('dstore', 1);
-          return BBPromise.join(
-            client.table('log').where({ project_id: 'clienttest' }).del().then(function () {}),
-            client.table('snapshots').where({ project_id: 'clienttest' }).del().then(function () {}),
-            client.table('versions').where({ project_id: 'clienttest' }).del().then(function () {})
-          ).catch(function () {
-            // noop
-          });
-        });
-    }
-  };
-
-  var clientId = app.config.project.client;
-  return clean[clientId]()
-    .then(function () {
-      return app.get('project.client');
-    })
+  return app.get('project.client')
     .then(function (client) {
       t.test('when putting a blueprint', function (ts) {
         var blueprint = {
