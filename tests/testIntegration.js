@@ -402,12 +402,12 @@ function testPostgresqlResult(result, t) {
       "uuid_type": "e5c20ace-7aa4-4077-983b-717c2ec5427d",
       "string_type": "string",
       "text_type": "text",
-      "datetime_type": "2012-11-10T08:08:07.000Z",
-      "date_type": "2012-11-09T23:00:00.000Z",
+      "datetime_type": "2012-11-10 09:08:07",
+      "date_type": "2012-11-10",
       "float_type": 11.1111,
-      "point_type": "0101000020E6100000AA262D019DA61740C6A70018CF644940",
-      "linestring_type": "0102000020E610000002000000AA262D019DA61740C6A70018CF644940AA262D019DA617405B25581CCE644940",
-      "polygon_type": "0103000020E6100000010000000500000000000000000059400000000000000000000000000040594000000000000000000000000000405940000000000000F03F0000000000005940000000000000F03F00000000000059400000000000000000",
+      "point_type": "{\"type\":\"Point\",\"coordinates\":[5.9127083,50.78757]}",
+      "linestring_type": "{\"type\":\"LineString\",\"coordinates\":[[5.9127083,50.78757],[5.9127083,50.78754]]}",
+      "polygon_type": "{\"type\":\"Polygon\",\"coordinates\":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]}",
       "boolean_type": true,
       "json_type": {
         "some": {
