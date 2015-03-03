@@ -370,6 +370,12 @@ sudo add-apt-repository -y "deb http://packages.elasticsearch.org/elasticsearch/
 echo "==> Installing dependencies"
 curl -sL https://deb.nodesource.com/setup | sudo bash -
 sudo apt-get install -y nodejs build-essential openjdk-7-jdk htop elasticsearch rabbitmq-server postgresql postgresql-contrib postgresql-9.3-postgis-2.1
+
+echo "==> Starting elasticsearch on startup"
+sudo update-rc.d elasticsearch defaults 95 10
+
+echo "==> Starting elasticsearch"
+sudo service elasticsearch start
 ```
 
 ### Install dstore
@@ -383,10 +389,6 @@ sudo dpkg -i dstore-1.deb
 
 echo "==> Running apt-get -f install (enter new postgresql credentials for dstore during installation)"
 sudo apt-get -f -y install
-
-echo "==> Starting elasticsearch on startup"
-sudo service elasticsearch start
-sudo update-rc.d elasticsearch defaults 95 10
 
 echo "==> Starting dstore on startup"
 sudo update-rc.d dstore defaults 96 11
