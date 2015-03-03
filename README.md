@@ -357,26 +357,47 @@ cd dstore
 vagrant up
 ```
 
-## APT
+## Apt
+
+### Install dependencies
+```shell
+echo "==> Grab elasticsearch key"
+wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -
+
+echo "==> Add elasticsearch repository"
+sudo add-apt-repository -y "deb http://packages.elasticsearch.org/elasticsearch/1.4/debian stable main"
+
+echo "==> Installing dependencies"
+curl -sL https://deb.nodesource.com/setup | sudo bash -
+sudo apt-get install -y nodejs build-essential openjdk-7-jdk htop elasticsearch rabbitmq-server postgresql postgresql-contrib postgresql-9.3-postgis-2.1
+```
+
+### Install dstore
 
 ```shell
+echo "==> Grab dstore .deb"
 wget https://github.com/trappsnl/dstore/raw/master/build/debinstall/dstore-1.deb
+
+echo "Installing deb"
 sudo dpkg -i dstore-1.deb
 
-# missing dependencies ?
-# if you don't already have elasticsearch installed, add the repository as described below
-wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -
-sudo add-apt-repository "deb http://packages.elasticsearch.org/elasticsearch/1.4/debian stable main"
-sudo apt-get update
+echo "==> Running apt-get -f install (enter new postgresql credentials for dstore during installation)"
+sudo apt-get -f -y install
 
-# you can now install all missing dependencies them like this:
-sudo apt-get -f install
+echo "==> Starting elasticsearch on startup"
+sudo service elasticsearch start
+sudo update-rc.d elasticsearch defaults 95 10
 
-# now try again
-sudo dpkg -i dstore-1.deb
+echo "==> Starting dstore on startup"
+sudo update-rc.d dstore defaults 96 11
+
+echo "==> Starting dstore"
+sudo service dstore start
 ```
 
 ## DIY
+
+Follow all the steps from the **Install dependencies** section, after that:
 
 ```shell
 # install dstore
@@ -384,14 +405,6 @@ npm install --save dstore
 
 # install PM2 (node.js process manager)
 sudo npm install -g pm2
-
-# add elasticsearch repository
-wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -
-sudo add-apt-repository "deb http://packages.elasticsearch.org/elasticsearch/1.4/debian stable main"
-sudo apt-get update
-
-# install dependencies
-sudo apt-get install rabbitmq-server postgresql-9.3 postgresql-contrib postgresql-9.3-postgis-2.1 nodejs build-essential openjdk-7-jdk libpq-dev
 
 # change user to postgres
 sudo su postgres
@@ -420,7 +433,7 @@ export STORES=postgresql,elasticsearch,level
 export PORT=2020
 
 # start dstore
-cd path/to/dstore/bin && ./start.sh
+./path/to/dstore/bin/start.sh
 ```
 
 #Dive deeper

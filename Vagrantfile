@@ -10,7 +10,7 @@ sudo add-apt-repository -y "deb http://packages.elasticsearch.org/elasticsearch/
 
 echo "==> Installing dependencies"
 curl -sL https://deb.nodesource.com/setup | sudo bash -
-sudo apt-get install -y nodejs build-essential openjdk-7-jdk htop
+sudo apt-get install -y nodejs build-essential openjdk-7-jdk htop elasticsearch rabbitmq-server postgresql postgresql-contrib postgresql-9.3-postgis-2.1
 
 echo "==> Grab dstore .deb"
 wget https://github.com/trappsnl/dstore/raw/master/build/debinstall/dstore-1.deb
