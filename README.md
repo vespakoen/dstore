@@ -415,13 +415,17 @@ sudo su postgres
 createdb -E UTF8 -T template0 template_postgis
 
 # create postgis template for postgresql (only if you need spatial support)
+# REPLACE THE USERNAME AND PASSWORD WITH THE ONE OF YOUR LIKINGS
 psql template_postgis <<EOF
 CREATE EXTENSION "uuid-ossp";
 CREATE EXTENSION postgis;
 UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';
+CREATE USER name_of_your_dstore_postgresql_user WITH PASSWORD 'your_very_own_password';
+ALTER USER name_of_your_dstore_postgresql_user CREATEDB;
 EOF
 
 # export necessary config variables
+# REPLACE THE USERNAME AND PASSWORD WITH THE ONES YOU CHOSE IN THE PREVIOUS STEP
 export POSTGRESQL_HOST="localhost"
 export POSTGRESQL_PORT="5432"
 export POSTGRESQL_USER="..."
