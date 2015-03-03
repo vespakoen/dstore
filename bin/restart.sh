@@ -1,4 +1,4 @@
 #!/bin/sh
 
-./stop.sh
-./start.sh
+$PROJECTOR_PATH/bin/stop.sh
+$PROJECTOR_PATH/bin/start.sh
